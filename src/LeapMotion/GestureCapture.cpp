@@ -56,12 +56,36 @@ void SampleListener::onExit(const Controller& controller) {
 void SampleListener::onFrame(const Controller& controller) {
   // Get the most recent frame and report some basic information
   const Frame frame = controller.frame();
-  std::cout //<< "Frame id: " << frame.id()
+  if(!frame.gestures().isEmpty())
+  {
+	Leap::GestureList gestures = frame.gestures();
+	for(Leap::GestureList::const_iterator gl = gestures.begin(); gl != gestures.end(); gl++)
+	{
+		switch ((*gl).type()) {
+			case Leap::Gesture::TYPE_CIRCLE:
+				std::cout<<"CIRCLE OMG";
+				break;
+			case Leap::Gesture::TYPE_KEY_TAP:
+				std::cout<<"wow such key tap";
+				break;
+			case Leap::Gesture::TYPE_SCREEN_TAP:
+				std::cout<<"TAPTAP BRO";
+				break;
+			case Leap::Gesture::TYPE_SWIPE:
+				std::cout<<"swiper no swiping";
+				break;
+			default:
+				std::cout<<"What even did you do";
+				break;
+		}
+    }
+  }
+  //std::cout //<< "Frame id: " << frame.id()
             //<< ", timestamp: " << frame.timestamp()
             //<< ", hands: " << frame.hands().count() << std::endl;
             //<< ", extended fingers: " << frame.fingers().extended().count()
             //<< ", tools: " << frame.tools().count()
-            << ", gestures: " << frame.gestures().count() << std::endl;
+    //        << ", gestures: " << frame.gestures().count() << std::endl;
 /*
   HandList hands = frame.hands();
   for (HandList::const_iterator hl = hands.begin(); hl != hands.end(); ++hl) {

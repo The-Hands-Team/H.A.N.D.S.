@@ -7,6 +7,6 @@ class GestureEvent {
 private:
 
 public:
-}
+};
 
 #endif

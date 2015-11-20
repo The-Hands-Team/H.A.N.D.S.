@@ -1,8 +1,6 @@
 #ifndef GESTUREEVENT_H
 #define GESTUREEVENT_H
 
-#include <cstring>
-
 enum GestureType {
 	CIRCLE,
 	KEY_TAP,
@@ -14,8 +12,10 @@ class GestureEvent {
 private:
 
 public:
-	String name;
+	std::string name;
 	GestureType type;
+	
+	GestureEvent(std::string eventName, GestureType gType);
 };
 
 #endif

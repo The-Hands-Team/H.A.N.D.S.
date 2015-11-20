@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cstring>
 #include "..\include\Leap.h"
+#include "GestureEvent.cpp"
 
 using namespace Leap;
 
@@ -31,6 +32,7 @@ class SampleListener : public Listener {
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
 const std::string boneNames[] = {"Metacarpal", "Proximal", "Middle", "Distal"};
 const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"};
+const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe"};
 
 void SampleListener::onInit(const Controller& controller) {
   std::cout << "Initialized" << std::endl;
@@ -54,32 +56,32 @@ void SampleListener::onExit(const Controller& controller) {
 }
 
 void SampleListener::onFrame(const Controller& controller) {
-  // Get the most recent frame and report some basic information
-  const Frame frame = controller.frame();
-  if(!frame.gestures().isEmpty())
-  {
-	Leap::GestureList gestures = frame.gestures();
-	for(Leap::GestureList::const_iterator gl = gestures.begin(); gl != gestures.end(); gl++)
+	// Get the most recent frame and report some basic information
+	const Frame frame = controller.frame();
+	if(!frame.gestures().isEmpty())
 	{
-		switch ((*gl).type()) {
-			case Leap::Gesture::TYPE_CIRCLE:
-				std::cout<<"CIRCLE OMG";
-				break;
-			case Leap::Gesture::TYPE_KEY_TAP:
-				std::cout<<"wow such key tap";
-				break;
-			case Leap::Gesture::TYPE_SCREEN_TAP:
-				std::cout<<"TAPTAP BRO";
-				break;
-			case Leap::Gesture::TYPE_SWIPE:
-				std::cout<<"swiper no swiping";
-				break;
-			default:
-				std::cout<<"What even did you do";
-				break;
+		Leap::GestureList gestures = frame.gestures();
+		for(Leap::GestureList::const_iterator gl = gestures.begin(); gl != gestures.end(); gl++)
+		{
+			switch ((*gl).type()) {
+				case Leap::Gesture::TYPE_CIRCLE:
+					GestureEvent(gestureNames[0], CIRCLE);
+					break;
+				case Leap::Gesture::TYPE_KEY_TAP:
+					GestureEvent(gestureNames[1], KEY_TAP);
+					break;
+				case Leap::Gesture::TYPE_SCREEN_TAP:
+					GestureEvent(gestureNames[2], SCREEN_TAP);
+					break;
+				case Leap::Gesture::TYPE_SWIPE:
+					GestureEvent(gestureNames[3], SWIPE);
+					break;
+				default:
+					std::cout<<"Not recognized\n";
+					break;
+			}
 		}
-    }
-  }
+	}
 }
 
 void SampleListener::onFocusGained(const Controller& controller) {

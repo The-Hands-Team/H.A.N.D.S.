@@ -124,11 +124,11 @@ void FileManager::doDeleteFiles( v_paths files, fs::copy_options options )
 
         if( fs::is_symlink( can ) )
         {
-            if( fs::copy_options::skip_symlinks & options )
+            if( (fs::copy_options::skip_symlinks & options) != fs::copy_options::none )
             {
                 continue;
             }
-            else if( fs::copy_options::copy_symlinks & options )
+            else if( (fs::copy_options::copy_symlinks & options) != fs::copy_options::none )
             {
 
             }
@@ -179,7 +179,7 @@ void FileManager::doDeleteFiles( v_paths files, fs::copy_options options )
         }
 
         setLock.unlock();
-        if( fs::copy_options::recursive & options )
+        if( (fs::copy_options::recursive & options) != fs::copy_options::none )
         {
             fs::remove_all( *it, ec );
         }

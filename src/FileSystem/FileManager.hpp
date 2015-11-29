@@ -89,14 +89,16 @@ class FileManager
     void doDeleteFiles( v_paths file, fs::copy_options options );
     void doCopyFiles( v_paths from, v_paths to, fs::copy_options options );
     void doMoveFiles( v_paths from, v_paths to, fs::copy_options options );
-    
-    std::unordered_set<fs::path> lockedPaths;
-    std::mutex setLock;
-    std::condition_variable notifier;
+
     
     HandleErrorCommand checkError( std::error_code& ec, fs::path p1 = fs::path(), fs::path p2 = fs::path() );
     void notifySuccess();
     
+    inline bool compare_options( fs::copy_options lhs, fs::copy_options rhs)
+    {
+        return ( lhs & rhs ) != fs::copy_options::none;
+    }
+
     
 };
 

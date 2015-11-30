@@ -10,11 +10,10 @@ enum GestureType {
 
 class GestureEvent {
 private:
-
-public:
 	std::string name;
 	GestureType type;
 	
+public:
 	GestureEvent(std::string eventName, GestureType gType);
 };
 

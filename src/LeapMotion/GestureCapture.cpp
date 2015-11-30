@@ -8,7 +8,8 @@
 
 #include <iostream>
 #include <cstring>
-#include "..\include\Leap.h"
+//#include "..\include\Leap.h"
+#include "Leap.h"
 #include "GestureEvent.cpp"
 
 using namespace Leap;

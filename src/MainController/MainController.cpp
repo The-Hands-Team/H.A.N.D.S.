@@ -66,10 +66,10 @@ void MainController::processEvent(GestureEvent* ge)
 		case KEY_TAP:
 			std::cout << "Key Tap!" << std::endl;
 			break;
-		case SCREEN_TAP
+		case SCREEN_TAP:
 			std::cout << "Screen Tap!" << std::endl;
 			break;
-		case SWIPE
+		case SWIPE:
 			std::cout << "Swipe!" << std::endl;
 			break;
 		default:

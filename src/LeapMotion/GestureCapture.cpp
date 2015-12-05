@@ -91,16 +91,16 @@ void GestureCapture::onFrame(const Controller& controller) {
 					break;
 			}
 		}
-		
-		for(int i=0; i<INVALID_GESTURE; i++)
-		{
-			if(curGestures[i]&&!activeGestures[i])
-				MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[i], (GestureType) i));
-			std::cout<<i<<" "<<curGestures[i]<<" "<<activeGestures[i]<<" , ";
-			activeGestures[i] = curGestures[i];
-		}
-		std::cout<<std::endl;
 	}
+	
+	for(int i=0; i<INVALID_GESTURE; i++)
+	{
+		if(curGestures[i]&&!activeGestures[i])
+			MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[i], (GestureType) i));
+		std::cout<<i<<" "<<curGestures[i]<<" "<<activeGestures[i]<<" , ";
+		activeGestures[i] = curGestures[i];
+	}
+	std::cout<<std::endl;
 }
 
 void GestureCapture::onFocusGained(const Controller& controller) {

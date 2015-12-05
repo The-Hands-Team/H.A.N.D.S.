@@ -96,8 +96,10 @@ void GestureCapture::onFrame(const Controller& controller) {
 		{
 			if(curGestures[i]&&!activeGestures[i])
 				MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[i], (GestureType) i));
+			std::cout<<i<<" "<<curGestures[i]<<" "<<activeGestures[i]<<" , ";
 			activeGestures[i] = curGestures[i];
 		}
+		std::cout<<std::endl;
 	}
 }
 

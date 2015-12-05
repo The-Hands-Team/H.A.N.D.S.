@@ -5,3 +5,11 @@ GestureEvent::GestureEvent(std::string eventName, GestureType gType){
   type = gType;
   std::cout<<name<<"\t"<<type<<std::endl;
 }
+
+std::string GestureEvent::getName(){
+	return name;
+}
+
+GestureType GestureEvent::getGestureType(){
+	return type;
+}

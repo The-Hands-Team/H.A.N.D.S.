@@ -39,7 +39,8 @@ const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe"};
 
 void SampleListener::onInit(const Controller& controller) {
   std::cout << "Leap Motion Initialized" << std::endl;
-  std::thread(MainController::initThread);
+  std::thread mainThread(MainController::initThread);
+  mainThread.detach();
   std::cout << "Main Controller Initialized" << std::endl;
 }
 

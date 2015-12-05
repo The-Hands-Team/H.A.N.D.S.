@@ -16,7 +16,7 @@
 
 using namespace Leap;
 
-class SampleListener : public Listener {
+class GestureCapture : public Listener {
 	public:
 		virtual void onInit(const Controller&);
 		virtual void onConnect(const Controller&);
@@ -30,6 +30,7 @@ class SampleListener : public Listener {
 		virtual void onServiceDisconnect(const Controller&);
 
 	private:
+		bool activeGestures[INVALID_GESTURE]= { 0 };
 };
 
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
@@ -37,14 +38,14 @@ const std::string boneNames[] = {"Metacarpal", "Proximal", "Middle", "Distal"};
 const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"};
 const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe"};
 
-void SampleListener::onInit(const Controller& controller) {
+void GestureCapture::onInit(const Controller& controller) {
   std::cout << "Leap Motion Initialized" << std::endl;
   std::thread mainThread(MainController::initThread);
   mainThread.detach();
   std::cout << "Main Controller Initialized" << std::endl;
 }
 
-void SampleListener::onConnect(const Controller& controller) {
+void GestureCapture::onConnect(const Controller& controller) {
   std::cout << "Leap Motion Connected" << std::endl;
   controller.enableGesture(Gesture::TYPE_CIRCLE);
   controller.enableGesture(Gesture::TYPE_KEY_TAP);
@@ -52,18 +53,21 @@ void SampleListener::onConnect(const Controller& controller) {
   controller.enableGesture(Gesture::TYPE_SWIPE);
 }
 
-void SampleListener::onDisconnect(const Controller& controller) {
+void GestureCapture::onDisconnect(const Controller& controller) {
   // Note: not dispatched when running in a debugger.
   std::cout << "Leap Motion Disconnected" << std::endl;
 }
 
-void SampleListener::onExit(const Controller& controller) {
+void GestureCapture::onExit(const Controller& controller) {
   std::cout << "Leap Motion Exited" << std::endl;
 }
 
-void SampleListener::onFrame(const Controller& controller) {
+void GestureCapture::onFrame(const Controller& controller) {
 	// Get the most recent frame and report some basic information
 	const Frame frame = controller.frame();
+	const Frame prevFrame = controller.frame(1);
+	//Initiallize all gestures to false
+	bool curGestures[INVALID_GESTURE] = { 0 };
 	if(!frame.gestures().isEmpty())
 	{
 		Leap::GestureList gestures = frame.gestures();
@@ -71,34 +75,41 @@ void SampleListener::onFrame(const Controller& controller) {
 		{
 			switch ((*gl).type()) {
 				case Leap::Gesture::TYPE_CIRCLE:
-					MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[0], CIRCLE));
+					curGestures[CIRCLE] = true;
 					break;
 				case Leap::Gesture::TYPE_KEY_TAP:
-					MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[1], KEY_TAP));
+					curGestures[KEY_TAP] = true;
 					break;
 				case Leap::Gesture::TYPE_SCREEN_TAP:
-					MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[2], SCREEN_TAP));
+					curGestures[SCREEN_TAP] = true;
 					break;
 				case Leap::Gesture::TYPE_SWIPE:
-					MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[3], SWIPE));
+					curGestures[SWIPE] = true;
 					break;
 				default:
 					std::cout<<"Leap Motion gesture not recognized\n";
 					break;
 			}
 		}
+		
+		for(int i=0; i<INVALID_GESTURE; i++)
+		{
+			if(curGestures[i]&&!activeGestures[i])
+				MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[i], (GestureType) i));
+			activeGestures[i] = curGestures[i];
+		}
 	}
 }
 
-void SampleListener::onFocusGained(const Controller& controller) {
+void GestureCapture::onFocusGained(const Controller& controller) {
   std::cout << "Leap Motion Focus Gained" << std::endl;
 }
 
-void SampleListener::onFocusLost(const Controller& controller) {
+void GestureCapture::onFocusLost(const Controller& controller) {
   std::cout << "Leap Motion Focus Lost" << std::endl;
 }
 
-void SampleListener::onDeviceChange(const Controller& controller) {
+void GestureCapture::onDeviceChange(const Controller& controller) {
   std::cout << "Leap Motion Device Changed" << std::endl;
   const DeviceList devices = controller.devices();
 
@@ -108,17 +119,17 @@ void SampleListener::onDeviceChange(const Controller& controller) {
   }
 }
 
-void SampleListener::onServiceConnect(const Controller& controller) {
+void GestureCapture::onServiceConnect(const Controller& controller) {
   std::cout << "Leap Motion Service Connected" << std::endl;
 }
 
-void SampleListener::onServiceDisconnect(const Controller& controller) {
+void GestureCapture::onServiceDisconnect(const Controller& controller) {
   std::cout << "Leap Motion Service Disconnected" << std::endl;
 }
 
 int main(int argc, char** argv) {
   // Create a sample listener and controller
-  SampleListener listener;
+  GestureCapture listener;
   Controller controller;
 
   // Have the sample listener receive events from the controller

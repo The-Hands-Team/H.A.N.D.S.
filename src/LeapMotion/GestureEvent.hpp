@@ -6,7 +6,8 @@ enum GestureType {
 	CIRCLE,
 	KEY_TAP,
 	SCREEN_TAP,
-	SWIPE
+	SWIPE,
+	INVALID_GESTURE
 };
 
 class GestureEvent {

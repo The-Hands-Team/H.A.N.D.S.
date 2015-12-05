@@ -53,5 +53,5 @@ void MainController::pushEvent(GestureEvent* ge)
 
 void MainController::processEvent(GestureEvent* ge)
 {
-	std::cout << "This is the part where an event gets processed! It was: " << ge->name << std::endl;
+	std::cout << "This is the part where an event gets processed! It was: " << ge->getName() << std::endl;
 }

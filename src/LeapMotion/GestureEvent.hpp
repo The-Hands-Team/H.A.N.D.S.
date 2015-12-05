@@ -1,5 +1,6 @@
 #ifndef GESTUREEVENT_H
 #define GESTUREEVENT_H
+#include <string>
 
 enum GestureType {
 	CIRCLE,

@@ -20,3 +20,8 @@ MainController* MainController::getInstance()
 
 	return curInstance;
 }
+
+void MainController::initThread()
+{
+	
+}

@@ -9,6 +9,7 @@ private:
 
 public:
 	static MainController* getInstance();
+	static void initThread();
 };
 
 #endif

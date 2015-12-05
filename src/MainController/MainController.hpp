@@ -13,6 +13,7 @@ private:
 	std::condition_variable event_cv;
 	GestureQueue* event_q;
 	bool ignore_new;
+	void processEvent(GestureEvent*);
 public:
 	static MainController* getInstance();
 	void initThread();

@@ -11,23 +11,24 @@
 //#include "..\include\Leap.h"
 #include "Leap.h"
 #include "GestureEvent.cpp"
+#include "../MainController/MainController.hpp"
 
 using namespace Leap;
 
 class SampleListener : public Listener {
-  public:
-    virtual void onInit(const Controller&);
-    virtual void onConnect(const Controller&);
-    virtual void onDisconnect(const Controller&);
-    virtual void onExit(const Controller&);
-    virtual void onFrame(const Controller&);
-    virtual void onFocusGained(const Controller&);
-    virtual void onFocusLost(const Controller&);
-    virtual void onDeviceChange(const Controller&);
-    virtual void onServiceConnect(const Controller&);
-    virtual void onServiceDisconnect(const Controller&);
+	public:
+		virtual void onInit(const Controller&);
+		virtual void onConnect(const Controller&);
+		virtual void onDisconnect(const Controller&);
+		virtual void onExit(const Controller&);
+		virtual void onFrame(const Controller&);
+		virtual void onFocusGained(const Controller&);
+		virtual void onFocusLost(const Controller&);
+		virtual void onDeviceChange(const Controller&);
+		virtual void onServiceConnect(const Controller&);
+		virtual void onServiceDisconnect(const Controller&);
 
-  private:
+	private:
 };
 
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
@@ -36,11 +37,13 @@ const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE"
 const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe"};
 
 void SampleListener::onInit(const Controller& controller) {
-  std::cout << "Initialized" << std::endl;
+  std::cout << "Leap Motion Initialized" << std::endl;
+  MainController::getInstance()->initThread();
+  std::cout << "Main Controller Initialized" << std::endl;
 }
 
 void SampleListener::onConnect(const Controller& controller) {
-  std::cout << "Connected" << std::endl;
+  std::cout << "Leap Motion Connected" << std::endl;
   controller.enableGesture(Gesture::TYPE_CIRCLE);
   controller.enableGesture(Gesture::TYPE_KEY_TAP);
   controller.enableGesture(Gesture::TYPE_SCREEN_TAP);
@@ -49,11 +52,11 @@ void SampleListener::onConnect(const Controller& controller) {
 
 void SampleListener::onDisconnect(const Controller& controller) {
   // Note: not dispatched when running in a debugger.
-  std::cout << "Disconnected" << std::endl;
+  std::cout << "Leap Motion Disconnected" << std::endl;
 }
 
 void SampleListener::onExit(const Controller& controller) {
-  std::cout << "Exited" << std::endl;
+  std::cout << "Leap Motion Exited" << std::endl;
 }
 
 void SampleListener::onFrame(const Controller& controller) {
@@ -66,19 +69,19 @@ void SampleListener::onFrame(const Controller& controller) {
 		{
 			switch ((*gl).type()) {
 				case Leap::Gesture::TYPE_CIRCLE:
-					GestureEvent(gestureNames[0], CIRCLE);
+					MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[0], CIRCLE));
 					break;
 				case Leap::Gesture::TYPE_KEY_TAP:
-					GestureEvent(gestureNames[1], KEY_TAP);
+					MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[1], KEY_TAP));
 					break;
 				case Leap::Gesture::TYPE_SCREEN_TAP:
-					GestureEvent(gestureNames[2], SCREEN_TAP);
+					MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[2], SCREEN_TAP));
 					break;
 				case Leap::Gesture::TYPE_SWIPE:
-					GestureEvent(gestureNames[3], SWIPE);
+					MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[3], SWIPE));
 					break;
 				default:
-					std::cout<<"Not recognized\n";
+					std::cout<<"Leap Motion gesture not recognized\n";
 					break;
 			}
 		}
@@ -86,15 +89,15 @@ void SampleListener::onFrame(const Controller& controller) {
 }
 
 void SampleListener::onFocusGained(const Controller& controller) {
-  std::cout << "Focus Gained" << std::endl;
+  std::cout << "Leap Motion Focus Gained" << std::endl;
 }
 
 void SampleListener::onFocusLost(const Controller& controller) {
-  std::cout << "Focus Lost" << std::endl;
+  std::cout << "Leap Motion Focus Lost" << std::endl;
 }
 
 void SampleListener::onDeviceChange(const Controller& controller) {
-  std::cout << "Device Changed" << std::endl;
+  std::cout << "Leap Motion Device Changed" << std::endl;
   const DeviceList devices = controller.devices();
 
   for (int i = 0; i < devices.count(); ++i) {
@@ -104,11 +107,11 @@ void SampleListener::onDeviceChange(const Controller& controller) {
 }
 
 void SampleListener::onServiceConnect(const Controller& controller) {
-  std::cout << "Service Connected" << std::endl;
+  std::cout << "Leap Motion Service Connected" << std::endl;
 }
 
 void SampleListener::onServiceDisconnect(const Controller& controller) {
-  std::cout << "Service Disconnected" << std::endl;
+  std::cout << "Leap Motion Service Disconnected" << std::endl;
 }
 
 int main(int argc, char** argv) {

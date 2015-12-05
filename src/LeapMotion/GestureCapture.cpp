@@ -76,15 +76,36 @@ void GestureCapture::onFrame(const Controller& controller) {
 			switch ((*gl).type()) {
 				case Leap::Gesture::TYPE_CIRCLE:
 					curGestures[CIRCLE] = true;
+					if(curGestures[CIRCLE]&&!activeGestures[CIRCLE])
+						MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[CIRCLE], CIRCLE));
 					break;
 				case Leap::Gesture::TYPE_KEY_TAP:
 					curGestures[KEY_TAP] = true;
+					if(curGestures[KEY_TAP]&&!activeGestures[KEY_TAP])
+						MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[KEY_TAP], KEY_TAP));
 					break;
 				case Leap::Gesture::TYPE_SCREEN_TAP:
 					curGestures[SCREEN_TAP] = true;
+					if(curGestures[SCREEN_TAP]&&!activeGestures[SCREEN_TAP])
+						MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SCREEN_TAP], SCREEN_TAP));
 					break;
 				case Leap::Gesture::TYPE_SWIPE:
 					curGestures[SWIPE] = true;
+					if(curGestures[SWIPE]&&!activeGestures[SWIPE])
+					{
+						Leap::Vector v = dynamic_cast<SwipeGesture>(*gl).direction();
+						std::string direction;
+						if( std::abs(v.y) > std::abs(v.x) )
+						{
+							direction = v.y > 0 ? " up" : " down";
+						}
+						else
+						{
+							direction = v.x > 0 ? " left" : " right";
+						}
+						MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SWIPE] + direction , SWIPE));
+						
+					}
 					break;
 				default:
 					std::cout<<"Leap Motion gesture not recognized\n";

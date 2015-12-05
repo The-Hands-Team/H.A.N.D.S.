@@ -15,6 +15,8 @@ private:
 	
 public:
 	GestureEvent(std::string eventName, GestureType gType);
+	std::string getName();
+	GestureType getGestureType();
 };
 
 #endif

@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <thread>
 //#include "..\include\Leap.h"
 #include "Leap.h"
 #include "GestureEvent.cpp"
@@ -38,7 +39,7 @@ const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe"};
 
 void SampleListener::onInit(const Controller& controller) {
   std::cout << "Leap Motion Initialized" << std::endl;
-  MainController::getInstance()->initThread();
+  std::thread(MainController::initThread);
   std::cout << "Main Controller Initialized" << std::endl;
 }
 

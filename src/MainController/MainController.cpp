@@ -29,7 +29,7 @@ void MainController::initThread()
 	while (true)
 	{
 		std::unique_lock<std::mutex> lk(event_m);
-		event_cv.wait(lk, []{return event_q->size() != 0;});
+		event_cv.wait(lk, [&]{return event_q->size() != 0;});
 		//got something in queue
 		GestureEvent* ev = event_q->pop();
 		//TODO: ACTUALLY PROCESS THE EVENT

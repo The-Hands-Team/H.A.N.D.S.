@@ -1,4 +1,2 @@
-
-
 all:
-	g++ -c -Wall -Wextra --std=c++11 -I.. -o ../../lib/FileSystem.o FileManager.cpp 
+	g++ -g -c -Wall -Wextra --std=c++11 -I.. -o ../../lib/FileSystem.o FileManager.cpp 

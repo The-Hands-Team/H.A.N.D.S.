@@ -14,9 +14,10 @@ private:
 	GestureQueue* event_q;
 	bool ignore_new;
 	void processEvent(GestureEvent*);
+	void mainLoop();
 public:
 	static MainController* getInstance();
-	void initThread();
+	static void initThread();
 	void pushEvent(GestureEvent*);
 };
 

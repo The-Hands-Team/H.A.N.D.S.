@@ -26,6 +26,11 @@ MainController* MainController::getInstance()
 
 void MainController::initThread()
 {
+	getInstance()->mainLoop();
+}
+
+void MainController::mainLoop()
+{
 	while (true)
 	{
 		std::unique_lock<std::mutex> lk(event_m);
@@ -54,4 +59,21 @@ void MainController::pushEvent(GestureEvent* ge)
 void MainController::processEvent(GestureEvent* ge)
 {
 	std::cout << "This is the part where an event gets processed! It was: " << ge->getName() << std::endl;
+	switch (ge->getGestureType()) {
+		case CIRCLE:
+			std::cout << "Circle!" << std::endl;
+			break;
+		case KEY_TAP:
+			std::cout << "Key Tap!" << std::endl;
+			break;
+		case SCREEN_TAP
+			std::cout << "Screen Tap!" << std::endl;
+			break;
+		case SWIPE
+			std::cout << "Swipe!" << std::endl;
+			break;
+		default:
+			std::cout<<"Gesture" << ge->getName() << " not supported\n";
+			break;
+	}
 }

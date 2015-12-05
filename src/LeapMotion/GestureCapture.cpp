@@ -11,7 +11,7 @@
 #include <thread>
 //#include "..\include\Leap.h"
 #include "Leap.h"
-#include "GestureEvent.cpp"
+#include "GestureEvent.hpp"
 #include "../MainController/MainController.hpp"
 
 using namespace Leap;

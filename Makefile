@@ -13,7 +13,7 @@ else
   LEAP_LIBRARY := lib/LeapMotion/libLeap.dylib
 endif
 
-all: lib/LeapMotion.o lib/FileSystem.o lib/MainController.o
+all:
 	make -C src/MainController
 	make -C src/LeapMotion
 	make -C src/FileSystem

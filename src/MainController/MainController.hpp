@@ -1,15 +1,21 @@
 #ifndef MAINCONTROLLER_H
 #define MAINCONTROLLER_H
+#include "../LeapMotion/GestureQueue.hpp"
+#include <mutex>
+#include <condition_variable>
 
 class MainController {
 private:
+	static MainController* curInstance;
 	MainController();
 	~MainController();
-	static MainController* curInstance;
-
+	std::mutex event_m;
+	std::condition_variable event_cv;
+	GestureQueue* event_q;
 public:
 	static MainController* getInstance();
-	static void initThread();
+	void initThread();
+	void pushEvent(GestureEvent*);
 };
 
 #endif

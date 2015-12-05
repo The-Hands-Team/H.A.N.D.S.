@@ -1,6 +1,6 @@
 #ifndef MAINCONTROLLER_H
 #define MAINCONTROLLER_H
-#include "../LeapMotion/GestureQueue.hpp"
+#include "GestureQueue.hpp"
 #include <mutex>
 #include <condition_variable>
 

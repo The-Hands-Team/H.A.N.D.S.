@@ -12,6 +12,7 @@ private:
 	std::mutex event_m;
 	std::condition_variable event_cv;
 	GestureQueue* event_q;
+	bool ignore_new;
 public:
 	static MainController* getInstance();
 	void initThread();

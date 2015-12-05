@@ -28,6 +28,7 @@ GestureEvent* GestureQueue::peek()
 int GestureQueue::size()
 {
 	q_mutex.lock();
-	return gesture_q.size();
+	int ret =  gesture_q.size();
 	q_mutex.unlock();
+	return ret;
 }

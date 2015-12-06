@@ -62,18 +62,20 @@ void MainController::processEvent(GestureEvent* ge)
 	std::cout << "This is the part where an event gets processed! It was: " << ge->getName() << std::endl;
 	switch (ge->getGestureType()) {
 		case CIRCLE:
-			std::cout << "Circle!" << std::endl;
 			break;
 		case KEY_TAP:
-			std::cout << "Key Tap!" << std::endl;
 			for(auto& p: fs::directory_iterator(cur_path))
 				std::cout << p << std::endl;
 			break;
 		case SCREEN_TAP:
-			std::cout << "Screen Tap!" << std::endl;
 			break;
-		case SWIPE:
-			std::cout << "Swipe!" << std::endl;
+		case SWIPE_UP:
+			break;
+		case SWIPE_DOWN:
+			break;
+		case SWIPE_RIGHT:
+			break;
+		case SWIPE_LEFT:
 			break;
 		default:
 			std::cout<<"Gesture" << ge->getName() << " not supported\n";

@@ -94,28 +94,48 @@ void GestureCapture::onFrame(const Controller& controller) {
                 activeGestures[SCREEN_TAP] = true;
                 break;
             case Leap::Gesture::TYPE_SWIPE:
-                curGestures[SWIPE] = true;
-                if(!activeGestures[SWIPE])
-                {
-                    SwipeGesture sg = *gl;
-                    Leap::Vector v = sg.direction();
-                    std::string direction;
-                    if( std::abs(v.y) > std::abs(v.x) )
-                    {
-                        direction = v.y > 0 ? " up" : " down";
-                    }
-                    else
-                    {
-                        direction = v.x > 0 ? " right" : " left";
-                    }
-                    MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SWIPE] + direction , SWIPE));
-
-                }
-                activeGestures[SWIPE] = true;
-                break;
+            {
+					SwipeGesture sg = *gl;
+					Leap::Vector v = sg.direction();
+					std::string direction;
+					GestureType swipeType = INVALID_GESTURE;
+					if( std::abs(v.y) > std::abs(v.x) )
+					{
+						if(v.y > 0 && !activeGestures[SWIPE_UP])
+						{
+							direction = " up";
+							swipeType = SWIPE_UP;
+						}
+						else if(!activeGestures[SWIPE_DOWN])
+						{
+							direction = " down";
+							swipeType = SWIPE_DOWN;
+						}
+					}
+					else
+					{
+						if(v.x > 0 && !activeGestures[SWIPE_RIGHT])
+						{
+							direction = " right";
+							swipeType = SWIPE_RIGHT;
+						}
+						else if(!activeGestures[SWIPE_LEFT])
+						{
+							direction = " left";
+							swipeType = SWIPE_LEFT;
+						}
+					}
+					if(swipeType!=INVALID_GESTURE)
+					{
+						MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[swipeType] + direction , swipeType));
+           			curGestures[swipeType] = true;
+						activeGestures[swipeType] = true;
+					}
+					break;
+				}
             default:
-                std::cout<<"Leap Motion gesture not recognized\n";
-                break;
+               std::cout<<"Leap Motion gesture not recognized\n";
+               break;
 		}
 	}
 	

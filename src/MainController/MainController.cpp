@@ -31,6 +31,7 @@ void MainController::initThread()
 
 void MainController::mainLoop()
 {
+	cur_path = fs::path("tests/test_dir");
 	while (true)
 	{
 		std::unique_lock<std::mutex> lk(event_m);
@@ -65,6 +66,8 @@ void MainController::processEvent(GestureEvent* ge)
 			break;
 		case KEY_TAP:
 			std::cout << "Key Tap!" << std::endl;
+			for(auto& p: fs::directory_iterator(cur_path))
+				std::cout << p << std::endl;
 			break;
 		case SCREEN_TAP:
 			std::cout << "Screen Tap!" << std::endl;

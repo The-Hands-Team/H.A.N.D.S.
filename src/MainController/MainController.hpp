@@ -3,6 +3,7 @@
 #include "GestureQueue.hpp"
 #include <mutex>
 #include <condition_variable>
+#include "FileSystem/FileManager.hpp"
 
 class MainController {
 private:
@@ -15,6 +16,7 @@ private:
 	bool ignore_new;
 	void processEvent(GestureEvent*);
 	void mainLoop();
+	fs::path cur_path;
 public:
 	static MainController* getInstance();
 	static void initThread();

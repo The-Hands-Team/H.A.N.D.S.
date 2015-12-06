@@ -17,6 +17,7 @@ using namespace Leap;
 
 class GestureCapture : public Listener {
     public:
+
         virtual void onInit(const Controller&);
         virtual void onConnect(const Controller&);
         virtual void onDisconnect(const Controller&);
@@ -30,6 +31,7 @@ class GestureCapture : public Listener {
 
     private:
         bool activeGestures[INVALID_GESTURE]= { 0 };
+
 };
 
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
@@ -39,9 +41,6 @@ const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe Up
 
 void GestureCapture::onInit(const Controller& controller) {
   std::cout << "Leap Motion Initialized" << std::endl;
-  std::thread mainThread(MainController::initThread);
-  mainThread.detach();
-  std::cout << "Main Controller Initialized" << std::endl;
 }
 
 void GestureCapture::onConnect(const Controller& controller) {
@@ -166,7 +165,8 @@ void GestureCapture::onServiceDisconnect(const Controller& controller) {
   std::cout << "Leap Motion Service Disconnected" << std::endl;
 }
 
-int main(int argc, char** argv) {
+void initGesture(bool background) {
+
   // Create a sample listener and controller
   GestureCapture listener;
   Controller controller;
@@ -174,15 +174,13 @@ int main(int argc, char** argv) {
   // Have the sample listener receive events from the controller
   controller.addListener(listener);
 
-  if (argc > 1 && strcmp(argv[1], "--bg") == 0)
+  if (background)
     controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
 
   // Keep this process running until Enter is pressed
-  std::cout << "Press Enter to quit..." << std::endl;
-  std::cin.get();
+  while(true);
 
   // Remove the sample listener when done
   controller.removeListener(listener);
 
-  return 0;
 }

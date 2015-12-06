@@ -2,6 +2,9 @@
 #define GESTUREEVENT_H
 #include <string>
 
+
+void initGesture(bool);
+
 enum GestureType {
 	CIRCLE,
 	KEY_TAP,

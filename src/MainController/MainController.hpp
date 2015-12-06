@@ -15,13 +15,13 @@ private:
 	GestureQueue* event_q;
 	bool ignore_new;
 	void processEvent(GestureEvent*);
-	void mainLoop();
 	fs::path cur_path;
 	fs::directory_iterator dir_it;
 public:
 	static MainController* getInstance();
 	static void initThread();
 	void pushEvent(GestureEvent*);
+    void mainLoop();
 };
 
 #endif

@@ -25,14 +25,17 @@ MainController* MainController::getInstance()
     return curInstance;
 }
 
-void MainController::initThread()
+int main(int argc, char** argv)
 {
-    getInstance()->mainLoop();
+    std::thread graphics(initGraphics);
+    std::thread gesture(initGesture, false);
+    gesture.detach();
+    graphics.detach();
+    MainController::getInstance()->mainLoop();
 }
 
 void MainController::mainLoop()
 {
-  go();
 	cur_path = fs::canonical(fs::path("tests/test_dir"));
 	dir_it = fs::directory_iterator(cur_path);
 	while (true)

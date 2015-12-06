@@ -71,8 +71,11 @@ void MainController::processEvent(GestureEvent* ge)
 		case SCREEN_TAP:
 			break;
 		case SWIPE_UP:
-			cur_path = cur_path.parent_path();
-			dir_it = fs::directory_iterator(cur_path);
+			if (cur_path.parent_path() != "")
+			{
+				cur_path = cur_path.parent_path();
+				dir_it = fs::directory_iterator(cur_path);
+			}
 			break;
 		case SWIPE_DOWN:
 			if( fs::is_directory( dir_it->path()) )

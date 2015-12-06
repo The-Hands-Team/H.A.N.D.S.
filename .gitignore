@@ -2,5 +2,5 @@
 .project
 .settings
 lib/*.o
-run
+Run
 .nfs*

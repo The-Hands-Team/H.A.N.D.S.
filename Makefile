@@ -17,6 +17,7 @@ all:
 	make -C src/MainController
 	make -C src/LeapMotion
 	make -C src/FileSystem
+	make -c src/Graphics
 	$(CXX) -std=c++11 -Wall -Wextra -g -Iinclude/ lib/*.o -o run $(LEAP_LIBRARY) $(LIBRARIES)
 ifeq ($(OS), Darwin)
 	install_name_tool -change @loader_path/libLeap.dylib lib/LeapMotion/libLeap.dylib GestureTest

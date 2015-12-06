@@ -90,18 +90,25 @@ scene::IBillboardTextSceneNode* dirBillboards[maxDirObjects];
 
 void initObjects()
 {
-	numDirObjects = 4;
-	dirObjects[0] = new dirObject('f', 0, 0, L"kittens");
-	dirObjects[1] = new dirObject('f', 0, 1, L"ragrets");
-	dirObjects[2] = new dirObject('d', 1, 0, L"goswanap");
-	dirObjects[3] = new dirObject('d', 1, 1, L"gastromorphs");
+	numDirObjects = 10;
+	dirObjects[0] = new dirObject('f', 0, 0, L"0,0");
+	dirObjects[1] = new dirObject('f', 0, 1, L"0,1");
+	dirObjects[2] = new dirObject('d', 0, 2, L"1,2");
+	dirObjects[3] = new dirObject('d', 0, 3, L"1,3");
+	dirObjects[4] = new dirObject('d', 0, 4, L"1,4");
+	dirObjects[5] = new dirObject('d', 0, 5, L"1,5");
+	dirObjects[6] = new dirObject('d', 0, 6, L"1,6");
+	dirObjects[7] = new dirObject('d', 0, 7, L"1,7");
+	dirObjects[8] = new dirObject('d', 0, 8, L"1,8");
+	dirObjects[9] = new dirObject('d', 0, 9, L"1,9");
 }
 
 void emptyNodes()
 {
 	for(int i = 0; i < numDirNodes; i++)
 	{
-		dirNodes[i]->remove();
+		if(dirNodes[i])
+			dirNodes[i]->remove();
 	}
 }
 
@@ -121,10 +128,24 @@ void fillNodes()
 
 		if(dirNodes[i])
 		{
-			dirNodes[i]->setPosition(core::vector3df(dirObjects[i]->getX()*10,0,dirObjects[i]->getY()*10));
+			dirNodes[i]->setPosition(core::vector3df
+				(
+					dirObjects[i]->getX()*10 + 10,
+					dirObjects[i]->getY()*10+20,
+					50
+				));
 			dirNodes[i]->setMaterialTexture(0, driver->getTexture("../../media/wall.bmp"));
 			dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
-			dirBillboards[i] = smgr->addBillboardTextSceneNode(env->getBuiltInFont(),dirObjects[i]->getName(),dirNodes[i],core::dimension2d<f32>(5.0f, 5.0f),core::vector3df(0,10,0),i,0xFFFFFFFF,0xFFFFFFFF);
+			dirBillboards[i] = smgr->addBillboardTextSceneNode
+				(
+					env->getFont("../../media/fontcourier.bmp"),
+					dirObjects[i]->getName(),
+					dirNodes[i],core::dimension2d<f32>(8.0f, 5.0f),
+					core::vector3df(0,0,-5),
+					i,
+					SColor(100,255,0,0),
+					SColor(100,0,0,255)
+				);
 		}
 
 	}
@@ -134,7 +155,7 @@ void fillNodes()
 /*
 This is the main method. We can now use main() on every platform.
 */
-int main()
+int go()
 {
 	// ask user for driver
 	video::E_DRIVER_TYPE driverType=driverChoiceConsole();
@@ -157,9 +178,12 @@ int main()
 	/*
 	To be able to look at and move around in this scene, we create a first
 	person shooter style camera and make the mouse cursor invisible.
-	*/
 	smgr->addCameraSceneNodeFPS();
 	device->getCursorControl()->setVisible(false);
+	*/
+
+	//create camera
+	smgr->addCameraSceneNode(0,core::vector3df(50,50,0),core::vector3df(50,50,100),-1,true);
 
 	/*
 	We have done everything, so lets draw it. We also write the current
@@ -178,9 +202,9 @@ int main()
 	{
 		fillNodes();
 
-		if(receiver.IsKeyDown(irr::KEY_KEY_Q))
+		if(receiver.IsKeyDown(irr::KEY_ESCAPE))
 		{
-
+			exit(0);
 		}
 		if(receiver.IsKeyDown(irr::KEY_KEY_W))
 		{

@@ -13,7 +13,7 @@ BinPath = ../../bin/$(SYSTEM)
 
 # general compiler settings (might need to be set when compiling the lib, too)
 # preprocessor flags, e.g. defines and include paths
-USERCPPFLAGS = 
+USERCPPFLAGS = -std=c++11 -Wall -Wextra -c -g
 # compiler flags such as optimization flags
 USERCXXFLAGS = -O3 -ffast-math
 #USERCXXFLAGS = -g -Wall
@@ -31,7 +31,7 @@ LDFLAGS = $(USERLDFLAGS)
 #default target is Linux
 all: all_linux
 
-silly: CPPFLAGS+= -stdc++11 -Wall -Wextra -c -g
+silly: 
 
 # target specific settings
 all_linux all_win32 static_win32: LDFLAGS += -L$(IrrlichtHome)/lib/irrlicht/ -lIrrlicht
@@ -47,11 +47,7 @@ DESTPATH = $(Target)$(SUF)
 
 all_linux all_win32 static_win32:
 	$(warning Building...)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(Sources) -o $(DESTPATH) $(LDFLAGS)
-
-silly:
-	$(warning Building...)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(Sources) -o ../../lib $(LDFLAGS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(Sources) -o ../../lib/irrlicht.o $(LDFLAGS)
 
 clean: clean_linux clean_win32
 	$(warning Cleaning...)

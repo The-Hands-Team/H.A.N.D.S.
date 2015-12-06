@@ -1,4 +1,5 @@
 #include "MainController.hpp"
+#include "Graphics/Graphics.hpp"
 #include <iostream>
 
 MainController* MainController::curInstance = nullptr;
@@ -31,6 +32,7 @@ void MainController::initThread()
 
 void MainController::mainLoop()
 {
+  go();
 	cur_path = fs::canonical(fs::path("tests/test_dir"));
 	dir_it = fs::directory_iterator(cur_path);
 	while (true)

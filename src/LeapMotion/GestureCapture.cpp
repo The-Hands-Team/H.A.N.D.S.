@@ -9,7 +9,6 @@
 #include <iostream>
 #include <cstring>
 #include <thread>
-//#include "..\include\Leap.h"
 #include "Leap.h"
 #include "GestureEvent.hpp"
 #include "../MainController/MainController.hpp"
@@ -17,26 +16,26 @@
 using namespace Leap;
 
 class GestureCapture : public Listener {
-	public:
-		virtual void onInit(const Controller&);
-		virtual void onConnect(const Controller&);
-		virtual void onDisconnect(const Controller&);
-		virtual void onExit(const Controller&);
-		virtual void onFrame(const Controller&);
-		virtual void onFocusGained(const Controller&);
-		virtual void onFocusLost(const Controller&);
-		virtual void onDeviceChange(const Controller&);
-		virtual void onServiceConnect(const Controller&);
-		virtual void onServiceDisconnect(const Controller&);
+    public:
+        virtual void onInit(const Controller&);
+        virtual void onConnect(const Controller&);
+        virtual void onDisconnect(const Controller&);
+        virtual void onExit(const Controller&);
+        virtual void onFrame(const Controller&);
+        virtual void onFocusGained(const Controller&);
+        virtual void onFocusLost(const Controller&);
+        virtual void onDeviceChange(const Controller&);
+        virtual void onServiceConnect(const Controller&);
+        virtual void onServiceDisconnect(const Controller&);
 
-	private:
-		bool activeGestures[INVALID_GESTURE]= { 0 };
+    private:
+        bool activeGestures[INVALID_GESTURE]= { 0 };
 };
 
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
 const std::string boneNames[] = {"Metacarpal", "Proximal", "Middle", "Distal"};
 const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"};
-const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe"};
+const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe Up", "Swipe Down", "Swipe Right", "Swipe Left"};
 
 void GestureCapture::onInit(const Controller& controller) {
   std::cout << "Leap Motion Initialized" << std::endl;
@@ -63,13 +62,13 @@ void GestureCapture::onExit(const Controller& controller) {
 }
 
 void GestureCapture::onFrame(const Controller& controller) {
-	// Get the most recent frame and report some basic information
-	const Frame frame = controller.frame();
-	const Frame prevFrame = controller.frame(1);
-	//Initialize all gestures to false
-	bool curGestures[INVALID_GESTURE] = { 0 };
+    // Get the most recent frame and report some basic information
+    const Frame frame = controller.frame();
+    const Frame prevFrame = controller.frame(1);
+    //Initialize all gestures to false
+    bool curGestures[INVALID_GESTURE] = { 0 };
 
-	// TODO don't ignore when the same gesture is made simultaneously by different fingers
+    // TODO don't ignore when the same gesture is made simultaneously by different fingers
 
     Leap::GestureList gestures = frame.gestures();
     for(Leap::GestureList::const_iterator gl = gestures.begin(); gl != gestures.end(); gl++)
@@ -95,54 +94,50 @@ void GestureCapture::onFrame(const Controller& controller) {
                 break;
             case Leap::Gesture::TYPE_SWIPE:
             {
-					SwipeGesture sg = *gl;
-					Leap::Vector v = sg.direction();
-					std::string direction;
-					GestureType swipeType = INVALID_GESTURE;
-					if( std::abs(v.y) > std::abs(v.x) )
-					{
-						if(v.y > 0 && !activeGestures[SWIPE_UP])
-						{
-							direction = " up";
-							swipeType = SWIPE_UP;
-						}
-						else if(!activeGestures[SWIPE_DOWN])
-						{
-							direction = " down";
-							swipeType = SWIPE_DOWN;
-						}
-					}
-					else
-					{
-						if(v.x > 0 && !activeGestures[SWIPE_RIGHT])
-						{
-							direction = " right";
-							swipeType = SWIPE_RIGHT;
-						}
-						else if(!activeGestures[SWIPE_LEFT])
-						{
-							direction = " left";
-							swipeType = SWIPE_LEFT;
-						}
-					}
-					if(swipeType!=INVALID_GESTURE)
-					{
-						MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[swipeType] + direction , swipeType));
-           			curGestures[swipeType] = true;
-						activeGestures[swipeType] = true;
-					}
-					break;
-				}
+                    SwipeGesture sg = *gl;
+                    Leap::Vector v = sg.direction();
+                    GestureType swipeType = INVALID_GESTURE;
+                    if( std::abs(v.y) > std::abs(v.x) )
+                    {
+                        if(v.y > 0)
+                        {
+                            swipeType = SWIPE_UP;
+                        }
+                        else
+                        {
+                            swipeType = SWIPE_DOWN;
+                        }
+                    }
+                    else
+                    {
+                        if(v.x > 0)
+                        {
+                            swipeType = SWIPE_RIGHT;
+                        }
+                        else
+                        {
+                            swipeType = SWIPE_LEFT;
+                        }
+                    }
+                    if(swipeType!=INVALID_GESTURE)
+                    {
+                        curGestures[swipeType] = true;
+                        if(!activeGestures[swipeType])
+                            MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[swipeType] , swipeType));
+                        activeGestures[swipeType] = true;
+                    }
+                    break;
+                }
             default:
                std::cout<<"Leap Motion gesture not recognized\n";
                break;
-		}
-	}
-	
-	for(int i=0; i<INVALID_GESTURE; i++)
-	{
-		activeGestures[i] = curGestures[i];
-	}
+        }
+    }
+
+    for(int i=0; i<INVALID_GESTURE; i++)
+    {
+        activeGestures[i] = curGestures[i];
+    }
 }
 
 void GestureCapture::onFocusGained(const Controller& controller) {

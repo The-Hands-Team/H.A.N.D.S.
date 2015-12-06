@@ -31,7 +31,8 @@ void MainController::initThread()
 
 void MainController::mainLoop()
 {
-	cur_path = fs::path("tests/test_dir");
+	cur_path = fs::canonical(fs::path("tests/test_dir"));
+	dir_it = fs::directory_iterator(cur_path);
 	while (true)
 	{
 		std::unique_lock<std::mutex> lk(event_m);
@@ -70,10 +71,24 @@ void MainController::processEvent(GestureEvent* ge)
 		case SCREEN_TAP:
 			break;
 		case SWIPE_UP:
+			cur_path = cur_path.parent_path();
+			dir_it = fs::directory_iterator(cur_path);
 			break;
 		case SWIPE_DOWN:
+			if( fs::is_directory( dir_it->path()) )
+			{
+				cur_path = dir_it->path();
+				dir_it = fs::directory_iterator(cur_path);
+			}
+			std::cout << cur_path << std::endl;
 			break;
 		case SWIPE_RIGHT:
+			dir_it++;
+			if (dir_it == fs::end(dir_it))
+			{
+				dir_it = fs::directory_iterator(cur_path);
+			}
+			std::cout << dir_it->path() << std::endl;
 			break;
 		case SWIPE_LEFT:
 			break;

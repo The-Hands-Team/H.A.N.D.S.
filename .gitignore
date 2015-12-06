@@ -3,3 +3,4 @@
 .settings
 lib/*.o
 run
+.nfs*

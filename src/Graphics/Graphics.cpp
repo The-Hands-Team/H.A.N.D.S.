@@ -86,11 +86,18 @@ void fillNodes()
         if(dirObjects[i].getType() == 'f')
         {
             dirNodes[i] = smgr->addSphereSceneNode();
+            dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/wall.bmp"));
         }
         else
         {
             dirNodes[i] = smgr->addCubeSceneNode();
+            dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/water.jpg"));
         }
+
+	if(dirNodes[i].isSelected)
+	{
+		dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/portal1.bmp"));
+	}
 
         //std::wcout << dirObjects[i].getName() << std::endl;
 
@@ -102,7 +109,6 @@ void fillNodes()
                     dirObjects[i].getY()*10+20,
                     50
                 ));
-            dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/wall.bmp"));
             dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
             dirBillboards[i] = smgr->addBillboardTextSceneNode
                 (

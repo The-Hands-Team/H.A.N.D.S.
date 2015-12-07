@@ -102,7 +102,28 @@ void fillNodes()
                     dirObjects[i].getY()*10+20,
                     50
                 ));
-            dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/wall.bmp"));
+		if(dirObjects[i].getType() == 'f')
+		{
+			if(dirObjects[i].isSelected)
+			{
+            			dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/portal1.bmp"));
+			}
+			else
+			{
+            			dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/wall.bmp"));
+			}
+		}
+		else// if(dirObjects[i].getType() == 'd')
+		{
+			if(dirObjects[i].isSelected)
+			{
+            			dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/portal1.bmp"));
+			}
+			else
+			{
+            			dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/water.jpg"));
+			}
+		}
             dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
             dirBillboards[i] = smgr->addBillboardTextSceneNode
                 (

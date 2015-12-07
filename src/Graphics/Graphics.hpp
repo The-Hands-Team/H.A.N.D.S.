@@ -12,12 +12,13 @@ struct dirObject
 {
 public:
     dirObject(){};
-    dirObject(char i_type, int i_x, int i_y, const wchar_t* i_name )
+    dirObject(char i_type, int i_x, int i_y, const wchar_t* i_name, bool i_isSelected)
     {
         type = i_type;
         x = i_x;
         y = i_y;
         std::wcscpy(name,i_name);
+	isSelected = i_isSelected;
     }
     char getType()
         {
@@ -35,6 +36,7 @@ public:
         {
             return name;
         }
+	bool isSelected;
 private:
     char type;
     int x;

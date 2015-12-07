@@ -2,7 +2,7 @@ OS := $(shell uname)
 ARCH := $(shell uname -m)
 
 
-C_FLAGS := -std=c++11 -Wall -Wextra -g -Iinclude/ -Isrc/
+C_FLAGS := -std=c++11 -Wall -Wextra -g -isysteminclude/ -Isrc/
 
 STD_LIB := -lpthread -lstdc++fs
 IRR_LIB := -Llib/irrlicht/ -lIrrlicht -lGL -lXxf86vm -lXext -lX11 -lXcursor

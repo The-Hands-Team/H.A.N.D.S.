@@ -1,5 +1,4 @@
 #include "MainController.hpp"
-#include "Graphics/Graphics.hpp"
 #include <iostream>
 
 MainController* MainController::curInstance = nullptr;
@@ -40,6 +39,7 @@ void MainController::mainLoop()
 	dir_it = fs::directory_iterator(cur_path);
 	while (true)
 	{
+        sendCurrentPath();
 		std::unique_lock<std::mutex> lk(event_m);
 		event_cv.wait(lk, [&]{return event_q->size() != 0;});
 		//got something in queue
@@ -70,8 +70,6 @@ void MainController::processEvent(GestureEvent* ge)
 		case CIRCLE:
 			break;
 		case KEY_TAP:
-			for(auto& p: fs::directory_iterator(cur_path))
-				std::cout << p << std::endl;
 			break;
 		case SCREEN_TAP:
 			break;
@@ -80,6 +78,7 @@ void MainController::processEvent(GestureEvent* ge)
 			{
 				cur_path = cur_path.parent_path();
 				dir_it = fs::directory_iterator(cur_path);
+                sendCurrentPath();
 			}
 			break;
 		case SWIPE_DOWN:
@@ -87,6 +86,7 @@ void MainController::processEvent(GestureEvent* ge)
 			{
 				cur_path = dir_it->path();
 				dir_it = fs::directory_iterator(cur_path);
+                sendCurrentPath();
 			}
 			std::cout << cur_path << std::endl;
 			break;
@@ -104,4 +104,18 @@ void MainController::processEvent(GestureEvent* ge)
 			std::cout<<"Gesture" << ge->getName() << " not supported\n";
 			break;
 	}
+}
+
+void MainController::sendCurrentPath()
+{
+    std::vector<dirObject> v_objects;
+    int i = 1;
+    for( fs::directory_iterator it (cur_path); it != fs::end(it); it++, i++)
+    {
+        std::wstring name = it->path().filename().wstring();
+        v_objects.emplace_back(fs::is_directory(it->path())?'d':'f',0,i,name.data());
+    }
+
+
+    newObjects(v_objects.data(), v_objects.size());
 }

@@ -1,7 +1,9 @@
 #ifndef MAINCONTROLLER_H
 #define MAINCONTROLLER_H
 #include "GestureQueue.hpp"
+#include "Graphics/Graphics.hpp"
 #include <mutex>
+#include <cstring>
 #include <condition_variable>
 #include "FileSystem/FileManager.hpp"
 
@@ -12,9 +14,11 @@ private:
 	~MainController();
 	std::mutex event_m;
 	std::condition_variable event_cv;
+    void sendCurrentPath();
 	GestureQueue* event_q;
 	bool ignore_new;
 	void processEvent(GestureEvent*);
+
 	fs::path cur_path;
 	fs::directory_iterator dir_it;
 public:

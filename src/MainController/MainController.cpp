@@ -70,6 +70,7 @@ void MainController::processEvent(GestureEvent* ge)
 		case CIRCLE:
 			break;
 		case KEY_TAP:
+            std::cout << fs::absolute(cur_path) << std::endl;
 			break;
 		case SCREEN_TAP:
 			break;
@@ -108,14 +109,18 @@ void MainController::processEvent(GestureEvent* ge)
 
 void MainController::sendCurrentPath()
 {
-    std::vector<dirObject> v_objects;
-    int i = 1;
+    size_t length = 0;
+    for( fs::directory_iterator it (cur_path); it != fs::end(it); it++) length++;
+
+    dirObject* objs = new dirObject[length];
+
+    int i = 0;
     for( fs::directory_iterator it (cur_path); it != fs::end(it); it++, i++)
     {
         std::wstring name = it->path().filename().wstring();
-        v_objects.emplace_back(fs::is_directory(it->path())?'d':'f',0,i,name.data());
+        objs[i] = dirObject(fs::is_directory(it->path())?'d':'f',i/4,i%4,name.data());
     }
 
 
-    newObjects(v_objects.data(), v_objects.size());
+    newObjects(objs, length);
 }

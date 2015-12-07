@@ -44,6 +44,6 @@ private:
 
 
 
-void newObjects(const dirObject*, size_t);
+void newObjects(dirObject*, size_t);
 
 #endif

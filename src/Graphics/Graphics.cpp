@@ -54,15 +54,17 @@ const size_t maxDirObjects = 100;
 int numDirObjects = 0;
 int numDirNodes = 0;
 std::mutex objLock;
-dirObject dirObjects[maxDirObjects];
+dirObject *dirObjects;
 scene::ISceneNode* dirNodes[maxDirObjects];
 scene::IBillboardTextSceneNode* dirBillboards[maxDirObjects];
 
-void newObjects(const dirObject* objs, size_t count)
+void newObjects( dirObject* objs, size_t count)
 {
     objLock.lock();
+    if( dirObjects )
+        delete[] dirObjects;
     numDirObjects = count;
-    std::memcpy(dirObjects, objs, std::min(count,maxDirObjects));
+    dirObjects = objs;
     objLock.unlock();
 }
 

@@ -1,6 +1,7 @@
 #include <memory>
 #include <cwchar>
 #include <cstring>
+
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
@@ -11,8 +12,8 @@ void initGraphics();
 struct dirObject
 {
 public:
-    dirObject(){};
-    dirObject(char i_type, int i_x, int i_y, const wchar_t* i_name, bool i_isSelected)
+    dirObject():type('f'),x(5),y(5),isSelected(false){for(int i=0;i<20;i++)name[i]=0;};
+    dirObject(char i_type, int i_x, int i_y, const wchar_t* i_name, bool i_isSelected )
     {
         type = i_type;
         x = i_x;

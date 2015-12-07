@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 
 void MainController::mainLoop()
 {
-	cur_path = fs::canonical(fs::path("tests/test_dir"));
+	cur_path = fs::path("tests/test_dir");
 	dir_it = fs::directory_iterator(cur_path);
 	while (true)
 	{
@@ -111,16 +111,22 @@ void MainController::sendCurrentPath()
 {
     size_t length = 0;
     for( fs::directory_iterator it (cur_path); it != fs::end(it); it++) length++;
+    std::cout << "length: " << length << std::endl;
 
     dirObject* objs = new dirObject[length];
 
     int i = 0;
-    for( fs::directory_iterator it (cur_path); it != fs::end(it); it++, i++)
+    for( fs::directory_iterator it (cur_path); i<length; it++, i++)
     {
-        std::wstring name = it->path().filename().wstring();
+        const std::wstring name = it->path().filename().wstring();
+        std::wcout << L"name: " << name << std::endl;
         objs[i] = dirObject(fs::is_directory(it->path())?'d':'f',i/4,i%4,name.data(), *it == *dir_it);
     }
 
+    std::cout << "i: " << i << std::endl;
+
 
     newObjects(objs, length);
+
+    std::cout << "end: " << std::endl;
 }

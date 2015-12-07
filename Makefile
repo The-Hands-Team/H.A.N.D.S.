@@ -41,7 +41,7 @@ lib/GestureQueue.o: src/MainController/GestureQueue.cpp
 lib/MainController.o: src/MainController/MainController.cpp
 	$(CXX) $(C_FLAGS) -c src/MainController/MainController.cpp -o lib/MainController.o
 	
-lib/Graphics.o: src/Graphics/Graphics.cpp
+lib/Graphics.o: src/Graphics/Graphics.cpp src/Graphics/Graphics.hpp
 	$(CXX) $(C_FLAGS) -c src/Graphics/Graphics.cpp -o lib/Graphics.o
 
 clean:

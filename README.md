@@ -1,8 +1,8 @@
 # Name TBD
 
 
-The code and binaries in include/LeapMotion and lib/LeapMotion are (c) Leap Motion, Inc.
-The code and binaries in include/irrlicht and lib/irrlict are (c) Nikolaus Gebhardt.
+The resources in `include/LeapMotion` and `lib/LeapMotion` are (c) Leap Motion, Inc.  
+The resources in `include/irrlicht`, `lib/irrlict`, and `media/irrlicht` are (c) Nikolaus Gebhardt.
 
 All other code may be derived from samples provided by Leap Motion, Inc. or Nikolaus Gebhardt
 

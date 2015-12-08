@@ -11,11 +11,15 @@ modification, are permitted provided that the following conditions are met:
     * The names of the contributors to this code may be used to endorse or
       promote products derived from this software without specific prior
       written permission.
-    * This code is bound by the Leap Motion SDK Agreement, The Irrlicht 
-      Engine License, the Independent JPEG Group License, the zlib License,
-      the libpng License. A copy of each of these, current as of 2015-12-08
-      is included with this license. These licenses may change at any time,
-      and the new version takese precidence over those presented here.
+    * Redistributions must also meet the condtions specified in
+      the Leap Motion SDK Agreement,
+      The Irrlicht Engine License,
+      the Independent JPEG Group License,
+      the zlib License, and
+      the libpng License.
+      A copy of each of these, current as of 2015-12-08 is included with this
+      license. These licenses may change at any time, and the new version takes
+      precidence over those presented here.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED

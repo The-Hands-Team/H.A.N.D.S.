@@ -77,8 +77,10 @@ void MainController::processEvent(GestureEvent* ge)
 		case SWIPE_UP:
 			if (cur_path.parent_path() != "")
 			{
-				cur_path = cur_path.parent_path();
-				dir_it = fs::directory_iterator(cur_path);
+			    fs::path parent = cur_path.parent_path();
+                dir_it = fs::directory_iterator(parent);
+                while( dir_it != fs::end(dir_it) && dir_it->path() != cur_path ) dir_it++;
+                cur_path = parent;
                 sendCurrentPath();
 			}
 			break;
@@ -111,22 +113,16 @@ void MainController::sendCurrentPath()
 {
     size_t length = 0;
     for( fs::directory_iterator it (cur_path); it != fs::end(it); it++) length++;
-    std::cout << "length: " << length << std::endl;
 
     dirObject* objs = new dirObject[length];
 
-    int i = 0;
+    size_t i = 0;
     for( fs::directory_iterator it (cur_path); i<length; it++, i++)
     {
         const std::wstring name = it->path().filename().wstring();
-        std::wcout << L"name: " << name << std::endl;
-        objs[i] = dirObject(fs::is_directory(it->path())?'d':'f',i/4,i%4,name.data(), *it == *dir_it);
+        objs[i] = dirObject(fs::is_directory(it->path())?'d':'f',1.5f*(i/4)+0.5,1.5f*(i%4)+0.5,name.data(), *it == *dir_it);
     }
-
-    std::cout << "i: " << i << std::endl;
-
 
     newObjects(objs, length);
 
-    std::cout << "end: " << std::endl;
 }

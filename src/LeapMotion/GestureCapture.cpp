@@ -37,7 +37,6 @@ class GestureCapture : public Listener {
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
 const std::string boneNames[] = {"Metacarpal", "Proximal", "Middle", "Distal"};
 const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"};
-const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe Up", "Swipe Down", "Swipe Right", "Swipe Left"};
 
 void GestureCapture::onInit(const Controller& controller) {
   std::cout << "Leap Motion Initialized" << std::endl;

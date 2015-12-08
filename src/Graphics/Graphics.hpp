@@ -1,6 +1,6 @@
 #include <memory>
-#include <cwchar>
 #include <cstring>
+#include "irrlicht/irrTypes.h"
 
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
@@ -13,7 +13,7 @@ struct dirObject
 {
 public:
     dirObject():type('f'),x(5),y(5),isSelected(false){for(int i=0;i<20;i++)name[i]=0;};
-    dirObject(char i_type, int i_x, int i_y, const wchar_t* i_name, bool i_isSelected )
+    dirObject(char i_type, irr::f32 i_x, irr::f32 i_y, const wchar_t* i_name, bool i_isSelected )
     {
         type = i_type;
         x = i_x;
@@ -25,11 +25,11 @@ public:
         {
             return type;
         }
-        int getX()
+        irr::f32 getX()
         {
             return x;
         }
-        int getY()
+        irr::f32 getY()
         {
             return y;
         }
@@ -40,8 +40,8 @@ public:
 	bool isSelected;
 private:
     char type;
-    int x;
-    int y;
+    irr::f32 x;
+    irr::f32 y;
     wchar_t name[20];
 };
 

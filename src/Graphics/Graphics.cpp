@@ -1,5 +1,8 @@
 #include <irrlicht/irrlicht.h>
 #include "irrlicht/driverChoice.h"
+#include "LeapMotion/GestureEvent.hpp"
+#include "MainController/GestureQueue.hpp"
+#include "MainController/MainController.hpp"
 #include <mutex>
 #include "Graphics.hpp"
 
@@ -28,7 +31,25 @@ public:
     {
         // Remember whether each key is down or up
         if (event.EventType == irr::EET_KEY_INPUT_EVENT)
+        {
+
+            if( event.KeyInput.PressedDown && ! KeyIsDown[event.KeyInput.Key])
+            switch(event.KeyInput.Key)
+            {
+            case KEY_RIGHT:
+                MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SWIPE_RIGHT] , SWIPE_RIGHT));
+                break;
+            case KEY_UP:
+                MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SWIPE_UP] , SWIPE_UP));
+                break;
+            case KEY_DOWN:
+                MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SWIPE_DOWN] , SWIPE_DOWN));
+                break;
+            default:
+                break;
+            }
             KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
+        }
 
         return false;
     }
@@ -102,28 +123,33 @@ void fillNodes()
                     dirObjects[i].getY()*10+20,
                     50
                 ));
-		if(dirObjects[i].getType() == 'f')
-		{
-			if(dirObjects[i].isSelected)
-			{
-            			dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/portal1.bmp"));
-			}
-			else
-			{
-            			dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/wall.bmp"));
-			}
-		}
-		else// if(dirObjects[i].getType() == 'd')
-		{
-			if(dirObjects[i].isSelected)
-			{
-            			dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/portal1.bmp"));
-			}
-			else
-			{
-            			dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/water.jpg"));
-			}
-		}
+
+
+            if(dirObjects[i].isSelected)
+            {
+                    dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/particlered.bmp"));
+                    dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
+                    dirBillboards[i] = smgr->addBillboardTextSceneNode
+                        (
+                            env->getFont("media/fontcourier.bmp"),
+                            dirObjects[i].getName(),
+                            dirNodes[i],core::dimension2d<f32>(8.0f, 5.0f),
+                            core::vector3df(0,0,-5),
+                            i,
+                            SColor(100,255,255,255),
+                            SColor(100,255,255,255)
+                        );
+}
+            else
+            {
+                if(dirObjects[i].getType() == 'f')
+                {
+                    dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/wall.jpg"));
+                }
+                else
+                {
+                    dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/water.jpg"));
+                }
             dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
             dirBillboards[i] = smgr->addBillboardTextSceneNode
                 (
@@ -132,9 +158,10 @@ void fillNodes()
                     dirNodes[i],core::dimension2d<f32>(8.0f, 5.0f),
                     core::vector3df(0,0,-5),
                     i,
-                    SColor(100,255,0,0),
-                    SColor(100,0,0,255)
+                    SColor(100,0,0,0),
+                    SColor(100,0,0,0)
                 );
+            }
         }
 
     }

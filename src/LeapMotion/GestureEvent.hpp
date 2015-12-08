@@ -5,6 +5,8 @@
 
 void initGesture(bool);
 
+const std::string gestureNames[] = {"Circle", "Key Tap", "Screen Tap", "Swipe Up", "Swipe Down", "Swipe Right", "Swipe Left"};
+
 enum GestureType {
 	CIRCLE,
 	KEY_TAP,

@@ -5,8 +5,6 @@ MainController* MainController::curInstance = nullptr;
 
 MainController::MainController()
 {
-    curInstance = this;
-    event_q = new GestureQueue();
     ignore_new = false;
 }
 
@@ -35,15 +33,15 @@ int main(int argc, char** argv)
 
 void MainController::mainLoop()
 {
+    GestureQueue* event_q = GestureQueue::getInstance();
 	cur_path = fs::path("tests/test_dir");
 	dir_it = fs::directory_iterator(cur_path);
+
 	while (true)
 	{
         sendCurrentPath();
-		std::unique_lock<std::mutex> lk(event_m);
-		event_cv.wait(lk, [&]{return event_q->size() != 0;});
 		//got something in queue
-		GestureEvent* ev = event_q->pop();
+		Message* ev = event_q->pop();
 		//TODO: ACTUALLY PROCESS THE EVENT
 		processEvent(ev);
 		while (event_q->size() != 0)
@@ -54,64 +52,110 @@ void MainController::mainLoop()
 	}
 }
 
-void MainController::pushEvent(GestureEvent* ge)
+void MainController::processEvent(Message* m)
 {
-    if (!ignore_new)
-    {
-        event_q->push(ge);
-        event_cv.notify_one();
-    }
-}
+    //std::cout << "This is the part where an event gets processed! It was: " << ge->getName() << std::endl;
+    std::cout << m->getType() << std::endl;
 
-void MainController::processEvent(GestureEvent* ge)
-{
-	std::cout << "This is the part where an event gets processed! It was: " << ge->getName() << std::endl;
-	switch (ge->getGestureType()) {
-		case CIRCLE:
-			break;
-		case KEY_TAP:
+    if (GESTURE == m->getType())
+    {
+        GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
+        switch (ge->getGesture())
+        {
+        case CIRCLE:
+            break;
+        case KEY_TAP:
             std::cout << fs::absolute(cur_path) << std::endl;
-			break;
-		case SCREEN_TAP:
-			break;
-		case SWIPE_UP:
-			if (cur_path.parent_path() != "")
-			{
-			    fs::path parent = cur_path.parent_path();
-                dir_it = fs::directory_iterator(parent);
-                while( dir_it != fs::end(dir_it) && dir_it->path() != cur_path ) dir_it++;
-                cur_path = parent;
-                sendCurrentPath();
-			}
-			break;
-		case SWIPE_DOWN:
-			if( fs::is_directory( dir_it->path()) )
-			{
-				cur_path = dir_it->path();
-				dir_it = fs::directory_iterator(cur_path);
-                sendCurrentPath();
-			}
-			std::cout << cur_path << std::endl;
-			break;
-		case SWIPE_RIGHT:
-			dir_it++;
-			if (dir_it == fs::end(dir_it))
-			{
-				dir_it = fs::directory_iterator(cur_path);
-			}
-			std::cout << dir_it->path() << std::endl;
-			break;
-		case SWIPE_LEFT:
-			break;
-		default:
-			std::cout<<"Gesture" << ge->getName() << " not supported\n";
-			break;
-	}
+            break;
+        case SCREEN_TAP:
+            break;
+        case SWIPE:
+            switch (ge->getDir())
+            {
+            case UP:
+                if (cur_path.parent_path() != "")
+                {
+                    fs::path parent = cur_path.parent_path();
+                    dir_it = fs::directory_iterator(parent);
+                    while (dir_it != fs::end(dir_it)
+                            && dir_it->path() != cur_path)
+                        dir_it++;
+                    cur_path = parent;
+                    sendCurrentPath();
+                }
+                break;
+            case DOWN:
+                if (fs::is_directory(dir_it->path()))
+                {
+                    cur_path = dir_it->path();
+                    dir_it = fs::directory_iterator(cur_path);
+                    sendCurrentPath();
+                }
+                std::cout << cur_path << std::endl;
+                break;
+            case RIGHT:
+                dir_it++;
+                if (dir_it == fs::end(dir_it))
+                {
+                    dir_it = fs::directory_iterator(cur_path);
+                }
+                std::cout << dir_it->path() << std::endl;
+                break;
+            default:
+                break;
+            }
+        default:
+            std::cout << "Gesture not supported\n";
+            break;
+        }
+    }
+    else if(KEYPRESS == m->getType())
+    {
+        KeyMessage* ke = dynamic_cast<KeyMessage*>(m);
+        std::cout << ke->getKey()<< ' ' << ke->getPressed() << std::endl;
+        if(ke->getPressed())
+            switch(ke->getKey())
+            {
+            case irr::EKEY_CODE::KEY_UP:
+                if (cur_path.parent_path() != "")
+                {
+                    fs::path parent = cur_path.parent_path();
+                    dir_it = fs::directory_iterator(parent);
+                    while (dir_it != fs::end(dir_it)
+                    && dir_it->path() != cur_path)
+                        dir_it++;
+                    cur_path = parent;
+                    sendCurrentPath();
+                }
+                break;
+            case irr::EKEY_CODE::KEY_DOWN:
+                if (fs::is_directory(dir_it->path()))
+                {
+                    cur_path = dir_it->path();
+                    dir_it = fs::directory_iterator(cur_path);
+                    sendCurrentPath();
+                }
+                std::cout << cur_path << std::endl;
+                break;
+            case irr::EKEY_CODE::KEY_RIGHT:
+                dir_it++;
+                if (dir_it == fs::end(dir_it))
+                {
+                    dir_it = fs::directory_iterator(cur_path);
+                }
+                std::cout << dir_it->path() << std::endl;
+                break;
+            default:
+                break;
+            }
+    }
+    delete m;
 }
 
 void MainController::sendCurrentPath()
 {
     size_t length = 0;
+    // TODO Also keep a copy of the list for ourselves, possibly with more information
     for( fs::directory_iterator it (cur_path); it != fs::end(it); it++) length++;
 
     dirObject* objs = new dirObject[length];

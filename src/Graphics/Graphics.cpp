@@ -2,7 +2,6 @@
 #include "irrlicht/driverChoice.h"
 #include "GestureCapture/GestureEvent.hpp"
 #include "MainController/GestureQueue.hpp"
-#include "MainController/MainController.hpp"
 #include <mutex>
 #include "Graphics.hpp"
 
@@ -29,22 +28,8 @@ using namespace irr;
             // Remember whether each key is down or up
             if (event.EventType == irr::EET_KEY_INPUT_EVENT)
             {
-
-                if( event.KeyInput.PressedDown && ! KeyIsDown[event.KeyInput.Key])
-                switch(event.KeyInput.Key)
-                {
-                case KEY_RIGHT:
-                    MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SWIPE_RIGHT] , SWIPE_RIGHT));
-                    break;
-                case KEY_UP:
-                    MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SWIPE_UP] , SWIPE_UP));
-                    break;
-                case KEY_DOWN:
-                    MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SWIPE_DOWN] , SWIPE_DOWN));
-                    break;
-                default:
-                    break;
-                }
+                if( event.KeyInput.PressedDown != KeyIsDown[event.KeyInput.Key])
+                    GestureQueue::getInstance()->push(new KeyMessage(event.KeyInput.Key,event.KeyInput.Shift,event.KeyInput.Control,event.KeyInput.PressedDown));
                 KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
             }
 

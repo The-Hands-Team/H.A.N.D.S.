@@ -10,8 +10,7 @@
 #include <cstring>
 #include <thread>
 #include "LeapMotion/Leap.h"
-#include "GestureEvent.hpp"
-#include "MainController/MainController.hpp"
+#include "MainController/GestureQueue.hpp"
 
 using namespace Leap;
 
@@ -75,53 +74,53 @@ void GestureCapture::onFrame(const Controller& controller) {
             case Leap::Gesture::TYPE_CIRCLE:
                 curGestures[CIRCLE] = true;
                 if(!activeGestures[CIRCLE])
-                    MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[CIRCLE], CIRCLE));
+                    GestureQueue::getInstance()->push(new GestureMessage(CIRCLE, NONE));
                 activeGestures[CIRCLE] = true;
                 break;
             case Leap::Gesture::TYPE_KEY_TAP:
                 curGestures[KEY_TAP] = true;
                 if(!activeGestures[KEY_TAP])
-                    MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[KEY_TAP], KEY_TAP));
+                    GestureQueue::getInstance()->push(new GestureMessage(KEY_TAP, NONE));
                 activeGestures[KEY_TAP] = true;
                 break;
             case Leap::Gesture::TYPE_SCREEN_TAP:
                 curGestures[SCREEN_TAP] = true;
                 if(!activeGestures[SCREEN_TAP])
-                    MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[SCREEN_TAP], SCREEN_TAP));
+                    GestureQueue::getInstance()->push(new GestureMessage(SCREEN_TAP, NONE));
                 activeGestures[SCREEN_TAP] = true;
                 break;
             case Leap::Gesture::TYPE_SWIPE:
             {
                     SwipeGesture sg = *gl;
                     Leap::Vector v = sg.direction();
-                    GestureType swipeType = INVALID_GESTURE;
+                    Direction swipeType = NONE;
                     if( std::abs(v.y) > std::abs(v.x) )
                     {
                         if(v.y > 0)
                         {
-                            swipeType = SWIPE_UP;
+                            swipeType = UP;
                         }
                         else
                         {
-                            swipeType = SWIPE_DOWN;
+                            swipeType = DOWN;
                         }
                     }
                     else
                     {
                         if(v.x > 0)
                         {
-                            swipeType = SWIPE_RIGHT;
+                            swipeType = RIGHT;
                         }
                         else
                         {
-                            swipeType = SWIPE_LEFT;
+                            swipeType = LEFT;
                         }
                     }
-                    if(swipeType!=INVALID_GESTURE)
+                    if(swipeType!=NONE)
                     {
                         curGestures[swipeType] = true;
                         if(!activeGestures[swipeType])
-                            MainController::getInstance()->pushEvent(new GestureEvent(gestureNames[swipeType] , swipeType));
+                            GestureQueue::getInstance()->push(new GestureMessage(SWIPE, swipeType));
                         activeGestures[swipeType] = true;
                     }
                     break;

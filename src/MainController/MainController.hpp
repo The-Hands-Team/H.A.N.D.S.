@@ -12,19 +12,15 @@ private:
 	static MainController* curInstance;
 	MainController();
 	~MainController();
-	std::mutex event_m;
-	std::condition_variable event_cv;
     void sendCurrentPath();
-	GestureQueue* event_q;
 	bool ignore_new;
-	void processEvent(GestureEvent*);
+	void processEvent(Message*);
 
 	fs::path cur_path;
 	fs::directory_iterator dir_it;
 public:
 	static MainController* getInstance();
 	static void initThread();
-	void pushEvent(GestureEvent*);
     void mainLoop();
 };
 

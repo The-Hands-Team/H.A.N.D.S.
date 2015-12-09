@@ -63,7 +63,13 @@ void MainController::processEvent(Message* m)
         switch (ge->getGesture())
         {
         case CIRCLE:
+        {
+            fs::path dest = cur_path;
+            dest += fs::path("_copy");
+            FileManager::getInstance()->copyFile(cur_path,dest);
+            sendCurrentPath();
             break;
+        }
         case KEY_TAP:
             std::cout << fs::absolute(cur_path) << std::endl;
             break;
@@ -112,10 +118,17 @@ void MainController::processEvent(Message* m)
     else if(KEYPRESS == m->getType())
     {
         KeyMessage* ke = dynamic_cast<KeyMessage*>(m);
-        std::cout << ke->getKey()<< ' ' << ke->getPressed() << std::endl;
         if(ke->getPressed())
             switch(ke->getKey())
             {
+            case irr::EKEY_CODE::KEY_KEY_C:
+            {
+                fs::path dest = dir_it->path();
+                dest += fs::path("_copy");
+                FileManager::getInstance()->copyFile(dir_it->path(),dest);
+                sendCurrentPath();
+                break;
+            }
             case irr::EKEY_CODE::KEY_UP:
                 if (cur_path.parent_path() != "")
                 {

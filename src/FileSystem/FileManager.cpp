@@ -30,9 +30,11 @@ FileManager* FileManager::getInstance()
 t_id FileManager::FileManager::deleteFiles( v_paths& files, fs::copy_options options )
 {
     std::thread t = std::thread( &static_DeleteFiles, files, options );
-    return t.get_id();
+    t_id ret = t.get_id();
+    t.detach();
+    return ret;
 }
-t_id FileManager::FileManager::deleteFile( fs::path& file )
+t_id FileManager::FileManager::deleteFile( const fs::path& file )
 {
     v_paths v = v_paths(1, file);
     return deleteFiles( v );        
@@ -43,17 +45,19 @@ t_id FileManager::copyFiles( v_paths& from
              , fs::copy_options options )
 {
     std::thread t = std::thread( &static_CopyFiles, from, to, options );
-    return t.get_id();
+    t_id ret = t.get_id();
+    t.detach();
+    return ret;
 }
 t_id FileManager::copyFiles( v_paths& from
-             , fs::path &to
+             , const fs::path &to
              , fs::copy_options options )
 {
     v_paths v = v_paths(1, to);
     return copyFiles( from, v, options );
 }
-t_id FileManager::copyFile( fs::path &from
-             , fs::path &to
+t_id FileManager::copyFile( const fs::path &from
+             , const fs::path &to
              , fs::copy_options options )
 {
     v_paths v1 = v_paths( 1, from );
@@ -66,17 +70,19 @@ t_id FileManager::moveFiles( v_paths& from
              , fs::copy_options options )
 {
     std::thread t = std::thread( &static_MoveFiles, from, to, options );
-    return t.get_id();
+    t_id ret = t.get_id();
+    t.detach();
+    return ret;
 }
 t_id FileManager::moveFiles( v_paths& from
-             , fs::path &to
+             , const fs::path &to
              , fs::copy_options options )
 {
     v_paths v = v_paths(1, to);
     return moveFiles( from, v, options );
 }
-t_id FileManager::moveFile( fs::path &from
-             , fs::path &to
+t_id FileManager::moveFile( const fs::path &from
+             , const fs::path &to
              , fs::copy_options options )
 {
     v_paths v1 = v_paths( 1, from );
@@ -288,7 +294,7 @@ void FileManager::doMoveFiles( v_paths from, v_paths to, fs::copy_options option
     notifySuccess();
 }
 
-FileManager::HandleErrorCommand FileManager::checkError( std::error_code& ec, fs::path p1, fs::path p2 )
+FileManager::HandleErrorCommand FileManager::checkError( std::error_code& ec, const fs::path p1, const fs::path p2 )
 {
     // TODO send error to controller and wait
     if( ec )

@@ -124,7 +124,7 @@ using namespace irr;
 
                 if(dirObjects[i].isSelected)
                 {
-                        dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/particlered.bmp"));
+                        dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
                         dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
                         dirBillboards[i] = smgr->addBillboardTextSceneNode
                             (
@@ -139,14 +139,15 @@ using namespace irr;
     }
                 else
                 {
-                    if(dirObjects[i].getType() == 'f')
+                        dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
+                    /*if(dirObjects[i].getType() == 'f')
                     {
                         dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/wall.jpg"));
                     }
                     else
                     {
                         dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/water.jpg"));
-                    }
+                    }*/
                 dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
                 dirBillboards[i] = smgr->addBillboardTextSceneNode
                     (
@@ -155,8 +156,8 @@ using namespace irr;
                         dirNodes[i],core::dimension2d<f32>(8.0f, 5.0f),
                         core::vector3df(0,0,-5),
                         i,
-                        video::SColor(100,0,0,0),
-                        video::SColor(100,0,0,0)
+                        video::SColor(100,255,255,255),
+                        video::SColor(100,255,255,255)
                     );
                 }
             }

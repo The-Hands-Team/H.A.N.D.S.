@@ -29,11 +29,11 @@ endif
 lib/FileManager.o: src/FileSystem/FileManager.cpp
 	$(CXX) $(C_FLAGS) -c src/FileSystem/FileManager.cpp -o lib/FileManager.o
 	
-lib/GestureCapture.o: src/LeapMotion/GestureCapture.cpp
-	$(CXX) $(C_FLAGS) -c src/LeapMotion/GestureCapture.cpp -o lib/GestureCapture.o
+lib/GestureCapture.o: src/GestureCapture/GestureCapture.cpp
+	$(CXX) $(C_FLAGS) -c src/GestureCapture/GestureCapture.cpp -o lib/GestureCapture.o
 	
-lib/GestureEvent.o: src/LeapMotion/GestureEvent.cpp
-	$(CXX) $(C_FLAGS) -c src/LeapMotion/GestureEvent.cpp -o lib/GestureEvent.o
+lib/GestureEvent.o: src/GestureCapture/GestureEvent.cpp
+	$(CXX) $(C_FLAGS) -c src/GestureCapture/GestureEvent.cpp -o lib/GestureEvent.o
 	
 lib/GestureQueue.o: src/MainController/GestureQueue.cpp
 	$(CXX) $(C_FLAGS) -c src/MainController/GestureQueue.cpp -o lib/GestureQueue.o

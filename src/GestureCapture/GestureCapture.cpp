@@ -9,9 +9,9 @@
 #include <iostream>
 #include <cstring>
 #include <thread>
-#include "Leap.h"
+#include "LeapMotion/Leap.h"
 #include "GestureEvent.hpp"
-#include "../MainController/MainController.hpp"
+#include "MainController/MainController.hpp"
 
 using namespace Leap;
 

@@ -1,6 +1,6 @@
 #ifndef GESTUREQUEUE_H
 #define GESTUREQUEUE_H
-#include "LeapMotion/GestureEvent.hpp"
+#include "GestureCapture/GestureEvent.hpp"
 #include <mutex>
 #include <queue>
 class GestureQueue {

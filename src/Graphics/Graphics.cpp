@@ -173,7 +173,7 @@ using namespace irr;
         for( size_t i = 0; nullptr == device && video::EDT_COUNT != preferedDrivers[i]; i++ )
         {
             device = createDevice(preferedDrivers[i],
-                    core::dimension2d<u32>(640, 480), 16, false, false, false, &receiver);
+                    core::dimension2d<u32>(1366, 768), 16, false, false, false, &receiver);
         }
 
         if( nullptr == device )

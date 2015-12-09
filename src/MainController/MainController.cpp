@@ -1,5 +1,6 @@
 #include "MainController.hpp"
 #include <iostream>
+#include <chrono>
 
 MainController* MainController::curInstance = nullptr;
 
@@ -60,20 +61,22 @@ void MainController::processEvent(Message* m)
     if (GESTURE == m->getType())
     {
         GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
+        std::cout << ge->getGesture() << std::endl;
         switch (ge->getGesture())
         {
-        case CIRCLE:
+        case KEY_TAP:
         {
-            fs::path dest = cur_path;
+            fs::path dest = dir_it->path();
             dest += fs::path("_copy");
-            FileManager::getInstance()->copyFile(cur_path,dest);
+            FileManager::getInstance()->copyFile(dir_it->path(),dest);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
             sendCurrentPath();
             break;
         }
-        case KEY_TAP:
+        case SCREEN_TAP:
             std::cout << fs::absolute(cur_path) << std::endl;
             break;
-        case SCREEN_TAP:
+        case CIRCLE:
             break;
         case SWIPE:
             switch (ge->getDir())
@@ -110,6 +113,7 @@ void MainController::processEvent(Message* m)
             default:
                 break;
             }
+            break;
         default:
             std::cout << "Gesture not supported\n";
             break;

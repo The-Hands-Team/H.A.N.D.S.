@@ -169,13 +169,14 @@ void MainController::processEvent(Message* m)
     }
     else if(KEYPRESS == m->getType())
     {
-        KeyMessage* fe = dynamic_cast<FileSystemMessage*>(m);
+        FileSystemMessage* fe = dynamic_cast<FileSystemMessage*>(m);
         switch( fe->getErrCode() )
         {
             case 0:
                 sendCurrentPath();
                 break;
             default:
+                break;
                 //we don't know;
         }
     }

@@ -3,6 +3,7 @@
 #include <functional>
 #include <iostream>
 #include "FileManager.hpp"
+#include "MainController/GestureQueue.hpp"
 namespace fs = std::experimental::filesystem;
 
 FileManager* FileManager::currentInstance = nullptr;
@@ -306,5 +307,5 @@ FileManager::HandleErrorCommand FileManager::checkError( std::error_code& ec, co
 }
 void FileManager::notifySuccess()
 {
-    GestureQueue::getInstance()->push(new FileSystemMessage(t.get_id(), 0));
+    GestureQueue::getInstance()->push(new FileSystemMessage(std::this_thread::get_id(), 0));
 }

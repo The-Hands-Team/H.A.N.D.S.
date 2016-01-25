@@ -1,7 +1,7 @@
 #ifndef GESTUREQUEUE_H
 #define GESTUREQUEUE_H
 #include "GestureCapture/GestureEvent.hpp"
-#include "irrlicht/Keycodes.h"
+#include <irrlicht/Keycodes.h>
 #include <thread>
 #include <mutex>
 #include <queue>
@@ -86,16 +86,16 @@ private:
 
 class GestureQueue {
 private:
-	std::queue<Message*> gesture_q;
-	std::mutex q_mutex;
-	static GestureQueue* instance;
+    std::queue<Message*> gesture_q;
+    std::mutex q_mutex;
+    static GestureQueue* instance;
 public:
-	~GestureQueue();
-	static GestureQueue* getInstance();
-	void push (Message*);
-	Message* pop ();
-	Message* peek ();
-	int size ();
+    ~GestureQueue();
+    static GestureQueue* getInstance();
+    void push (Message*);
+    Message* pop ();
+    Message* peek ();
+    int size ();
     std::condition_variable event_cv;
     std::mutex event_m;
 };

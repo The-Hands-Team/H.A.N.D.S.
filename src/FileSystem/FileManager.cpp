@@ -306,5 +306,5 @@ FileManager::HandleErrorCommand FileManager::checkError( std::error_code& ec, co
 }
 void FileManager::notifySuccess()
 {
-    // TODO notify with zero
+    GestureQueue::getInstance()->push(new FileSystemMessage(t.get_id(), 0));
 }

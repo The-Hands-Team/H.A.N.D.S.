@@ -35,22 +35,22 @@ int main(int argc, char** argv)
 void MainController::mainLoop()
 {
     GestureQueue* event_q = GestureQueue::getInstance();
-	cur_path = fs::path("tests/test_dir");
-	dir_it = fs::directory_iterator(cur_path);
+    cur_path = fs::path("tests/test_dir");
+    dir_it = fs::directory_iterator(cur_path);
 
-	while (true)
-	{
+    while (true)
+    {
         sendCurrentPath();
-		//got something in queue
-		Message* ev = event_q->pop();
-		//TODO: ACTUALLY PROCESS THE EVENT
-		processEvent(ev);
-		while (event_q->size() != 0)
-		{
-			ev = event_q->pop();
-			processEvent(ev);
-		}
-	}
+        //got something in queue
+        Message* ev = event_q->pop();
+        //TODO: ACTUALLY PROCESS THE EVENT
+        processEvent(ev);
+        while (event_q->size() != 0)
+        {
+            ev = event_q->pop();
+            processEvent(ev);
+        }
+    }
 }
 
 void MainController::processEvent(Message* m)
@@ -66,6 +66,7 @@ void MainController::processEvent(Message* m)
         {
         case KEY_TAP:
         {
+            break;
             fs::path dest = dir_it->path();
             dest += fs::path("_copy");
             FileManager::getInstance()->copyFile(dir_it->path(),dest);
@@ -165,6 +166,18 @@ void MainController::processEvent(Message* m)
             default:
                 break;
             }
+    }
+    else if(KEYPRESS == m->getType())
+    {
+        KeyMessage* fe = dynamic_cast<FileSystemMessage*>(m);
+        switch( fe->getErrCode() )
+        {
+            case 0:
+                sendCurrentPath();
+                break;
+            default:
+                //we don't know;
+        }
     }
     delete m;
 }

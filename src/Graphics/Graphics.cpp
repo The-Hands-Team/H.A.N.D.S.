@@ -101,7 +101,7 @@ using namespace irr;
             {
                 dirNodes[i]->setPosition(core::vector3df
                     (
-                        dirObjects[i].getX()*10 + 10,
+                        dirObjects[i].getX()*10 + 22,
                         dirObjects[i].getY()*10+20,
                         50
                     ));
@@ -173,7 +173,7 @@ using namespace irr;
         for( size_t i = 0; nullptr == device && video::EDT_COUNT != preferedDrivers[i]; i++ )
         {
             device = createDevice(preferedDrivers[i],
-                    core::dimension2d<u32>(1366, 768), 16, false, false, false, &receiver);
+                    core::dimension2d<u32>(1366/2, 768), 16, false, false, false, &receiver);
         }
 
         if( nullptr == device )

@@ -8,14 +8,12 @@ namespace fs = std::experimental::filesystem;
 
 FileManager* FileManager::currentInstance = nullptr;
 
-FileManager::FileManager()
+FileManager::FileManager() : mess_ready(false)
 {
-    currentInstance = this;
-    
 }
 
 FileManager::~FileManager()
-{  
+{
 }
 
 FileManager* FileManager::getInstance()
@@ -24,7 +22,7 @@ FileManager* FileManager::getInstance()
     {
         currentInstance = new FileManager();
     }
-    
+
     return currentInstance;
 }
 
@@ -32,13 +30,13 @@ t_id FileManager::FileManager::deleteFiles( v_paths& files, fs::copy_options opt
 {
     std::thread t = std::thread( &static_DeleteFiles, files, options );
     t_id ret = t.get_id();
-    t.detach();
+    threads.emplace(ret, std::move(t));
     return ret;
 }
 t_id FileManager::FileManager::deleteFile( const fs::path& file )
 {
     v_paths v = v_paths(1, file);
-    return deleteFiles( v );        
+    return deleteFiles( v );
 }
 
 t_id FileManager::copyFiles( v_paths& from
@@ -47,7 +45,7 @@ t_id FileManager::copyFiles( v_paths& from
 {
     std::thread t = std::thread( &static_CopyFiles, from, to, options );
     t_id ret = t.get_id();
-    t.detach();
+    threads.emplace(ret,std::move(t));
     return ret;
 }
 t_id FileManager::copyFiles( v_paths& from
@@ -72,7 +70,7 @@ t_id FileManager::moveFiles( v_paths& from
 {
     std::thread t = std::thread( &static_MoveFiles, from, to, options );
     t_id ret = t.get_id();
-    t.detach();
+    threads.emplace(ret,std::move(t));
     return ret;
 }
 t_id FileManager::moveFiles( v_paths& from
@@ -127,10 +125,10 @@ void FileManager::doDeleteFiles( v_paths files, fs::copy_options options )
             }
         }
 
-        switch( checkError( ec, *it ) )
+        switch( checkError( ec, DELETE, *it ) )
         {
             case TERMINATE:
-                return;
+                return signalThreadEnd( DELETE );
             case RETRY:
                 it--;
             /* break intentionally omitted */
@@ -149,10 +147,10 @@ void FileManager::doDeleteFiles( v_paths files, fs::copy_options options )
             fs::remove( *it, ec );
         }
         // TODO move to trash
-        switch( checkError( ec, *it ) )
+        switch( checkError( ec, DELETE, *it ) )
         {
             case TERMINATE:
-                return;
+                return signalThreadEnd( DELETE );
             case RETRY:
                 it--;
             /* break intentionally omitted */
@@ -162,22 +160,22 @@ void FileManager::doDeleteFiles( v_paths files, fs::copy_options options )
                 break;
         }
     }
-    notifySuccess();
+    signalThreadEnd( DELETE );
 }
 void FileManager::doCopyFiles( v_paths from, v_paths to, fs::copy_options options )
 
 {
     std::error_code ec;
     bool to_dir = 1 == to.size() && 1 < from.size();
-    
+
     if( from.size() != to.size() &&
         !( to_dir &&
            fs::is_directory( to[0], ec ) ) ) do
     {
-       switch( checkError( ec, to[0] ) )
+       switch( checkError( ec, COPY, to[0] ) )
        {
            case TERMINATE:
-               return;
+               return signalThreadEnd( COPY );
            case RETRY:
            case IGNORE:
                continue;
@@ -186,7 +184,7 @@ void FileManager::doCopyFiles( v_paths from, v_paths to, fs::copy_options option
        }
 
     ec.assign( EDOM, std::generic_category() );
-    checkError( ec );
+    checkError( ec, COPY, to[0] );
 
     } while( ec );
 
@@ -197,10 +195,10 @@ void FileManager::doCopyFiles( v_paths from, v_paths to, fs::copy_options option
         {
             ec.assign( EISDIR, std::generic_category() );
         }
-        switch( checkError( ec, *from_it ) )
+        switch( checkError( ec, COPY, *from_it ) )
         {
             case TERMINATE:
-                return;
+                return signalThreadEnd( COPY );
             case RETRY:
                 from_it--;
                 if( to_dir ) to_it--;
@@ -213,10 +211,10 @@ void FileManager::doCopyFiles( v_paths from, v_paths to, fs::copy_options option
 
         fs::copy( *from_it, *to_it, options, ec );
 
-        switch( checkError( ec, *from_it ) )
+        switch( checkError( ec, COPY, *from_it, *to_it ) )
         {
             case TERMINATE:
-                return;
+                return signalThreadEnd( COPY );
             case RETRY:
                 from_it--;
                 if( to_dir ) to_it--;
@@ -227,21 +225,21 @@ void FileManager::doCopyFiles( v_paths from, v_paths to, fs::copy_options option
                 break;
         }
     }
-    notifySuccess();
+    signalThreadEnd( COPY );
 }
 void FileManager::doMoveFiles( v_paths from, v_paths to, fs::copy_options options )
 {
     std::error_code ec;
     bool to_dir = 1 == to.size() && 1 < from.size();
-    
+
     if( from.size() != to.size() &&
         !( to_dir &&
            fs::is_directory( to[0], ec ) ) ) do
     {
-       switch( checkError( ec, to[0] ) )
+       switch( checkError( ec, MOVE, to[0] ) )
        {
            case TERMINATE:
-               return;
+               return signalThreadEnd( MOVE );
            case RETRY:
            case IGNORE:
                continue;
@@ -250,7 +248,7 @@ void FileManager::doMoveFiles( v_paths from, v_paths to, fs::copy_options option
        }
 
     ec.assign( EDOM, std::generic_category() );
-    checkError( ec );
+    checkError( ec, MOVE, to[0]);
 
     } while( ec );
 
@@ -262,10 +260,10 @@ void FileManager::doMoveFiles( v_paths from, v_paths to, fs::copy_options option
         {
             ec.assign( EISDIR, std::generic_category() );
         }
-        switch( checkError( ec, *from_it ) )
+        switch( checkError( ec, MOVE, *from_it ) )
         {
             case TERMINATE:
-                return;
+                return signalThreadEnd( MOVE );
             case RETRY:
                 from_it--;
                 if( to_dir ) to_it--;
@@ -278,10 +276,10 @@ void FileManager::doMoveFiles( v_paths from, v_paths to, fs::copy_options option
 
         fs::rename( *from_it, *to_it, ec );
 
-        switch( checkError( ec, *from_it ) )
+        switch( checkError( ec, MOVE, *from_it, *to_it ) )
         {
             case TERMINATE:
-                return;
+                return signalThreadEnd( MOVE );
             case RETRY:
                 from_it--;
                 if( to_dir ) to_it--;
@@ -292,20 +290,43 @@ void FileManager::doMoveFiles( v_paths from, v_paths to, fs::copy_options option
                 break;
         }
     }
-    notifySuccess();
+    signalThreadEnd( MOVE );
 }
 
-FileManager::HandleErrorCommand FileManager::checkError( std::error_code& ec, const fs::path p1, const fs::path p2 )
+void FileManager::replyToError( t_id message_address, HandleErrorCommand message )
 {
-    // TODO send error to controller and wait
+    std::unique_lock<std::mutex> lk(cond_mutex);
+    cond_var.wait(lk, [=]{return !mess_ready;});
+    mess_addr = message_address;
+    mess = message;
+    mess_ready = true;
+    lk.unlock();
+    cond_var.notify_all();
+}
+
+FileManager::HandleErrorCommand FileManager::checkError( std::error_code& ec, FileSystemAction act, const fs::path p1, const fs::path p2 )
+{
+    HandleErrorCommand ret = NO_ERROR;
     if( ec )
     {
-        std::cerr << ec.message() << std::endl;
-        return IGNORE;
+        GestureQueue::getInstance()->push(new FileSystemMessage(std::this_thread::get_id(), ec.default_error_condition(), act, p1, p2 ));
+        std::unique_lock<std::mutex> lk(cond_mutex);
+        cond_var.wait(lk, [=]{return mess_ready && std::this_thread::get_id() == mess_addr;});
+        ret = mess;
+        lk.unlock();
+        cond_var.notify_all();
     }
-    return NO_ERROR;
+    return ret;
 }
-void FileManager::notifySuccess()
+void FileManager::signalThreadEnd( FileSystemAction act)
 {
-    GestureQueue::getInstance()->push(new FileSystemMessage(std::this_thread::get_id(), 0));
+    GestureQueue::getInstance()->push(new FileSystemMessage(std::this_thread::get_id(), std::error_condition(), act, fs::path(), fs::path() ));
+}
+
+void FileManager::joinThread( t_id tid )
+{
+    threads.at(tid).join();
+    threads.erase(tid);
+
+
 }

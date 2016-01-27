@@ -4,3 +4,5 @@
 lib/*.o
 Run
 .nfs*
+LeapTop.cbp
+LeapTop.layout

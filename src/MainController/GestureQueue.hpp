@@ -1,6 +1,7 @@
 #ifndef GESTUREQUEUE_H
 #define GESTUREQUEUE_H
 #include "GestureCapture/GestureEvent.hpp"
+#include "FileSystem/FileManager.hpp"
 #include <irrlicht/Keycodes.h>
 #include <thread>
 #include <mutex>
@@ -46,7 +47,7 @@ enum Direction {
 class GestureMessage : public Message
 {
 public:
-    GestureMessage(GestureType g, Direction d): gesture(g),dir(d),Message(GESTURE){};
+    GestureMessage(GestureType g, Direction d): Message(GESTURE),gesture(g),dir(d){};
     GestureType getGesture() { return gesture; };
     Direction getDir() { return dir; };
 
@@ -58,7 +59,7 @@ private:
 class KeyMessage : public Message
 {
 public:
-    KeyMessage(irr::EKEY_CODE k, bool s, bool c, bool p) : key(k),shift(s),ctrl(c),pressed(p),Message(KEYPRESS){};
+    KeyMessage(irr::EKEY_CODE k, bool s, bool c, bool p) : Message(KEYPRESS),key(k),shift(s),ctrl(c),pressed(p){};
     irr::EKEY_CODE getKey(){ return key; };
     bool getShift(){ return shift; };
     bool getCtrl(){ return ctrl; };
@@ -74,13 +75,21 @@ private:
 class FileSystemMessage : public Message
 {
 public:
-    FileSystemMessage(std::thread::id id, int err) : t_id(id),errCode(err), Message(FILESYSTEM) {};
+    FileSystemMessage(std::thread::id id, std::error_condition err, FileManager::FileSystemAction act, fs::path p1, fs::path p2 ) : Message(FILESYSTEM),t_id(id)
+                                                                                                                 , errCode(err), action(act)
+                                                                                                                 , path1(p1), path2(p2){};
     std::thread::id get_t_id(){ return t_id; };
-    int getErrCode(){ return errCode; };
+    std::error_condition getErrCode(){ return errCode; };
+    FileManager::FileSystemAction getAction(){return action;};
+    fs::path getPath1(){return path1;};
+    fs::path getPath2(){return path2;};
 
 private:
     std::thread::id t_id;
-    int errCode;
+    std::error_condition errCode;
+    FileManager::FileSystemAction action;
+    fs::path path1;
+    fs::path path2;
 };
 
 

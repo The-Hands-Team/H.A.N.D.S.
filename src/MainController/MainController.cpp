@@ -167,12 +167,13 @@ void MainController::processEvent(Message* m)
                 break;
             }
     }
-    else if(KEYPRESS == m->getType())
+    else if(FILESYSTEM == m->getType())
     {
         FileSystemMessage* fe = dynamic_cast<FileSystemMessage*>(m);
-        switch( fe->getErrCode() )
+        switch( fe->getErrCode().value() )
         {
             case 0:
+                FileManager::getInstance()->joinThread(fe->get_t_id());
                 sendCurrentPath();
                 break;
             default:

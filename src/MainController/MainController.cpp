@@ -127,13 +127,27 @@ void MainController::processEvent(Message* m)
             switch(ke->getKey())
             {
             case irr::EKEY_CODE::KEY_KEY_C:
-            {
-                fs::path dest = dir_it->path();
-                dest += fs::path("_copy");
-                FileManager::getInstance()->copyFile(dir_it->path(),dest);
-                sendCurrentPath();
-                break;
-            }
+                {
+                    fs::path dest = dir_it->path();
+                    dest += fs::path("_copy");
+                    FileManager::getInstance()->copyFile(dir_it->path(),dest);
+                    sendCurrentPath();
+                    break;
+                }
+            case irr::EKEY_CODE::KEY_KEY_R:
+                {
+                    fs::path dest = dir_it->path();
+                    dest += fs::path("_rename");
+                    FileManager::getInstance()->moveFile(dir_it->path(),dest);
+                    sendCurrentPath();
+                    break;
+                }
+            case irr::EKEY_CODE::KEY_KEY_D:
+                {
+                    FileManager::getInstance()->deleteFile(dir_it->path());
+                    sendCurrentPath();
+                    break;
+                }
             case irr::EKEY_CODE::KEY_UP:
                 if (cur_path.parent_path() != "")
                 {
@@ -177,6 +191,7 @@ void MainController::processEvent(Message* m)
                 sendCurrentPath();
                 break;
             default:
+                std::cerr << fe->getErrCode().message() << std::endl;
                 break;
                 //we don't know;
         }

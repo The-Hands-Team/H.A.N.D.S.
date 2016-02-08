@@ -211,7 +211,7 @@ void MainController::sendCurrentPath()
     for( fs::directory_iterator it (cur_path); i<length; it++, i++)
     {
         const std::wstring name = it->path().filename().wstring();
-        objs[i] = dirObject(fs::is_directory(it->path())?'d':'f',1.5f*(i/4)+0.5,1.5f*(i%4)+0.5,name.data(), *it == *dir_it);
+        objs[i] = dirObject(fs::is_directory(it->path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name.data(), *it == *dir_it);
     }
 
     newObjects(objs, length);

@@ -19,6 +19,10 @@ using namespace irr;
     scene::ISceneManager* smgr;
     gui::IGUIEnvironment* env;
 
+    const int width = 10;
+    const int unit_size = 5;
+    const int view_height = width*10;
+
     class MyEventReceiver : public IEventReceiver
     {
     public:
@@ -101,8 +105,8 @@ using namespace irr;
             {
                 dirNodes[i]->setPosition(core::vector3df
                     (
-                        dirObjects[i].getX()*10 + 22,
-                        dirObjects[i].getY()*10+20,
+                        dirObjects[i].getX() * unit_size*width,
+                        dirObjects[i].getY() * unit_size*width,
                         50
                     ));
 
@@ -113,9 +117,10 @@ using namespace irr;
                         dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
                         dirBillboards[i] = smgr->addBillboardTextSceneNode
                             (
-                                env->getFont("media/fontcourier.bmp"),
+                                env->getFont("media/bigfont.png"),
                                 dirObjects[i].getName(),
-                                dirNodes[i],core::dimension2d<f32>(8.0f, 5.0f),
+                                dirNodes[i],
+				core::dimension2d<f32>(10.0f, 4.0f),
                                 core::vector3df(0,0,-5),
                                 i,
                                 video::SColor(100,255,255,255),
@@ -191,7 +196,8 @@ using namespace irr;
         */
 
         //create camera
-        smgr->addCameraSceneNode(0,core::vector3df(50,50,0),core::vector3df(50,50,100),-1,true);
+	float mid = (width * unit_size) / 2.0;
+        smgr->addCameraSceneNode(0,core::vector3df(mid,mid,0),core::vector3df(mid,mid,view_height),-1,true);
 
         /*
         We have done everything, so lets draw it. We also write the current

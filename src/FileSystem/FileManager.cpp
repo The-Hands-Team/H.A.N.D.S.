@@ -313,9 +313,11 @@ FileManager::HandleErrorCommand FileManager::checkError( std::error_code& ec, Fi
         std::unique_lock<std::mutex> lk(cond_mutex);
         cond_var.wait(lk, [=]{return mess_ready && std::this_thread::get_id() == mess_addr;});
         ret = mess;
+        mess_ready = false;
         lk.unlock();
         cond_var.notify_all();
     }
+    if( TERMINATE == ret ) std::cerr << "Terminating thread: " << std::this_thread::get_id() << std::endl;
     return ret;
 }
 void FileManager::signalThreadEnd( FileSystemAction act)

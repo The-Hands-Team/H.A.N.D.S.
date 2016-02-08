@@ -192,6 +192,8 @@ void MainController::processEvent(Message* m)
                 break;
             default:
                 std::cerr << fe->getErrCode().message() << std::endl;
+                FileManager::getInstance()->replyToError( fe->get_t_id(), FileManager::TERMINATE );
+                sendCurrentPath();
                 break;
                 //we don't know;
         }

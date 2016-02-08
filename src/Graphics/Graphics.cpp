@@ -23,6 +23,8 @@ using namespace irr;
     const int unit_size = 5;
     const int view_height = width*10;
 
+    const int max_text_length = 11;
+
     class MyEventReceiver : public IEventReceiver
     {
     public:
@@ -110,7 +112,15 @@ using namespace irr;
                         50
                     ));
 
+		wchar_t finished_name[ max_text_length ];
 
+		wcsncpy( finished_name, dirObjects[i].getName(), max_text_length);
+
+		if( wcslen( dirObjects[i].getName() ) + 1 /*null terminator*/ > max_text_length )
+		{
+			wcsncpy( &(finished_name[max_text_length-4]), L"...", 4);
+		}
+		
                 if(dirObjects[i].isSelected)
                 {
                         dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
@@ -118,9 +128,9 @@ using namespace irr;
                         dirBillboards[i] = smgr->addBillboardTextSceneNode
                             (
                                 env->getFont("media/bigfont.png"),
-                                dirObjects[i].getName(),
+				dirObjects[i].getName(),
                                 dirNodes[i],
-				core::dimension2d<f32>(10.0f, 4.0f),
+				core::dimension2d<f32>(wcslen(finished_name) * 0.75, 3.0f),
                                 core::vector3df(0,0,-5),
                                 i,
                                 video::SColor(100,255,255,255),
@@ -130,25 +140,17 @@ using namespace irr;
                 else
                 {
                         dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
-                    /*if(dirObjects[i].getType() == 'f')
-                    {
-                        dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/wall.jpg"));
-                    }
-                    else
-                    {
-                        dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/water.jpg"));
-                    }*/
-                dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
-                dirBillboards[i] = smgr->addBillboardTextSceneNode
-                    (
-                        env->getFont("media/fontcourier.bmp"),
-                        dirObjects[i].getName(),
-                        dirNodes[i],core::dimension2d<f32>(8.0f, 5.0f),
-                        core::vector3df(0,0,-5),
-                        i,
-                        video::SColor(100,255,255,255),
-                        video::SColor(100,255,255,255)
-                    );
+                	dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
+                	dirBillboards[i] = smgr->addBillboardTextSceneNode
+		            (
+		                env->getFont("media/bigfont.png"),
+		                finished_name,
+		                dirNodes[i],core::dimension2d<f32>(wcslen(finished_name) * 0.75, 3.0f),
+		                core::vector3df(0,0,-5),
+		                i,
+		                video::SColor(100,255,255,255),
+		                video::SColor(100,255,255,255)
+		            );
                 }
             }
 

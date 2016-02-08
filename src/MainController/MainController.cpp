@@ -291,8 +291,7 @@ void MainController::sendCurrentPath()
     ///**/dirObject* objs = new dirObject[length];
     dirObject* objs = new dirObject[new_dir_contents.size()];
 
-    size_t i = 0;
-	for (; i < new_dir_contents.size(); i++)
+	for (int i = 0; i < new_dir_contents.size(); i++)
 	{
         const std::wstring name = new_dir_contents[i].path().filename().wstring();
         objs[i] = dirObject(fs::is_directory(new_dir_contents[i].path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name.data(), i == new_dir_i);

@@ -131,23 +131,26 @@ void GestureCapture::onFrame(const Controller& controller) {
         }
     }
     
+    detectPinch(frame, curGestures);
+
+    for(int i=0; i<INVALID_GESTURE; i++)
+    {
+        activeGestures[i] = curGestures[i];
+    }
+}
+
+void detectPinch(Frame frame, bool *curGestures)
+{
     Leap::Finger firstFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_THUMB];
     Leap::Finger secondFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_INDEX];
     float distance = firstFinger.tipPosition().distanceTo(secondFinger.tipPosition());
     
     if(distance!=0 && abs(distance)<16)
     {
-        std::cout<<"touch ";
         curGestures[KEY_TAP] = true;
-        std::cout<<curGestures[KEY_TAP]<<" "<<activeGestures[KEY_TAP]<<"\n";
         if(!activeGestures[KEY_TAP])
             GestureQueue::getInstance()->push(new GestureMessage(KEY_TAP, NONE));
         activeGestures[KEY_TAP] = true;
-    }
-
-    for(int i=0; i<INVALID_GESTURE; i++)
-    {
-        activeGestures[i] = curGestures[i];
     }
 }
 

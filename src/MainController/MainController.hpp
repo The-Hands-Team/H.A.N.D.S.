@@ -24,7 +24,7 @@ private:
 	void copyCurrent();
 	fs::directory_entry curEntry();
 
-	int new_dir_i;
+	unsigned int new_dir_i;
 	std::vector<fs::directory_entry> new_dir_contents;
 	void updateDirectory(fs::path);
 

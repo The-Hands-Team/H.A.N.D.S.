@@ -134,7 +134,11 @@ void GestureCapture::onFrame(const Controller& controller) {
     Leap::Finger firstFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_THUMB];
     Leap::Finger secondFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_INDEX];
     float distance = firstFinger.tipPosition().distanceTo(secondFinger.tipPosition());
-    if(firstFinger.tipPosition()!=Leap::Vector::zero() && secondFinger.tipPosition()!=Leap::Vector::zero() && abs(distance) < 12)
+    
+    if(abs(distance)<20)
+        std::cout<<">"<<abs(distance)<<"\n";
+    
+    if(firstFinger.tipPosition()!=Leap::Vector::zero() && secondFinger.tipPosition()!=Leap::Vector::zero() && abs(distance)<20)
     {
         curGestures[KEY_TAP] = true;
         if(!activeGestures[KEY_TAP])

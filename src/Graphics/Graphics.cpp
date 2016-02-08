@@ -120,7 +120,7 @@ using namespace irr;
 		{
 			wcsncpy( &(finished_name[max_text_length-4]), L"...", 4);
 		}
-		
+
                 if(dirObjects[i].isSelected)
                 {
                         dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
@@ -210,7 +210,7 @@ using namespace irr;
 
         // In order to do framerate independent movement, we have to know
         // how long it was since the last frame
-        u32 then = device->getTimer()->getTime();
+        // u32 then = device->getTimer()->getTime();
 
 
 

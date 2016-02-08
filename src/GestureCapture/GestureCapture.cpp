@@ -12,50 +12,20 @@
 #include "LeapMotion/Leap.h"
 #include "MainController/GestureQueue.hpp"
 
+#include "GestureCapture.hpp"
+
 using namespace Leap;
-
-class GestureCapture : public Listener {
-    public:
-
-        virtual void onInit(const Controller&);
-        virtual void onConnect(const Controller&);
-        virtual void onDisconnect(const Controller&);
-        virtual void onExit(const Controller&);
-        virtual void onFrame(const Controller&);
-        virtual void onFocusGained(const Controller&);
-        virtual void onFocusLost(const Controller&);
-        virtual void onDeviceChange(const Controller&);
-        virtual void onServiceConnect(const Controller&);
-        virtual void onServiceDisconnect(const Controller&);
-
-    private:
-        bool activeGestures[INVALID_GESTURE]= { 0 };
-
-};
 
 const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
 const std::string boneNames[] = {"Metacarpal", "Proximal", "Middle", "Distal"};
 const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"};
 
-void GestureCapture::onInit(const Controller& controller) {
-  std::cout << "Leap Motion Initialized" << std::endl;
-}
 
 void GestureCapture::onConnect(const Controller& controller) {
-  std::cout << "Leap Motion Connected" << std::endl;
   controller.enableGesture(Gesture::TYPE_CIRCLE);
   controller.enableGesture(Gesture::TYPE_KEY_TAP);
   controller.enableGesture(Gesture::TYPE_SCREEN_TAP);
   controller.enableGesture(Gesture::TYPE_SWIPE);
-}
-
-void GestureCapture::onDisconnect(const Controller& controller) {
-  // Note: not dispatched when running in a debugger.
-  std::cout << "Leap Motion Disconnected" << std::endl;
-}
-
-void GestureCapture::onExit(const Controller& controller) {
-  std::cout << "Leap Motion Exited" << std::endl;
 }
 
 void GestureCapture::onFrame(const Controller& controller) {
@@ -130,7 +100,7 @@ void GestureCapture::onFrame(const Controller& controller) {
                break;
         }
     }
-    
+
     detectPinch(frame, curGestures);
 
     for(int i=0; i<INVALID_GESTURE; i++)
@@ -139,12 +109,12 @@ void GestureCapture::onFrame(const Controller& controller) {
     }
 }
 
-void detectPinch(Frame frame, bool *curGestures)
+void GestureCapture::detectPinch(Frame frame, bool *curGestures)
 {
     Leap::Finger firstFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_THUMB];
     Leap::Finger secondFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_INDEX];
     float distance = firstFinger.tipPosition().distanceTo(secondFinger.tipPosition());
-    
+
     if(distance!=0 && abs(distance)<16)
     {
         curGestures[KEY_TAP] = true;
@@ -152,32 +122,6 @@ void detectPinch(Frame frame, bool *curGestures)
             GestureQueue::getInstance()->push(new GestureMessage(KEY_TAP, NONE));
         activeGestures[KEY_TAP] = true;
     }
-}
-
-void GestureCapture::onFocusGained(const Controller& controller) {
-  std::cout << "Leap Motion Focus Gained" << std::endl;
-}
-
-void GestureCapture::onFocusLost(const Controller& controller) {
-  std::cout << "Leap Motion Focus Lost" << std::endl;
-}
-
-void GestureCapture::onDeviceChange(const Controller& controller) {
-  std::cout << "Leap Motion Device Changed" << std::endl;
-  const DeviceList devices = controller.devices();
-
-  for (int i = 0; i < devices.count(); ++i) {
-    std::cout << "id: " << devices[i].toString() << std::endl;
-    std::cout << "  isStreaming: " << (devices[i].isStreaming() ? "true" : "false") << std::endl;
-  }
-}
-
-void GestureCapture::onServiceConnect(const Controller& controller) {
-  std::cout << "Leap Motion Service Connected" << std::endl;
-}
-
-void GestureCapture::onServiceDisconnect(const Controller& controller) {
-  std::cout << "Leap Motion Service Disconnected" << std::endl;
 }
 
 void initGesture(bool background) {

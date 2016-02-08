@@ -6,8 +6,8 @@ C_FLAGS := -std=c++11 -Wall -Wextra -g -isysteminclude/ -Isrc/
 
 STD_LIB := -lpthread -lstdc++fs
 IRR_LIB := -Llib/irrlicht/ -lIrrlicht -lGL -lXxf86vm -lXext -lX11 -lXcursor
-MY_LIBS := lib/FileManager.o lib/GestureCapture.o lib/MainController.o lib/Graphics.o lib/GestureQueue.o 
-#lib/GestureEvent.o 
+MY_LIBS := lib/FileManager.o lib/GestureCapture.o lib/MainController.o lib/Graphics.o lib/GestureQueue.o
+#lib/GestureEvent.o
 ifeq ($(OS), Linux)
   ifeq ($(ARCH), x86_64)
     LEAP_LIBRARY := lib/LeapMotion/x64/libLeap.so -Wl,-rpath,lib/LeapMotion/x64
@@ -28,19 +28,16 @@ endif
 
 lib/FileManager.o: src/FileSystem/FileManager.cpp src/FileSystem/FileManager.hpp
 	$(CXX) $(C_FLAGS) -c src/FileSystem/FileManager.cpp -o lib/FileManager.o
-	
-lib/GestureCapture.o: src/GestureCapture/GestureCapture.cpp #src/GestureCapture/GestureCapture.hpp
+
+lib/GestureCapture.o: src/GestureCapture/GestureCapture.cpp src/GestureCapture/GestureCapture.hpp
 	$(CXX) $(C_FLAGS) -c src/GestureCapture/GestureCapture.cpp -o lib/GestureCapture.o
-	
-lib/GestureEvent.o: src/GestureCapture/GestureEvent.cpp
-	$(CXX) $(C_FLAGS) -c src/GestureCapture/GestureEvent.cpp -o lib/GestureEvent.o
-	
+
 lib/GestureQueue.o: src/MainController/GestureQueue.cpp src/MainController/GestureQueue.hpp
 	$(CXX) $(C_FLAGS) -c src/MainController/GestureQueue.cpp -o lib/GestureQueue.o
-	
+
 lib/MainController.o: src/MainController/MainController.cpp src/MainController/MainController.hpp
 	$(CXX) $(C_FLAGS) -c src/MainController/MainController.cpp -o lib/MainController.o
-	
+
 lib/Graphics.o: src/Graphics/Graphics.cpp src/Graphics/Graphics.hpp
 	$(CXX) $(C_FLAGS) -c src/Graphics/Graphics.cpp -o lib/Graphics.o
 

@@ -1,11 +1,8 @@
 #ifndef MAINCONTROLLER_H
 #define MAINCONTROLLER_H
-#include "GestureQueue.hpp"
-#include "Graphics/Graphics.hpp"
-#include <mutex>
-#include <cstring>
-#include <condition_variable>
+
 #include <vector>
+#include "GestureQueue.hpp"
 #include "FileSystem/FileManager.hpp"
 
 class MainController {

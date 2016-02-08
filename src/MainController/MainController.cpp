@@ -1,6 +1,7 @@
 #include "MainController.hpp"
 #include <iostream>
-#include <chrono>
+
+#include "Graphics/Graphics.hpp"
 
 MainController* MainController::curInstance = nullptr;
 
@@ -23,7 +24,7 @@ MainController* MainController::getInstance()
     return curInstance;
 }
 
-int main(int argc, char** argv)
+int main()
 {
     std::thread graphics(initGraphics);
     std::thread gesture(initGesture, false);

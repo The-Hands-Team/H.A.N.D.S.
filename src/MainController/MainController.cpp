@@ -36,7 +36,8 @@ void MainController::mainLoop()
 {
     GestureQueue* event_q = GestureQueue::getInstance();
     cur_path = fs::path("tests/test_dir");
-    dir_it = fs::directory_iterator(cur_path);
+    /**/dir_it = fs::directory_iterator(cur_path);
+	//updateDirectory(cur_path);
 
     while (true)
     {
@@ -53,6 +54,67 @@ void MainController::mainLoop()
     }
 }
 
+void MainController::updateDirectory(fs::path new_dir)
+{
+	if (fs::is_directory(new_dir))
+	{
+		new_dir_contents.clear();
+		//set us on the new_dir
+		//get the iterator
+		fs::directory_iterator d_it = fs::directory_iterator(new_dir);
+		int i = 0;
+		new_dir_i = i;
+		//iterate through
+		while (d_it != fs::end(d_it))
+		{
+			//put the biz in there
+			new_dir_contents.push_back(*d_it);
+			if (d_it->path() == cur_path)
+			{
+				new_dir_i = i;
+			}
+			i++;
+		}
+		cur_path = new_dir;
+		//TODO: update graphiczz
+		sendCurrentPath();
+	}
+}
+
+void MainController::chdirUp()
+{
+	updateDirectory(cur_path.parent_path());
+}
+
+void MainController::chdirDown()
+{
+	updateDirectory(new_dir_contents[new_dir_i].path());
+}
+
+void MainController::iterateForward()
+{
+	new_dir_i = (new_dir_i + 1) % new_dir_contents.size();
+}
+
+void MainController::iterateBack()
+{
+	new_dir_i = (new_dir_i - 1) % new_dir_contents.size();
+}
+
+void MainController::copyCurrent()
+{
+	fs::path dest = curEntry().path();
+    dest += fs::path("_copy");
+    FileManager::getInstance()->copyFile(curEntry().path(),dest);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    sendCurrentPath();
+}
+
+fs::directory_entry MainController::curEntry()
+{
+	return new_dir_contents[new_dir_i];
+}
+
 void MainController::processEvent(Message* m)
 {
     //std::cout << "This is the part where an event gets processed! It was: " << ge->getName() << std::endl;
@@ -61,17 +123,18 @@ void MainController::processEvent(Message* m)
     if (GESTURE == m->getType())
     {
         GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
-        std::cout << ge->getGesture() << std::endl;
+        //std::cout << ge->getGesture() << std::endl;
         switch (ge->getGesture())
         {
         case KEY_TAP:
         {
-            break;
-            fs::path dest = dir_it->path();
-            dest += fs::path("_copy");
-            FileManager::getInstance()->copyFile(dir_it->path(),dest);
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            sendCurrentPath();
+			//copyCurrent()
+            /**/break;
+            /**/fs::path dest = dir_it->path();
+            /**/dest += fs::path("_copy");
+            /**/FileManager::getInstance()->copyFile(dir_it->path(),dest);
+            /**/std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            /**/sendCurrentPath();
             break;
         }
         case SCREEN_TAP:
@@ -83,34 +146,41 @@ void MainController::processEvent(Message* m)
             switch (ge->getDir())
             {
             case UP:
-                if (cur_path.parent_path() != "")
-                {
-                    fs::path parent = cur_path.parent_path();
-                    dir_it = fs::directory_iterator(parent);
-                    while (dir_it != fs::end(dir_it)
+				//chdirUp()
+                /**/if (cur_path.parent_path() != "")
+                /**/{
+                    /**/fs::path parent = cur_path.parent_path();
+                    /**/dir_it = fs::directory_iterator(parent);
+                    /**/while (dir_it != fs::end(dir_it)
                             && dir_it->path() != cur_path)
-                        dir_it++;
-                    cur_path = parent;
-                    sendCurrentPath();
-                }
+                        /**/dir_it++;
+                    /**/cur_path = parent;
+                    /**/sendCurrentPath();
+                /**/}
                 break;
             case DOWN:
-                if (fs::is_directory(dir_it->path()))
-                {
-                    cur_path = dir_it->path();
-                    dir_it = fs::directory_iterator(cur_path);
-                    sendCurrentPath();
-                }
+				//chdirDown()
+                /**/if (fs::is_directory(dir_it->path()))
+                /**/{
+                    /**/cur_path = dir_it->path();
+                    /**/dir_it = fs::directory_iterator(cur_path);
+                    /**/sendCurrentPath();
+                /**/}
                 std::cout << cur_path << std::endl;
                 break;
             case RIGHT:
-                dir_it++;
-                if (dir_it == fs::end(dir_it))
-                {
-                    dir_it = fs::directory_iterator(cur_path);
-                }
-                std::cout << dir_it->path() << std::endl;
+				//iterateForward()
+                /**/dir_it++;
+                /**/if (dir_it == fs::end(dir_it))
+                /**/{
+                    /**/dir_it = fs::directory_iterator(cur_path);
+                /**/}
+                /**/std::cout << dir_it->path() << std::endl;
+                std::cout << curEntry().path() << std::endl;
                 break;
+			case LEFT:
+				//iterateBack()
+				break;
             default:
                 break;
             }
@@ -128,55 +198,65 @@ void MainController::processEvent(Message* m)
             {
             case irr::EKEY_CODE::KEY_KEY_C:
                 {
-                    fs::path dest = dir_it->path();
-                    dest += fs::path("_copy");
-                    FileManager::getInstance()->copyFile(dir_it->path(),dest);
-                    sendCurrentPath();
+					//copyCurrent()
+                    /**/fs::path dest = dir_it->path();
+                    /**/dest += fs::path("_copy");
+                    /**/FileManager::getInstance()->copyFile(dir_it->path(),dest);
+                    /**/sendCurrentPath();
                     break;
                 }
             case irr::EKEY_CODE::KEY_KEY_R:
                 {
-                    fs::path dest = dir_it->path();
-                    dest += fs::path("_rename");
-                    FileManager::getInstance()->moveFile(dir_it->path(),dest);
-                    sendCurrentPath();
+					break;
+                    /**/fs::path dest = dir_it->path();
+                    /**/dest += fs::path("_rename");
+                    /**/FileManager::getInstance()->moveFile(dir_it->path(),dest);
+                    /**/sendCurrentPath();
                     break;
                 }
             case irr::EKEY_CODE::KEY_KEY_D:
                 {
-                    FileManager::getInstance()->deleteFile(dir_it->path());
-                    sendCurrentPath();
+					break;
+                    /**/FileManager::getInstance()->deleteFile(dir_it->path());
+                    /**/sendCurrentPath();
                     break;
                 }
             case irr::EKEY_CODE::KEY_UP:
-                if (cur_path.parent_path() != "")
-                {
-                    fs::path parent = cur_path.parent_path();
-                    dir_it = fs::directory_iterator(parent);
-                    while (dir_it != fs::end(dir_it)
+				//chdirUp()
+                /**/if (cur_path.parent_path() != "")
+                /**/{
+                    /**/fs::path parent = cur_path.parent_path();
+                    /**/dir_it = fs::directory_iterator(parent);
+                    /**/while (dir_it != fs::end(dir_it)
                     && dir_it->path() != cur_path)
-                        dir_it++;
-                    cur_path = parent;
-                    sendCurrentPath();
-                }
+                        /**/dir_it++;
+                    /**/cur_path = parent;
+                    /**/sendCurrentPath();
+                /**/}
                 break;
             case irr::EKEY_CODE::KEY_DOWN:
-                if (fs::is_directory(dir_it->path()))
-                {
-                    cur_path = dir_it->path();
-                    dir_it = fs::directory_iterator(cur_path);
-                    sendCurrentPath();
-                }
+				//chdirDown()
+                /**/if (fs::is_directory(dir_it->path()))
+                /**/{
+                    /**/cur_path = dir_it->path();
+                    /**/dir_it = fs::directory_iterator(cur_path);
+                    /**/sendCurrentPath();
+                /**/}
                 std::cout << cur_path << std::endl;
                 break;
             case irr::EKEY_CODE::KEY_RIGHT:
-                dir_it++;
-                if (dir_it == fs::end(dir_it))
-                {
-                    dir_it = fs::directory_iterator(cur_path);
-                }
-                std::cout << dir_it->path() << std::endl;
+				//iterateForward()
+                /**/dir_it++;
+                /**/if (dir_it == fs::end(dir_it))
+                /**/{
+                    /**/dir_it = fs::directory_iterator(cur_path);
+                /**/}
+                /**/std::cout << dir_it->path() << std::endl;
+                std::cout << curEntry().path() << std::endl;
                 break;
+			case irr::EKEY_CODE::KEY_LEFT:
+				//iterateForward()
+				break;
             default:
                 break;
             }
@@ -210,6 +290,11 @@ void MainController::sendCurrentPath()
     dirObject* objs = new dirObject[length];
 
     size_t i = 0;
+	/*for (; i < new_dir_contents.size(); i++)
+	{
+        const std::wstring name = new_dir_contents[i].path().filename().wstring();
+        objs[i] = dirObject(fs::is_directory(new_dir_contents[i].path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name.data(), i == new_dir_i);
+	}*/
     for( fs::directory_iterator it (cur_path); i<length; it++, i++)
     {
         const std::wstring name = it->path().filename().wstring();

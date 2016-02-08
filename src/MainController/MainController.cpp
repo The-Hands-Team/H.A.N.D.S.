@@ -38,6 +38,9 @@ void MainController::mainLoop()
     cur_path = fs::path("tests/test_dir");
     /**/dir_it = fs::directory_iterator(cur_path);
 	//updateDirectory(cur_path);
+	new_dir_i = 0;
+	new_dir_contents = std::vector<fs::directory_entry> 
+
 
     while (true)
     {
@@ -176,7 +179,7 @@ void MainController::processEvent(Message* m)
                     /**/dir_it = fs::directory_iterator(cur_path);
                 /**/}
                 /**/std::cout << dir_it->path() << std::endl;
-                std::cout << curEntry().path() << std::endl;
+                //std::cout << curEntry().path() << std::endl;
                 break;
 			case LEFT:
 				//iterateBack()
@@ -252,7 +255,7 @@ void MainController::processEvent(Message* m)
                     /**/dir_it = fs::directory_iterator(cur_path);
                 /**/}
                 /**/std::cout << dir_it->path() << std::endl;
-                std::cout << curEntry().path() << std::endl;
+                //std::cout << curEntry().path() << std::endl;
                 break;
 			case irr::EKEY_CODE::KEY_LEFT:
 				//iterateForward()

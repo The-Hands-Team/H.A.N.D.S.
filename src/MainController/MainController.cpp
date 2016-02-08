@@ -39,8 +39,6 @@ void MainController::mainLoop()
     /**/dir_it = fs::directory_iterator(cur_path);
 	//updateDirectory(cur_path);
 	new_dir_i = 0;
-	new_dir_contents = std::vector<fs::directory_entry> 
-
 
     while (true)
     {

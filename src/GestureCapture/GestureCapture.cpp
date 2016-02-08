@@ -30,7 +30,6 @@ class GestureCapture : public Listener {
 
     private:
         bool activeGestures[INVALID_GESTURE]= { 0 };
-        bool isTouching = false;
 
 };
 
@@ -134,21 +133,14 @@ void GestureCapture::onFrame(const Controller& controller) {
     
     Leap::Finger firstFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_THUMB];
     Leap::Finger secondFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_INDEX];
-    
-    float distance = firstFinger.tipPosition().x - secondFinger.tipPosition().x;
-    if(firstFinger.tipPosition()!=Leap::Vector::zero() && secondFinger.tipPosition()!=Leap::Vector::zero() && abs(distance) < 10)
+    float distance = firstFinger.tipPosition().distanceTo(secondFinger.tipPosition());
+    if(firstFinger.tipPosition()!=Leap::Vector::zero() && secondFinger.tipPosition()!=Leap::Vector::zero() && abs(distance) < 12)
     {
-        if(!isTouching)
-        {
-            curGestures[KEY_TAP] = true;
-            if(!activeGestures[KEY_TAP])
-                GestureQueue::getInstance()->push(new GestureMessage(KEY_TAP, NONE));
-            activeGestures[KEY_TAP] = true;
-            isTouching = true;
-        }
+        curGestures[KEY_TAP] = true;
+        if(!activeGestures[KEY_TAP])
+            GestureQueue::getInstance()->push(new GestureMessage(KEY_TAP, NONE));
+        activeGestures[KEY_TAP] = true;
     }
-    else
-        isTouching = false;
 
     for(int i=0; i<INVALID_GESTURE; i++)
     {

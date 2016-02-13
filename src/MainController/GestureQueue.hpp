@@ -1,6 +1,5 @@
 #ifndef GESTUREQUEUE_H
 #define GESTUREQUEUE_H
-#include "GestureCapture/GestureEvent.hpp"
 #include "FileSystem/FileManager.hpp"
 #include <irrlicht/Keycodes.h>
 #include <thread>

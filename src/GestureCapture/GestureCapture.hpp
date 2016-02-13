@@ -2,6 +2,10 @@
 #ifndef GESTURE_CAPTURE
 #define GESTURE_CAPTURE
 
+#include "LeapMotion/Leap.h"
+
+void initGesture(bool background);
+
 using namespace Leap;
 
 class GestureCapture : public Listener {

@@ -1,6 +1,5 @@
 #include <irrlicht/irrlicht.h>
 #include "irrlicht/driverChoice.h"
-#include "GestureCapture/GestureEvent.hpp"
 #include "MainController/GestureQueue.hpp"
 #include <mutex>
 #include "Graphics.hpp"
@@ -63,14 +62,14 @@ using namespace irr;
     int numDirObjects = 0;
     int numDirNodes = 0;
     std::mutex objLock;
-    dirObject *dirObjects;
+    dirObject *dirObjects = nullptr;
     scene::ISceneNode* dirNodes[maxDirObjects];
     scene::IBillboardTextSceneNode* dirBillboards[maxDirObjects];
 
     void newObjects( dirObject* objs, size_t count)
     {
         objLock.lock();
-        if( dirObjects )
+        if( nullptr != dirObjects )
             delete[] dirObjects;
         numDirObjects = count;
         dirObjects = objs;
@@ -112,46 +111,45 @@ using namespace irr;
                         50
                     ));
 
-		wchar_t finished_name[ max_text_length ];
+        std::wstring finished_name( *(dirObjects[i].getName()) );
 
-		wcsncpy( finished_name, dirObjects[i].getName(), max_text_length);
+        if( !dirObjects[i].isSelected && finished_name.length() > max_text_length )
+        {
+            finished_name.erase( max_text_length - 3 );
+            finished_name += L"...";
+        }
 
-		if( wcslen( dirObjects[i].getName() ) + 1 /*null terminator*/ > max_text_length )
-		{
-			wcsncpy( &(finished_name[max_text_length-4]), L"...", 4);
-		}
-
-                if(dirObjects[i].isSelected)
-                {
-                        dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
-                        dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
-                        dirBillboards[i] = smgr->addBillboardTextSceneNode
-                            (
-                                env->getFont("media/bigfont.png"),
-				dirObjects[i].getName(),
-                                dirNodes[i],
-				core::dimension2d<f32>(wcslen(finished_name) * 0.75, 3.0f),
-                                core::vector3df(0,0,-5),
-                                i,
-                                video::SColor(100,255,255,255),
-                                video::SColor(100,255,255,255)
-                            );
-    }
-                else
-                {
-                        dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
-                	dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
-                	dirBillboards[i] = smgr->addBillboardTextSceneNode
-		            (
-		                env->getFont("media/bigfont.png"),
-		                finished_name,
-		                dirNodes[i],core::dimension2d<f32>(wcslen(finished_name) * 0.75, 3.0f),
-		                core::vector3df(0,0,-5),
-		                i,
-		                video::SColor(100,255,255,255),
-		                video::SColor(100,255,255,255)
-		            );
-                }
+        if(dirObjects[i].isSelected)
+        {
+            dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
+            dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
+            dirBillboards[i] = smgr->addBillboardTextSceneNode
+                (
+                    env->getFont("media/bigfont.png"),
+                    finished_name.c_str(),
+                    dirNodes[i],
+                    core::dimension2d<f32>(finished_name.length() * 0.75, 3.0f),
+                    core::vector3df(0,0,-5),
+                    i,
+                    video::SColor(100,255,255,255),
+                    video::SColor(100,255,255,255)
+                );
+        }
+        else
+        {
+                dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
+            dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
+            dirBillboards[i] = smgr->addBillboardTextSceneNode
+            (
+                env->getFont("media/bigfont.png"),
+                finished_name.c_str(),
+                dirNodes[i],core::dimension2d<f32>( finished_name.length() * 0.75, 3.0f),
+                core::vector3df(0,0,-5),
+                i,
+                video::SColor(100,255,255,255),
+                video::SColor(100,255,255,255)
+            );
+        }
             }
 
         }
@@ -198,7 +196,7 @@ using namespace irr;
         */
 
         //create camera
-	float mid = (width * unit_size) / 2.0;
+    float mid = (width * unit_size) / 2.0;
         smgr->addCameraSceneNode(0,core::vector3df(mid,mid,0),core::vector3df(mid,mid,view_height),-1,true);
 
         /*
@@ -211,7 +209,6 @@ using namespace irr;
         // In order to do framerate independent movement, we have to know
         // how long it was since the last frame
         // u32 then = device->getTimer()->getTime();
-
 
 
         while(device->run())

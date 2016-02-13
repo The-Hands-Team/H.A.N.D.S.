@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "Graphics/Graphics.hpp"
+#include "GestureCapture/GestureCapture.hpp"
 
 MainController* MainController::curInstance = nullptr;
 
@@ -290,12 +291,15 @@ void MainController::sendCurrentPath()
     // TODO Also keep a copy of the list for ourselves, possibly with more information
     ///**/for( fs::directory_iterator it (cur_path); it != fs::end(it); it++) length++;
     ///**/dirObject* objs = new dirObject[length];
-    dirObject* objs = new dirObject[new_dir_contents.size()];
+    size_t length = new_dir_contents.size();
+    dirObject* objs = nullptr;
+    
+    if( length > 0 ) objs = new dirObject[length];
 
-	for (unsigned int i = 0; i < new_dir_contents.size(); i++)
+	for (unsigned int i = 0; i < length; i++)
 	{
         const std::wstring name = new_dir_contents[i].path().filename().wstring();
-        objs[i] = dirObject(fs::is_directory(new_dir_contents[i].path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name.data(), i == new_dir_i);
+        objs[i] = dirObject(fs::is_directory(new_dir_contents[i].path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name, i == new_dir_i);
 	}
     /*for( fs::directory_iterator it (cur_path); i<length; it++, i++)
     {
@@ -304,6 +308,6 @@ void MainController::sendCurrentPath()
     }*/
 
     ///**/newObjects(objs, length);
-    newObjects(objs, new_dir_contents.size());
+    newObjects(objs, length);
 
 }

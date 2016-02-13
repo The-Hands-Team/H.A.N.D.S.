@@ -12,18 +12,15 @@ void initGraphics();
 struct dirObject
 {
 public:
-    dirObject():isSelected(false),type('f'),x(5),y(5){name = new wchar_t[0];};
-    dirObject(char i_type, irr::f32 i_x, irr::f32 i_y, const wchar_t* i_name, bool i_isSelected )
+    dirObject():isSelected(false),type('f'),x(5),y(5),name(L""){  };
+    dirObject(char i_type, irr::f32 i_x, irr::f32 i_y, const std::wstring& i_name, bool i_isSelected )
     {
-        size_t len = std::wcslen( i_name ) + 1;
         isSelected = i_isSelected;
         type = i_type;
         x = i_x;
         y = i_y;
-        name = new wchar_t[len];
-        std::wcsncpy(name, i_name, len);
+        name = std::wstring( i_name );
     }
-    ~dirObject() {delete[] name;};
     char getType()
         {
             return type;
@@ -36,16 +33,16 @@ public:
         {
             return y;
         }
-        wchar_t* getName()
+        std::wstring* getName()
         {
-            return name;
+            return &name;
         }
 	bool isSelected;
 private:
     char type;
     irr::f32 x;
     irr::f32 y;
-    wchar_t *name;
+    std::wstring name;
 };
 
 

@@ -9,7 +9,6 @@
 #include <iostream>
 #include <cstring>
 #include <thread>
-#include "LeapMotion/Leap.h"
 #include "MainController/GestureQueue.hpp"
 
 #include "GestureCapture.hpp"

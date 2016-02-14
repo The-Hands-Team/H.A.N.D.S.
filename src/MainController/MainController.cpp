@@ -68,6 +68,7 @@ void MainController::updateDirectory(fs::path new_dir)
 		int i = 0;
 		new_dir_i = i;
 		//iterate through
+		clearSelected();
 		while (d_it != fs::end(d_it))
 		{
 			//put the biz in there
@@ -105,13 +106,76 @@ void MainController::iterateBack()
 	new_dir_i = (new_dir_i + new_dir_contents.size() - 1) % new_dir_contents.size();
 }
 
+
+void MainController::select()
+{
+	fs::path selection = curEntry().path();
+	if( 0 == selected.count( selection ) )
+	{
+		selected.emplace( selection );
+	}
+	else
+	{
+		selected.erase( selection );
+	}
+}
+
+
 void MainController::copyCurrent()
 {
-	fs::path dest = curEntry().path();
-    dest += fs::path("_copy");
-    FileManager::getInstance()->copyFile(curEntry().path(),dest);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    sendCurrentPath();
+	std::vector<fs::path> source;
+	std::vector<fs::path> dest;
+	
+	for( auto const v : selected )
+	{
+		source.emplace_back( v );
+		dest.emplace_back( cur_path / v.filename() / "_copy" );
+	}
+	
+    FileManager::getInstance()->copyFiles(source,dest);
+    
+	clearSelected();
+}
+void MainController::copyInto()
+{
+	fs::path dest_p = curEntry().path();
+	std::vector<fs::path> source;
+	std::vector<fs::path> dest;
+	if (fs::is_directory(dest_p))
+	{
+		for( auto const v : selected )
+		{
+			source.emplace_back( v );
+			dest.emplace_back( dest_p / v.filename() );
+		}
+		
+		FileManager::getInstance()->copyFiles(source,dest);
+		
+		clearSelected();
+	}
+}
+void MainController::copyUp()
+{
+	fs::path dest_p = cur_path.parent_path();
+	std::vector<fs::path> source;
+	std::vector<fs::path> dest;
+	
+	if (fs::is_directory(dest_p))
+	{
+		for( auto const v : selected )
+		{
+			source.emplace_back( v );
+			dest.emplace_back( dest_p / v.filename() );
+		}
+		
+		FileManager::getInstance()->copyFiles(source,dest);
+		
+		clearSelected();
+	}
+}
+void MainController::clearSelected()
+{
+	selected.clear();
 }
 
 fs::directory_entry MainController::curEntry()
@@ -202,64 +266,31 @@ void MainController::processEvent(Message* m)
             {
             case irr::EKEY_CODE::KEY_KEY_C:
                 {
-					/**/copyCurrent();
-                    ///**/fs::path dest = dir_it->path();
-                    ///**/dest += fs::path("_copy");
-                    ///**/FileManager::getInstance()->copyFile(dir_it->path(),dest);
-                    ///**/sendCurrentPath();
+					copyCurrent();
                     break;
                 }
-            case irr::EKEY_CODE::KEY_KEY_R:
+            case irr::EKEY_CODE::KEY_KEY_S:
                 {
-					//break;
-                    ///**/fs::path dest = dir_it->path();
-                    ///**/dest += fs::path("_rename");
-                    ///**/FileManager::getInstance()->moveFile(dir_it->path(),dest);
-                    ///**/sendCurrentPath();
+					select();
                     break;
                 }
             case irr::EKEY_CODE::KEY_KEY_D:
                 {
-					//break;
-                    ///**/FileManager::getInstance()->deleteFile(dir_it->path());
-                    ///**/sendCurrentPath();
                     break;
                 }
             case irr::EKEY_CODE::KEY_UP:
-				/**/chdirUp();
-                ///**/if (cur_path.parent_path() != "")
-                ///**/{
-                    ///**/fs::path parent = cur_path.parent_path();
-                    ///**/dir_it = fs::directory_iterator(parent);
-                    ///**/while (dir_it != fs::end(dir_it)
-                    //&& dir_it->path() != cur_path)
-                        ///**/dir_it++;
-                    ///**/cur_path = parent;
-                    ///**/sendCurrentPath();
-                ///**/}
+				chdirUp();
                 break;
             case irr::EKEY_CODE::KEY_DOWN:
-				/**/chdirDown();
-                ///**/if (fs::is_directory(dir_it->path()))
-                ///**/{
-                    ///**/cur_path = dir_it->path();
-                    ///**/dir_it = fs::directory_iterator(cur_path);
-                    ///**/sendCurrentPath();
-                ///**/}
+				chdirDown();
                 std::cout << cur_path << std::endl;
                 break;
             case irr::EKEY_CODE::KEY_RIGHT:
-				/**/iterateForward();
-                ///**/dir_it++;
-                ///**/if (dir_it == fs::end(dir_it))
-                ///**/{
-                   // /**/dir_it = fs::directory_iterator(cur_path);
-                ///**/}
-                ///**/std::cout << dir_it->path() << std::endl;
-                /**/std::cout << curEntry().path() << std::endl;
+				iterateForward();
+                std::cout << curEntry().path() << std::endl;
                 break;
 			case irr::EKEY_CODE::KEY_LEFT:
-				/**/iterateBack();
+				iterateBack();
 				break;
             default:
                 break;
@@ -299,7 +330,7 @@ void MainController::sendCurrentPath()
 	for (unsigned int i = 0; i < length; i++)
 	{
         const std::wstring name = new_dir_contents[i].path().filename().wstring();
-        objs[i] = dirObject(fs::is_directory(new_dir_contents[i].path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name, i == new_dir_i);
+        objs[i] = dirObject(fs::is_directory(new_dir_contents[i].path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name, i == new_dir_i, selected.count(new_dir_contents[i].path()));
 	}
     /*for( fs::directory_iterator it (cur_path); i<length; it++, i++)
     {

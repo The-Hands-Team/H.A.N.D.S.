@@ -111,45 +111,37 @@ using namespace irr;
                         50
                     ));
 
-        std::wstring finished_name( *(dirObjects[i].getName()) );
+                std::wstring finished_name( *(dirObjects[i].getName()) );
 
-        if( !dirObjects[i].isSelected && finished_name.length() > max_text_length )
-        {
-            finished_name.erase( max_text_length - 3 );
-            finished_name += L"...";
-        }
+                if( !dirObjects[i].isHighlighted && finished_name.length() > max_text_length )
+                {
+                    finished_name.erase( max_text_length - 3 );
+                    finished_name += L"...";
+                }
 
-        if(dirObjects[i].isSelected)
-        {
-            dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
-            dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
-            dirBillboards[i] = smgr->addBillboardTextSceneNode
+                if(dirObjects[i].isHighlighted)
+                {
+                    dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
+                }
+                else
+                {
+                    dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
+                }
+                if(dirObjects[i].isSelected)
+                {
+                    dirNodes[i]->setMaterialFlag(video::EMF_WIREFRAME, true);
+                }
+                dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
+                dirBillboards[i] = smgr->addBillboardTextSceneNode
                 (
                     env->getFont("media/bigfont.png"),
                     finished_name.c_str(),
-                    dirNodes[i],
-                    core::dimension2d<f32>(finished_name.length() * 0.75, 3.0f),
+                    dirNodes[i],core::dimension2d<f32>( finished_name.length() * 0.75, 3.0f),
                     core::vector3df(0,0,-5),
                     i,
                     video::SColor(100,255,255,255),
                     video::SColor(100,255,255,255)
                 );
-        }
-        else
-        {
-                dirNodes[i]->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
-            dirNodes[i]->setMaterialFlag(video::EMF_LIGHTING, false);
-            dirBillboards[i] = smgr->addBillboardTextSceneNode
-            (
-                env->getFont("media/bigfont.png"),
-                finished_name.c_str(),
-                dirNodes[i],core::dimension2d<f32>( finished_name.length() * 0.75, 3.0f),
-                core::vector3df(0,0,-5),
-                i,
-                video::SColor(100,255,255,255),
-                video::SColor(100,255,255,255)
-            );
-        }
             }
 
         }

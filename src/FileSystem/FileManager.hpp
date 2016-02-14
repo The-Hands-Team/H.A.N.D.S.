@@ -16,6 +16,25 @@ namespace fs = std::experimental::filesystem;
 typedef std::thread::id t_id;
 typedef std::vector<fs::path> v_paths;
 
+namespace std
+{
+    template <>
+    struct hash<fs::path>
+    {
+        size_t operator()(const fs::path& key) const
+        {
+            size_t ret = 5381;
+            const fs::path::value_type* str = key.c_str();
+            size_t c;
+            while ( (c = *str++) )
+            {
+                ret = ((ret << 5) + ret) + c; /* hash * 33 + c */
+            }
+            return ret;
+        }
+    };
+}
+
 class FileManager
 {
     public:

@@ -110,11 +110,7 @@ void GestureCapture::onFrame(const Controller& controller) {
 
 void GestureCapture::detectPinch(Frame frame, bool *curGestures)
 {
-    Leap::Finger firstFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_THUMB];
-    Leap::Finger secondFinger = frame.hands()[0].fingers()[Leap::Finger::TYPE_INDEX];
-    float distance = firstFinger.tipPosition().distanceTo(secondFinger.tipPosition());
-
-    if(distance!=0 && abs(distance)<16)
+    if(1==frame.hands()[0].pinchStrength())
     {
         curGestures[KEY_TAP] = true;
         if(!activeGestures[KEY_TAP])

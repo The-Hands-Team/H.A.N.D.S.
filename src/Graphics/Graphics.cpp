@@ -189,7 +189,7 @@ using namespace irr;
 
         //create camera
     float mid = (width * unit_size) / 2.0;
-        smgr->addCameraSceneNode(0,core::vector3df(mid,mid,0),core::vector3df(mid,mid,view_height),-1,true);
+        irr::scene::ICameraSceneNode* cam = smgr->addCameraSceneNode(0,core::vector3df(mid,mid,0),core::vector3df(mid,mid,view_height),-1,true);
 
         /*
         We have done everything, so lets draw it. We also write the current
@@ -211,9 +211,15 @@ using namespace irr;
             {
                 exit(0);
             }
-            if(receiver.IsKeyDown(irr::KEY_KEY_W))
+            if(receiver.IsKeyDown(irr::KEY_KEY_Z))
             {
-
+		cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+1, cam->getPosition().Z));
+		cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y+1, cam->getTarget().Z));
+            }
+            if(receiver.IsKeyDown(irr::KEY_KEY_X))
+            {
+		cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-1, cam->getPosition().Z));
+		cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y-1, cam->getTarget().Z));
             }
 
 

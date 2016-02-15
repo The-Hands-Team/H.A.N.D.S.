@@ -137,7 +137,7 @@ using namespace irr;
                     env->getFont("media/bigfont.png"),
                     finished_name.c_str(),
                     dirNodes[i],core::dimension2d<f32>( finished_name.length() * 0.75, 3.0f),
-                    core::vector3df(0,0,-5),
+                    core::vector3df(0,0,-7),
                     i,
                     video::SColor(100,255,255,255),
                     video::SColor(100,255,255,255)
@@ -148,6 +148,58 @@ using namespace irr;
         numDirNodes = numDirObjects;
         objLock.unlock();
     }
+
+    bool tiltingR = false;
+    bool tiltingL = false;
+    bool tiltingU = false;
+    bool tiltingD = false;
+    void checkTilt(irr::scene::ICameraSceneNode* cam, MyEventReceiver receiver)
+    {
+       if(receiver.IsKeyDown(irr::KEY_KEY_I) && !tiltingU)
+       {
+          cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+25, cam->getPosition().Z));
+          tiltingU = true;
+       }
+       else if(!receiver.IsKeyDown(irr::KEY_KEY_I) && tiltingU)
+       {
+          cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-25, cam->getPosition().Z));
+	  tiltingU = false;
+       }
+
+       if(receiver.IsKeyDown(irr::KEY_KEY_K) && !tiltingD)
+       {
+          cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-25, cam->getPosition().Z));
+          tiltingD = true;
+       }
+       else if(!receiver.IsKeyDown(irr::KEY_KEY_K) && tiltingD)
+       {
+          cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+25, cam->getPosition().Z));
+	  tiltingD = false;
+       }
+
+       if(receiver.IsKeyDown(irr::KEY_KEY_J) && !tiltingL)
+       {
+          cam->setPosition(core::vector3df(cam->getPosition().X-25, cam->getPosition().Y, cam->getPosition().Z));
+          tiltingL = true;
+       }
+       else if(!receiver.IsKeyDown(irr::KEY_KEY_J) && tiltingL)
+       {
+          cam->setPosition(core::vector3df(cam->getPosition().X+25, cam->getPosition().Y, cam->getPosition().Z));
+	  tiltingL = false;
+       }
+
+       if(receiver.IsKeyDown(irr::KEY_KEY_L) && !tiltingR)
+       {
+          cam->setPosition(core::vector3df(cam->getPosition().X+25, cam->getPosition().Y, cam->getPosition().Z));
+          tiltingR = true;
+       }
+       else if(!receiver.IsKeyDown(irr::KEY_KEY_L) && tiltingR)
+       {
+          cam->setPosition(core::vector3df(cam->getPosition().X-25, cam->getPosition().Y, cam->getPosition().Z));
+	  tiltingR = false;
+       }
+    }
+	
 
     /*
     This is the main method. We can now use main() on every platform.
@@ -202,7 +254,6 @@ using namespace irr;
         // how long it was since the last frame
         // u32 then = device->getTimer()->getTime();
 
-
         while(device->run())
         {
             fillNodes();
@@ -221,6 +272,8 @@ using namespace irr;
 		cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-1, cam->getPosition().Z));
 		cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y-1, cam->getTarget().Z));
             }
+
+	checkTilt(cam, receiver);
 
 
             driver->beginScene(true, true, video::SColor(255,113,113,133));

@@ -188,10 +188,15 @@ void FileManager::doCopyFiles( v_paths from, v_paths to, fs::copy_options option
 
     } while( ec );
 
-    for( v_paths::iterator from_it = from.begin(), to_it = to.begin(); from.end() != from_it; from_it++, ( to_dir ? to_it : to_it++ ) )
+    for( v_paths::iterator from_it = from.begin(), to_it = to.begin();
+         from.end() != from_it;
+         from_it++, ( to_dir ? to_it : to_it++ ) )
     {
+		
+		std::cout << *from_it << " " << *to_it << std::endl;
 
-        if( !compare_options( options, fs::copy_options::recursive ) && fs::is_directory( *from_it, ec ) )
+        if( !compare_options( options, fs::copy_options::recursive )
+            && fs::is_directory( *from_it, ec ) )
         {
             ec.assign( EISDIR, std::generic_category() );
         }
@@ -255,7 +260,6 @@ void FileManager::doMoveFiles( v_paths from, v_paths to, fs::copy_options option
 
     for( v_paths::iterator from_it = from.begin(), to_it = to.begin(); from.end() != from_it; from_it++, ( to_dir ? to_it : to_it++ ) )
     {
-
         if( !compare_options( options, fs::copy_options::recursive ) && fs::is_directory( *from_it, ec ) )
         {
             ec.assign( EISDIR, std::generic_category() );

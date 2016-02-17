@@ -1,5 +1,6 @@
 #include "MainController.hpp"
 #include <iostream>
+#include <errno.h>
 
 #include "Graphics/Graphics.hpp"
 #include "GestureCapture/GestureCapture.hpp"
@@ -129,7 +130,7 @@ void MainController::copyCurrent()
 	for( auto const v : selected )
 	{
 		source.emplace_back( v );
-		dest.emplace_back( cur_path / v.filename() / "_copy" );
+		dest.emplace_back( cur_path / v.filename().concat( "_copy" ) );
 	}
 	
     FileManager::getInstance()->copyFiles(source,dest);
@@ -228,23 +229,9 @@ void MainController::processEvent(Message* m)
                 break;
             case DOWN:
 				/**/chdirDown();
-                ///**/if (fs::is_directory(dir_it->path()))
-                ///**/{
-                    ///**/cur_path = dir_it->path();
-                    ///**/dir_it = fs::directory_iterator(cur_path);
-                    ///**/sendCurrentPath();
-                ///**/}
-                std::cout << cur_path << std::endl;
                 break;
             case RIGHT:
 				/**/iterateForward();
-                ///**/dir_it++;
-                ///**/if (dir_it == fs::end(dir_it))
-                ///**/{
-                   // /**/dir_it = fs::directory_iterator(cur_path);
-                ///**/}
-                ///**/std::cout << dir_it->path() << std::endl;
-                /**/std::cout << curEntry().path() << std::endl;
                 break;
 			case LEFT:
 				/**/iterateBack();
@@ -283,11 +270,9 @@ void MainController::processEvent(Message* m)
                 break;
             case irr::EKEY_CODE::KEY_DOWN:
 				chdirDown();
-                std::cout << cur_path << std::endl;
                 break;
             case irr::EKEY_CODE::KEY_RIGHT:
 				iterateForward();
-                std::cout << curEntry().path() << std::endl;
                 break;
 			case irr::EKEY_CODE::KEY_LEFT:
 				iterateBack();
@@ -303,12 +288,17 @@ void MainController::processEvent(Message* m)
         {
             case 0:
                 FileManager::getInstance()->joinThread(fe->get_t_id());
-                sendCurrentPath();
+                updateDirectory(cur_path);
+                break;
+            case EIO:
+                std::cerr << fe->getErrCode().value() << fe->getErrCode().message() << " " << fe->getPath1() << " " << fe->getPath2() << std::endl;
+                FileManager::getInstance()->replyToError( fe->get_t_id(), FileManager::IGNORE );
+                updateDirectory(cur_path);
                 break;
             default:
-                std::cerr << fe->getErrCode().message() << std::endl;
+                std::cerr << fe->getErrCode().value() << fe->getErrCode().message() << " " << fe->getPath1() << " " << fe->getPath2() << std::endl;
                 FileManager::getInstance()->replyToError( fe->get_t_id(), FileManager::TERMINATE );
-                sendCurrentPath();
+                updateDirectory(cur_path);
                 break;
                 //we don't know;
         }

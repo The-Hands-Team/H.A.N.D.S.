@@ -41,18 +41,25 @@ enum Direction {
     NONE
 };
 
+enum Hand {
+    LEFT,
+    RIGHT
+}
+
 //TODO move code to cpp
 
 class GestureMessage : public Message
 {
 public:
-    GestureMessage(GestureType g, Direction d): Message(GESTURE),gesture(g),dir(d){};
+    GestureMessage(GestureType g, Direction d, Hand h): Message(GESTURE),gesture(g),dir(d),hand(h) {};
     GestureType getGesture() { return gesture; };
     Direction getDir() { return dir; };
+    Hand getHand() { return hand; };
 
 private:
     GestureType gesture;
     Direction dir;
+    Hand hand;
 };
 
 class KeyMessage : public Message

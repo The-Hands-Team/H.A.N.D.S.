@@ -1,7 +1,8 @@
 .cproject
 .project
 .settings
-lib/*.o
+lib/Release/
+lib/Debug/
 Run
 .nfs*
 LeapTop.cbp

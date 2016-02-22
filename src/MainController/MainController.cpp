@@ -172,6 +172,60 @@ void MainController::copyUp()
 		clearSelected();
 	}
 }
+
+void MainController::moveCurrent()
+{
+	std::vector<fs::path> source;
+	std::vector<fs::path> dest;
+	
+	for( auto const v : selected )
+	{
+		source.emplace_back( v );
+		dest.emplace_back( cur_path / v.filename().concat( "_rename" ) );
+	}
+	
+    FileManager::getInstance()->moveFiles(source,dest);
+    
+	clearSelected();
+}
+void MainController::moveInto()
+{
+	fs::path dest_p = curEntry().path();
+	std::vector<fs::path> source;
+	std::vector<fs::path> dest;
+	if (fs::is_directory(dest_p))
+	{
+		for( auto const v : selected )
+		{
+			source.emplace_back( v );
+			dest.emplace_back( dest_p / v.filename() );
+		}
+		
+		FileManager::getInstance()->moveFiles(source,dest);
+		
+		clearSelected();
+	}
+}
+void MainController::moveUp()
+{
+	fs::path dest_p = cur_path.parent_path();
+	std::vector<fs::path> source;
+	std::vector<fs::path> dest;
+	
+	if (fs::is_directory(dest_p))
+	{
+		for( auto const v : selected )
+		{
+			source.emplace_back( v );
+			dest.emplace_back( dest_p / v.filename() );
+		}
+		
+		FileManager::getInstance()->moveFiles(source,dest);
+		
+		clearSelected();
+	}
+}
+
 void MainController::clearSelected()
 {
 	selected.clear();
@@ -231,10 +285,33 @@ void MainController::processEvent(Message* m)
             switch(ke->getKey())
             {
             case irr::EKEY_CODE::KEY_KEY_C:
-                {
+				if( ke->getShift() )
+				{
+					copyUp();
+				}
+				else if ( ke->getCtrl() )
+				{
+					copyInto();
+				}
+				else
+				{
 					copyCurrent();
-                    break;
-                }
+				}
+				break;
+			case irr::EKEY_CODE::KEY_KEY_M:
+				if( ke->getShift() )
+				{
+					moveUp();
+				}
+				else if ( ke->getCtrl() )
+				{
+					moveInto();
+				}
+				else
+				{
+					moveCurrent();
+				}
+				break;
             case irr::EKEY_CODE::KEY_KEY_S:
                 {
 					select();
@@ -242,8 +319,9 @@ void MainController::processEvent(Message* m)
                 }
             case irr::EKEY_CODE::KEY_KEY_D:
                 {
-                    break;
+                    std::cout << ke->getShift() << ke->getCtrl() << std::endl;
                 }
+                break;
             case irr::EKEY_CODE::KEY_UP:
 				chdirUp();
                 break;

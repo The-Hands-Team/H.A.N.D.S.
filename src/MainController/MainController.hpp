@@ -23,6 +23,9 @@ private:
 	void copyCurrent();
     void copyInto();
     void copyUp();
+	void moveCurrent();
+    void moveInto();
+    void moveUp();
     void clearSelected();
 	fs::directory_entry curEntry();
 

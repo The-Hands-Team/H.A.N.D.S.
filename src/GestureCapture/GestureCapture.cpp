@@ -104,13 +104,17 @@ void GestureCapture::onFrame(const Controller& controller) {
 
 void GestureCapture::detectPinch(Frame frame, bool *curGestures)
 {
-    if(1==frame.hands()[0].pinchStrength())
+  Leap::HandList hands = frame.hands();
+  for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
+  {
+    if(1==(*hl).pinchStrength())
     {
         curGestures[PINCH] = true;
         if(!activeGestures[PINCH])
-            GestureQueue::getInstance()->push(new GestureMessage(PINCH, NONE, ((frame.hands()[0].isRight()) ? HAND_RIGHT : HAND_LEFT )));
+            GestureQueue::getInstance()->push(new GestureMessage(PINCH, NONE, (((*hl).isRight()) ? HAND_RIGHT : HAND_LEFT )));
         activeGestures[PINCH] = true;
     }
+  }
 }
 
 void initGesture(bool background) {

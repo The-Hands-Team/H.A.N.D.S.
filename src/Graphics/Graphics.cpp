@@ -107,7 +107,7 @@ using namespace irr;
                 dirNodes[i]->setPosition(core::vector3df
                     (
                         dirObjects[i].getX() * unit_size*width,
-                        dirObjects[i].getY() * unit_size*width,
+                        -dirObjects[i].getY() * unit_size*width,
                         50
                     ));
 
@@ -147,6 +147,20 @@ using namespace irr;
         }
         numDirNodes = numDirObjects;
         objLock.unlock();
+    }
+
+    void checkScroll(irr::scene::ICameraSceneNode* cam, MyEventReceiver receiver)
+    {
+       if(receiver.IsKeyDown(irr::KEY_KEY_Z))
+       {
+	  cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+1, cam->getPosition().Z));
+	  cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y+1, cam->getTarget().Z));
+       }
+       if(receiver.IsKeyDown(irr::KEY_KEY_X))
+       {
+	  cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-1, cam->getPosition().Z));
+	  cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y-1, cam->getTarget().Z));
+       }
     }
 
     bool tiltingR = false;
@@ -232,16 +246,25 @@ using namespace irr;
         smgr = device->getSceneManager();
         env = device->getGUIEnvironment();
 
-        /*
-        To be able to look at and move around in this scene, we create a first
-        person shooter style camera and make the mouse cursor invisible.
-        smgr->addCameraSceneNodeFPS();
-        device->getCursorControl()->setVisible(false);
-        */
+        //create persp camera
+    	float mid = (width * unit_size) / 2.0;
+        irr::scene::ICameraSceneNode* camPersp = smgr->addCameraSceneNode(
+							0,
+							core::vector3df(mid,-mid,0),
+							core::vector3df(mid,-mid,view_height),
+							-1,
+							true);
 
-        //create camera
-    float mid = (width * unit_size) / 2.0;
-        irr::scene::ICameraSceneNode* cam = smgr->addCameraSceneNode(0,core::vector3df(mid,mid,0),core::vector3df(mid,mid,view_height),-1,true);
+	//create orth camera
+	irr:scene::ICameraSceneNode* camOrth = smgr->addCameraSceneNode(
+							0,
+							core::vector3df(mid,-mid,0),
+							core::vector3df(mid,-mid,view_height),
+							-1,
+							true);
+	core::matrix4 projMat;
+	projMat.buildProjectionMatrixOrthoLH(75,75,10,100);
+	camOrth->setProjectionMatrix(projMat, true);
 
         /*
         We have done everything, so lets draw it. We also write the current
@@ -256,23 +279,23 @@ using namespace irr;
 
         while(device->run())
         {
+	    irr::scene::ICameraSceneNode* cam = smgr->getActiveCamera();
             fillNodes();
 
             if(receiver.IsKeyDown(irr::KEY_ESCAPE))
             {
                 exit(0);
             }
-            if(receiver.IsKeyDown(irr::KEY_KEY_Z))
+            if(receiver.IsKeyDown(irr::KEY_KEY_P))
             {
-		cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+1, cam->getPosition().Z));
-		cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y+1, cam->getTarget().Z));
+                smgr->setActiveCamera(camPersp);  
             }
-            if(receiver.IsKeyDown(irr::KEY_KEY_X))
+            if(receiver.IsKeyDown(irr::KEY_KEY_O))
             {
-		cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-1, cam->getPosition().Z));
-		cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y-1, cam->getTarget().Z));
+                smgr->setActiveCamera(camOrth);
             }
 
+	checkScroll(cam, receiver);
 	checkTilt(cam, receiver);
 
 

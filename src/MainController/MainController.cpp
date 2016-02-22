@@ -39,8 +39,7 @@ void MainController::mainLoop()
 {
     GestureQueue* event_q = GestureQueue::getInstance();
     cur_path = fs::path("tests/test_dir");
-    ///**/dir_it = fs::directory_iterator(cur_path);
-	/**/updateDirectory(cur_path);
+	updateDirectory(cur_path);
 	new_dir_i = 0;
 
     while (true)
@@ -48,7 +47,6 @@ void MainController::mainLoop()
         sendCurrentPath();
         //got something in queue
         Message* ev = event_q->pop();
-        //TODO: ACTUALLY PROCESS THE EVENT
         processEvent(ev);
         while (event_q->size() != 0)
         {
@@ -82,7 +80,7 @@ void MainController::updateDirectory(fs::path new_dir)
 			d_it++;
 		}
 		cur_path = new_dir;
-		//TODO: update graphiczz
+		//update graphiczz
 		sendCurrentPath();
 	}
 }
@@ -186,24 +184,15 @@ fs::directory_entry MainController::curEntry()
 
 void MainController::processEvent(Message* m)
 {
-    //std::cout << "This is the part where an event gets processed! It was: " << ge->getName() << std::endl;
-    //std::cout << m->getType() << std::endl;
 
     if (GESTURE == m->getType())
     {
         GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
-        //std::cout << ge->getGesture() << std::endl;
         switch (ge->getGesture())
         {
         case KEY_TAP:
         {
-			/**/copyCurrent();
-            //break;
-            ///**/fs::path dest = dir_it->path();
-            ///**/dest += fs::path("_copy");
-            ///**/FileManager::getInstance()->copyFile(dir_it->path(),dest);
-            ///**/std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            ///**/sendCurrentPath();
+			copyCurrent();
             break;
         }
         case SCREEN_TAP:
@@ -215,26 +204,16 @@ void MainController::processEvent(Message* m)
             switch (ge->getDir())
             {
             case UP:
-				/**/chdirUp();
-                ///**/if (cur_path.parent_path() != "")
-                ///**/{
-                   // /**/fs::path parent = cur_path.parent_path();
-                    ///**/dir_it = fs::directory_iterator(parent);
-                    ///**/while (dir_it != fs::end(dir_it)
-                          //  && dir_it->path() != cur_path)
-                        ///**/dir_it++;
-                    ///**/cur_path = parent;
-                    ///**/sendCurrentPath();
-                ///**/}
+				chdirUp();
                 break;
             case DOWN:
-				/**/chdirDown();
+				chdirDown();
                 break;
             case RIGHT:
-				/**/iterateForward();
+				iterateForward();
                 break;
 			case LEFT:
-				/**/iterateBack();
+				iterateBack();
 				break;
             default:
                 break;
@@ -308,10 +287,7 @@ void MainController::processEvent(Message* m)
 
 void MainController::sendCurrentPath()
 {
-    ///**/size_t length = 0;
     // TODO Also keep a copy of the list for ourselves, possibly with more information
-    ///**/for( fs::directory_iterator it (cur_path); it != fs::end(it); it++) length++;
-    ///**/dirObject* objs = new dirObject[length];
     size_t length = new_dir_contents.size();
     dirObject* objs = nullptr;
     
@@ -322,13 +298,7 @@ void MainController::sendCurrentPath()
         const std::wstring name = new_dir_contents[i].path().filename().wstring();
         objs[i] = dirObject(fs::is_directory(new_dir_contents[i].path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name, i == new_dir_i, selected.count(new_dir_contents[i].path()));
 	}
-    /*for( fs::directory_iterator it (cur_path); i<length; it++, i++)
-    {
-        const std::wstring name = it->path().filename().wstring();
-        objs[i] = dirObject(fs::is_directory(it->path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name.data(), *it == *dir_it);
-    }*/
 
-    ///**/newObjects(objs, length);
     newObjects(objs, length);
 
 }

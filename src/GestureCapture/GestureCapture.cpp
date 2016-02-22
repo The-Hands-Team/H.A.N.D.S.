@@ -46,12 +46,6 @@ void GestureCapture::onFrame(const Controller& controller) {
                     GestureQueue::getInstance()->push(new GestureMessage(CIRCLE, NONE));
                 activeGestures[CIRCLE] = true;
                 break;
-            case Leap::Gesture::TYPE_KEY_TAP:
-                /*curGestures[KEY_TAP] = true;
-                if(!activeGestures[KEY_TAP])
-                    GestureQueue::getInstance()->push(new GestureMessage(KEY_TAP, NONE));
-                activeGestures[KEY_TAP] = true;*/
-                break;
             case Leap::Gesture::TYPE_SCREEN_TAP:
                 curGestures[SCREEN_TAP] = true;
                 if(!activeGestures[SCREEN_TAP])
@@ -112,10 +106,10 @@ void GestureCapture::detectPinch(Frame frame, bool *curGestures)
 {
     if(1==frame.hands()[0].pinchStrength())
     {
-        curGestures[KEY_TAP] = true;
-        if(!activeGestures[KEY_TAP])
-            GestureQueue::getInstance()->push(new GestureMessage(KEY_TAP, NONE));
-        activeGestures[KEY_TAP] = true;
+        curGestures[PINCH] = true;
+        if(!activeGestures[PINCH])
+            GestureQueue::getInstance()->push(new GestureMessage(PINCH, NONE));
+        activeGestures[PINCH] = true;
     }
 }
 

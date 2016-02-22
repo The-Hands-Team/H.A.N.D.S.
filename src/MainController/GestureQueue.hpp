@@ -42,9 +42,9 @@ enum Direction {
 };
 
 enum Hand {
-    LEFT,
-    RIGHT
-}
+    HAND_LEFT,
+    HAND_RIGHT
+};
 
 //TODO move code to cpp
 

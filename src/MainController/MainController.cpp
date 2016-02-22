@@ -190,7 +190,7 @@ void MainController::processEvent(Message* m)
         GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
         switch (ge->getGesture())
         {
-        case KEY_TAP:
+        case PINCH:
         {
 			copyCurrent();
             break;

@@ -108,7 +108,7 @@ void GestureCapture::detectPinch(Frame frame, bool *curGestures)
     {
         curGestures[PINCH] = true;
         if(!activeGestures[PINCH])
-            GestureQueue::getInstance()->push(new GestureMessage(PINCH, NONE, HAND_RIGHT));
+            GestureQueue::getInstance()->push(new GestureMessage(PINCH, NONE, ((frame.hands()[0].isRight()) ? HAND_RIGHT : HAND_LEFT )));
         activeGestures[PINCH] = true;
     }
 }

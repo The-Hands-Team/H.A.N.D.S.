@@ -22,7 +22,6 @@ const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE"
 
 void GestureCapture::onConnect(const Controller& controller) {
   controller.enableGesture(Gesture::TYPE_CIRCLE);
-  controller.enableGesture(Gesture::TYPE_KEY_TAP);
   controller.enableGesture(Gesture::TYPE_SCREEN_TAP);
   controller.enableGesture(Gesture::TYPE_SWIPE);
 }
@@ -95,6 +94,7 @@ void GestureCapture::onFrame(const Controller& controller) {
     }
 
     detectPinch(frame, curGestures);
+    detectGrab(frame, curGestures);
 
     for(int i=0; i<INVALID_GESTURE; i++)
     {
@@ -113,6 +113,21 @@ void GestureCapture::detectPinch(Frame frame, bool *curGestures)
         if(!activeGestures[PINCH])
             GestureQueue::getInstance()->push(new GestureMessage(PINCH, NONE, (((*hl).isRight()) ? HAND_RIGHT : HAND_LEFT )));
         activeGestures[PINCH] = true;
+    }
+  }
+}
+
+void GestureCapture::detectGrab(Frame frame, bool *curGestures)
+{
+  Leap::HandList hands = frame.hands();
+  for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
+  {
+    if(1==(*hl).grabStrength())
+    {
+        curGestures[GRAB] = true;
+        if(!activeGestures[GRAB])
+            GestureQueue::getInstance()->push(new GestureMessage(GRAB, NONE, (((*hl).isRight()) ? HAND_RIGHT : HAND_LEFT )));
+        activeGestures[GRAB] = true;
     }
   }
 }

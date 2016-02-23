@@ -28,6 +28,7 @@ protected:
 enum GestureType {
     CIRCLE,
     PINCH,
+    GRAB,
     SCREEN_TAP,
     SWIPE,
     INVALID_GESTURE

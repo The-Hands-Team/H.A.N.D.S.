@@ -1,17 +1,27 @@
+# Makefile
+#
+# This makefile searches for .cpp files and creates a temporary
+# makefile that contains the rules for making the corresponding
+# object files. It then includes that makefile and builds those
+# object files. Finally it links everything into an executable.
+#
+
+########## VARIABLES ##########
 OS := $(shell uname)
 ARCH := $(shell uname -m)
 
-
-C_FLAGS = -std=c++11 -Wall -Wextra -Wpedantic -g -D DEBUG=$(DEBUG) -isysteminclude/ -Isrc/
-FOLDER := lib/Debug/
-DEBUG := 1
+# Finds all .cpp files in src/
+FILES := $(shell find src/ -name *.cpp -printf "%p ")
+# Every .cpp file has a corresponding .o file
+MY_LIBS = $(addprefix lib/_output/,$(addsuffix .o,$(basename $(notdir $(FILES)))))
+# Compiler flags
+CXXFLAGS = -std=c++11 -Wall -Wextra -Wpedantic -g -isysteminclude/ -Isrc/
+# The temporary makefile to use
 TEMPFILE := temp.mk
 
+### Libraries we include
 STD_LIB := -lpthread -lstdc++fs
-IRR_LIB = -Llib/irrlicht/ -lIrrlicht -lGL -lXxf86vm -lXext -lX11 -lXcursor
-MY_LIBS = $(FOLDER)FileManager.o $(FOLDER)GestureCapture.o $(FOLDER)MainController.o $(FOLDER)Graphics.o $(FOLDER)GestureQueue.o
-Files = make/FileManager.d make/GestureCapture.d make/MainController.d make/Graphics.d make/GestureQueue.d
-#$(FOLDER)GestureEvent.o
+IRR_LIB := -Llib/irrlicht/ -lIrrlicht -lGL -lXxf86vm -lXext -lX11 -lXcursor
 ifeq ($(OS), Linux)
   ifeq ($(ARCH), x86_64)
     LEAP_LIBRARY := lib/LeapMotion/x64/libLeap.so -Wl,-rpath,lib/LeapMotion/x64
@@ -22,44 +32,43 @@ else
   # OS X
   LEAP_LIBRARY := lib/LeapMotion/libLeap.dylib
 endif
-
-Debug: $(MY_LIBS)
-	$(CXX) $(C_FLAGS) $(MY_LIBS) $(LEAP_LIBRARY) $(IRR_LIB) $(STD_LIB) -o Run; \
-	rm $(TEMPFILE)
-
-Release: setRelease $(MY_LIBS)
-	$(CXX) $(C_FLAGS) $(MY_LIBS) $(LEAP_LIBRARY) $(IRR_LIB) $(STD_LIB) -o Run; \
-	rm $(TEMPFILE)
-
-setRelease:
-	$(eval FOLDER=lib/Release/)
-	$(eval DEBUG=0)
-
 ifeq ($(OS), Darwin)
-	install_name_tool -change @loader_path/libLeap.dylib $(FOLDER)LeapMotion/libLeap.dylib GestureTest
+	install_name_tool -change @loader_path/libLeap.dylib lib/_output/LeapMotion/libLeap.dylib GestureTest
 endif
 
--include $(TEMPFILE)
 
+########## FUNCTIONS ##########
+# Function used to write rules in the temporary makefile
+define createStatement = 
+	$(CXX) $(CXXFLAGS) -MM -MT $(addprefix lib/_output/,$(addsuffix .o,$(basename $(notdir $(1))))) $(1) >> $(TEMPFILE); \
+	printf "	$(CXX) $(CXXFLAGS) -c $$< -o \$$@\n\n" >> $(TEMPFILE);
+endef
+
+########## TARGETS ##########
+
+# Default target
+all: $(MY_LIBS) | lib/_output
+	$(CXX) $(CXXFLAGS) $(MY_LIBS) $(LEAP_LIBRARY) $(IRR_LIB) $(STD_LIB) -o Run; rm $(TEMPFILE)
+
+# Create Target Folder
+lib/_output:
+	mkdir lib/_output
+
+# This creates the temporary makefile
 $(TEMPFILE):
+	rm -f $(TEMPFILE)
 	touch $(TEMPFILE)
-	$(CXX) $(C_FLAGS) -MM -MT $(FOLDER)MainController.o src/MainController/MainController.cpp >> $(TEMPFILE)
-	printf "	$(CXX) $(C_FLAGS) -c $$< -o $(FOLDER)MainController.o\n\n" >> $(TEMPFILE)
-	$(CXX) $(C_FLAGS) -MM -MT $(FOLDER)FileManager.o src/FileSystem/FileManager.cpp >> $(TEMPFILE)
-	printf "	$(CXX) $(C_FLAGS) -c $$< -o $(FOLDER)FileManager.o\n\n" >> $(TEMPFILE)
-	$(CXX) $(C_FLAGS) -MM -MT $(FOLDER)GestureCapture.o src/GestureCapture/GestureCapture.cpp >> $(TEMPFILE)
-	printf "	$(CXX) $(C_FLAGS) -c $$< -o $(FOLDER)GestureCapture.o\n\n" >> $(TEMPFILE)
-	$(CXX) $(C_FLAGS) -MM -MT $(FOLDER)GestureQueue.o src/MainController/GestureQueue.cpp >> $(TEMPFILE)
-	printf "	$(CXX) $(C_FLAGS) -c $$< -o $(FOLDER)GestureQueue.o\n\n" >> $(TEMPFILE)
-	$(CXX) $(C_FLAGS) -MM -MT $(FOLDER)Graphics.o src/Graphics/Graphics.cpp >> $(TEMPFILE)
-	printf "	$(CXX) $(C_FLAGS) -c $$< -o $(FOLDER)Graphics.o\n\n" >> $(TEMPFILE)
+	$(foreach file, $(FILES), $(call createStatement,$(file)))
 
+### Cleanup
 
 clean:
-	rm -rf Run $(MY_LIBS); \
-	rm $(TEMPFILE)
+	rm -rf Run $(TEMPFILE) lib/_output/*
 
-releaseClean: setRelease clean
-	
+### Special targets
+#.SILENT: $(TEMPFILE)
 
-.SILENT: $(TEMPFILE)
+.PHONY: all clean
+
+########## INCLUDES ##########
+-include $(TEMPFILE)

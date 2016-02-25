@@ -107,14 +107,16 @@ void GestureCapture::checkHands(Frame frame, bool *curGestures)
   Leap::HandList hands = frame.hands();
   for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
   {
-    if(1==(*hl).grabStrength())
+    float pinchStr = (*hl).pinchStrength();
+    float grabStr = (*hl).grabStrength();
+    if(1==grabStr && 1>pinchStr)
     {
         curGestures[GRAB] = true;
         if(!activeGestures[GRAB])
             GestureQueue::getInstance()->push(new GestureMessage(GRAB, NONE, (((*hl).isRight()) ? RIGHT_HAND : LEFT_HAND )));
         activeGestures[GRAB] = true;
     }
-    else if(1==(*hl).pinchStrength())
+    else if(1==pinchStr && .7>grabStr)
     {
         curGestures[PINCH] = true;
         if(!activeGestures[PINCH])

@@ -28,8 +28,8 @@ MainController* MainController::getInstance()
 
 int main()
 {
-    std::thread graphics(initGraphics);
-    std::thread gesture(initGesture, false);
+    std::thread graphics( Graphics::getInstance );
+    std::thread gesture( initGesture, false);
     gesture.detach();
     graphics.detach();
     MainController::getInstance()->mainLoop();
@@ -178,14 +178,14 @@ fs::directory_entry MainController::curEntry()
 void MainController::processEvent(Message* m)
 {
 
-    if (GESTURE == m->getType())
+    if ( Message::GESTURE == m->getType() )
     {
         GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
-        std::cout << ge->getGesture() << " " << ge->getHand() << " " << ge->getDir() << std::endl;
+        std::cout << ge->getGesture() << " " << ge->getHandedness() << " " << ge->getDir() << std::endl;
         switch (ge->getGesture())
         {
         case PINCH:
-            if( HAND_RIGHT == ge->getHand() )
+            if( RIGHT_HAND == ge->getHandedness() )
             {
                 select();
                 break;
@@ -195,7 +195,7 @@ void MainController::processEvent(Message* m)
                 copyInto( cur_path );
             }
         case SCREEN_TAP:
-            if( HAND_RIGHT == ge->getHand() )
+            if( RIGHT_HAND == ge->getHandedness() )
             {
                 std::cout << cur_path << std::endl;
             }
@@ -203,7 +203,7 @@ void MainController::processEvent(Message* m)
         case CIRCLE:
             break;
         case SWIPE:
-            if( HAND_RIGHT == ge->getHand() )
+            if( RIGHT_HAND == ge->getHandedness() )
             {
                 switch (ge->getDir())
                 {
@@ -249,7 +249,7 @@ void MainController::processEvent(Message* m)
             break;
         }
     }
-    else if(KEYPRESS == m->getType())
+    else if( Message::KEYPRESS == m->getType() )
     {
         KeyMessage* ke = dynamic_cast<KeyMessage*>(m);
         if(ke->getPressed())
@@ -309,7 +309,7 @@ void MainController::processEvent(Message* m)
                 break;
             }
     }
-    else if(FILESYSTEM == m->getType())
+    else if( Message::FILESYSTEM == m->getType() )
     {
         FileSystemMessage* fe = dynamic_cast<FileSystemMessage*>(m);
         switch( fe->getErrCode().value() )
@@ -337,17 +337,17 @@ void MainController::processEvent(Message* m)
 void MainController::sendCurrentPath()
 {
     // TODO Also keep a copy of the list for ourselves, possibly with more information
-    size_t length = new_dir_contents.size();
-    dirObject* objs = nullptr;
+    std::vector<DirObject> objs;
 
-    if( length > 0 ) objs = new dirObject[length];
-
-	for (unsigned int i = 0; i < length; i++)
+	for ( unsigned int i = 0; i < new_dir_contents.size(); i++ )
 	{
-        const std::wstring name = new_dir_contents[i].path().filename().wstring();
-        objs[i] = dirObject(fs::is_directory(new_dir_contents[i].path())?'d':'f',0.25f*(i/5),0.25f*(i%5),name, i == new_dir_i, selected.count(new_dir_contents[i].path()));
+        objs.emplace_back( fs::is_directory(new_dir_contents[i].path())?'d':'f'
+                         , 0.25f*(i/5),0.25f*(i%5)
+                         , new_dir_contents[i].path().filename().wstring()
+                         , i == new_dir_i
+                         , selected.count( new_dir_contents[i].path() ) );
 	}
 
-    newObjects(objs, length);
+    Graphics::getInstance()->newObjects(objs);
 
 }

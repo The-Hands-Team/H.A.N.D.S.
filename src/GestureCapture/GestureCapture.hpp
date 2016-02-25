@@ -6,6 +6,28 @@
 
 void initGesture(bool background);
 
+enum GestureType {
+    CIRCLE,
+    PINCH,
+    GRAB,
+    SCREEN_TAP,
+    SWIPE,
+    INVALID_GESTURE
+};
+
+enum Direction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    NONE
+};
+
+enum Handedness {
+    LEFT_HAND,
+    RIGHT_HAND
+};
+
 using namespace Leap;
 
 class GestureCapture : public Listener {

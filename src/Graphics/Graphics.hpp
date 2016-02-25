@@ -1,54 +1,50 @@
-#include <memory>
-#include <cstring>
-#include "irrlicht/irrTypes.h"
+#include "DirObject.hpp"
+#include <vector>
+#include <mutex>
+#include "EventListener.hpp"
+#include "irrlicht/ISceneNode.h"
+#include "irrlicht/ICameraSceneNode.h"
+#include "irrlicht/IVideoDriver.h"
+#include "irrlicht/ISceneManager.h"
+#include "irrlicht/IGUIEnvironment.h"
 
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+using namespace irr;
 
-void initGraphics();
-
-
-struct dirObject
+class Graphics
 {
+
 public:
-    dirObject():isHighlighted(false),type('f'),x(5),y(5),name(L""){  };
-    dirObject(char i_type, irr::f32 i_x, irr::f32 i_y, const std::wstring& i_name, bool i_isHighlighted, bool i_isSelected )
-        : isHighlighted( i_isHighlighted )
-        , isSelected( i_isSelected )
-        , type( i_type )
-        , x( i_x )
-        , y( i_y )
-        , name( i_name )
-    {
-    };
-    char getType()
-        {
-            return type;
-        }
-        irr::f32 getX()
-        {
-            return x;
-        }
-        irr::f32 getY()
-        {
-            return y;
-        }
-        std::wstring* getName()
-        {
-            return &name;
-        }
-	bool isHighlighted;
-    bool isSelected;
+
+    Graphics();
+
+    void newObjects( const std::vector<DirObject>& );
+
+    static Graphics* getInstance();
+
+
 private:
-    char type;
-    irr::f32 x;
-    irr::f32 y;
-    std::wstring name;
+    static Graphics* instance;
+
+    video::IVideoDriver* driver;
+    scene::ISceneManager* smgr;
+    gui::IGUIEnvironment* env;
+
+    static const int width;
+    static const int unit_size;
+    static const int view_height;
+    static const int max_text_length;
+
+    std::mutex objLock;
+    std::vector<DirObject> dirObjects;
+    std::vector<scene::ISceneNode*> dirNodes;
+
+    void emptyNodes();
+    void fillNodes();
+    void checkScroll(scene::ICameraSceneNode*, EventListener);
+
 };
-
-
-
-void newObjects(dirObject*, size_t);
 
 #endif

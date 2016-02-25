@@ -1,10 +1,9 @@
 .cproject
 .project
 .settings
-lib/Release/
-lib/Debug/
+lib/_output/*
 Run
 .nfs*
 LeapTop.cbp
 LeapTop.layout
-tests/
+tests/**/*

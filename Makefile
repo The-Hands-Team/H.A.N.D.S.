@@ -39,7 +39,7 @@ endif
 
 ########## FUNCTIONS ##########
 # Function used to write rules in the temporary makefile
-define createStatement = 
+define createStatement =
 	$(CXX) $(CXXFLAGS) -MM -MT $(addprefix lib/_output/,$(addsuffix .o,$(basename $(notdir $(1))))) $(1) >> $(TEMPFILE); \
 	printf "	$(CXX) $(CXXFLAGS) -c $$< -o \$$@\n\n" >> $(TEMPFILE);
 endef
@@ -66,7 +66,7 @@ clean:
 	rm -rf Run $(TEMPFILE) lib/_output/*
 
 ### Special targets
-#.SILENT: $(TEMPFILE)
+.SILENT: $(TEMPFILE)
 
 .PHONY: all clean
 

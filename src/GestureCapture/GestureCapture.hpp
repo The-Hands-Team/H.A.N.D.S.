@@ -21,8 +21,7 @@ class GestureCapture : public Listener {
         virtual void onDeviceChange(const Controller&) {};
         virtual void onServiceConnect(const Controller&) {};
         virtual void onServiceDisconnect(const Controller&) {};
-        void detectPinch(Frame frame, bool *curGestures);
-        void detectGrab(Frame frame, bool *curGestures);
+        void checkHands(Frame frame, bool *curGestures);
 
     private:
         bool activeGestures[INVALID_GESTURE]= { 0 };

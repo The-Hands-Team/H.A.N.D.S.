@@ -38,17 +38,18 @@ void GestureCapture::onFrame(const Controller& controller) {
     Leap::GestureList gestures = frame.gestures();
     for(Leap::GestureList::const_iterator gl = gestures.begin(); gl != gestures.end(); gl++)
     {
+        ::Hand hand = (*(*gl).hands().begin()).isRight() ? HAND_RIGHT : HAND_LEFT;
         switch ((*gl).type()) {
             case Leap::Gesture::TYPE_CIRCLE:
                 curGestures[CIRCLE] = true;
                 if(!activeGestures[CIRCLE])
-                    GestureQueue::getInstance()->push(new GestureMessage(CIRCLE, NONE, HAND_RIGHT));
+                    GestureQueue::getInstance()->push(new GestureMessage(CIRCLE, NONE, hand));
                 activeGestures[CIRCLE] = true;
                 break;
             case Leap::Gesture::TYPE_SCREEN_TAP:
                 curGestures[SCREEN_TAP] = true;
                 if(!activeGestures[SCREEN_TAP])
-                    GestureQueue::getInstance()->push(new GestureMessage(SCREEN_TAP, NONE, HAND_RIGHT));
+                    GestureQueue::getInstance()->push(new GestureMessage(SCREEN_TAP, NONE, hand));
                 activeGestures[SCREEN_TAP] = true;
                 break;
             case Leap::Gesture::TYPE_SWIPE:
@@ -82,7 +83,7 @@ void GestureCapture::onFrame(const Controller& controller) {
                     {
                         curGestures[swipeType] = true;
                         if(!activeGestures[swipeType])
-                            GestureQueue::getInstance()->push(new GestureMessage(SWIPE, swipeType, HAND_RIGHT));
+                            GestureQueue::getInstance()->push(new GestureMessage(SWIPE, swipeType, hand));
                         activeGestures[swipeType] = true;
                     }
                     break;
@@ -93,8 +94,7 @@ void GestureCapture::onFrame(const Controller& controller) {
         }
     }
 
-    detectPinch(frame, curGestures);
-    detectGrab(frame, curGestures);
+    checkHands(frame, curGestures);
 
     for(int i=0; i<INVALID_GESTURE; i++)
     {
@@ -102,22 +102,7 @@ void GestureCapture::onFrame(const Controller& controller) {
     }
 }
 
-void GestureCapture::detectPinch(Frame frame, bool *curGestures)
-{
-  Leap::HandList hands = frame.hands();
-  for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
-  {
-    if(1==(*hl).pinchStrength())
-    {
-        curGestures[PINCH] = true;
-        if(!activeGestures[PINCH])
-            GestureQueue::getInstance()->push(new GestureMessage(PINCH, NONE, (((*hl).isRight()) ? HAND_RIGHT : HAND_LEFT )));
-        activeGestures[PINCH] = true;
-    }
-  }
-}
-
-void GestureCapture::detectGrab(Frame frame, bool *curGestures)
+void GestureCapture::checkHands(Frame frame, bool *curGestures)
 {
   Leap::HandList hands = frame.hands();
   for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
@@ -128,6 +113,13 @@ void GestureCapture::detectGrab(Frame frame, bool *curGestures)
         if(!activeGestures[GRAB])
             GestureQueue::getInstance()->push(new GestureMessage(GRAB, NONE, (((*hl).isRight()) ? HAND_RIGHT : HAND_LEFT )));
         activeGestures[GRAB] = true;
+    }
+    else if(1==(*hl).pinchStrength())
+    {
+        curGestures[PINCH] = true;
+        if(!activeGestures[PINCH])
+            GestureQueue::getInstance()->push(new GestureMessage(PINCH, NONE, (((*hl).isRight()) ? HAND_RIGHT : HAND_LEFT )));
+        activeGestures[PINCH] = true;
     }
   }
 }

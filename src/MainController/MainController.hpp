@@ -20,12 +20,8 @@ private:
 	void iterateForward();
 	void iterateBack();
     void select();
-	void copyCurrent();
-    void copyInto();
-    void copyUp();
-	void moveCurrent();
-    void moveInto();
-    void moveUp();
+    void copyInto(fs::path);
+    void moveInto(fs::path);
     void clearSelected();
 	fs::directory_entry curEntry();
 

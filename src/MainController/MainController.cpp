@@ -119,109 +119,48 @@ void MainController::select()
 	}
 }
 
+void MainController::copyInto(fs::path dest)
+{
+	std::vector<fs::path> source;
+	std::vector<fs::path> destination;
+	if (fs::is_directory(dest))
+	{
+		for( auto const v : selected )
+		{
+            fs::path dest_name = dest / v.filename();
+            if( fs::exists(dest_name) ) dest_name += "_copy";
+			source.emplace_back( v );
+			destination.emplace_back( dest_name );
+		}
 
-void MainController::copyCurrent()
-{
-	std::vector<fs::path> source;
-	std::vector<fs::path> dest;
-	
-	for( auto const v : selected )
-	{
-		source.emplace_back( v );
-		dest.emplace_back( cur_path / v.filename().concat( "_copy" ) );
-	}
-	
-    FileManager::getInstance()->copyFiles(source,dest);
-    
-	clearSelected();
-}
-void MainController::copyInto()
-{
-	fs::path dest_p = curEntry().path();
-	std::vector<fs::path> source;
-	std::vector<fs::path> dest;
-	if (fs::is_directory(dest_p))
-	{
-		for( auto const v : selected )
-		{
-			source.emplace_back( v );
-			dest.emplace_back( dest_p / v.filename() );
-		}
-		
-		FileManager::getInstance()->copyFiles(source,dest);
-		
-		clearSelected();
-	}
-}
-void MainController::copyUp()
-{
-	fs::path dest_p = cur_path.parent_path();
-	std::vector<fs::path> source;
-	std::vector<fs::path> dest;
-	
-	if (fs::is_directory(dest_p))
-	{
-		for( auto const v : selected )
-		{
-			source.emplace_back( v );
-			dest.emplace_back( dest_p / v.filename() );
-		}
-		
-		FileManager::getInstance()->copyFiles(source,dest);
-		
+        if( 0 < source.size() )
+        {
+            FileManager::getInstance()->copyFiles(source,destination);
+        }
+
 		clearSelected();
 	}
 }
 
-void MainController::moveCurrent()
+void MainController::moveInto(fs::path dest)
 {
 	std::vector<fs::path> source;
-	std::vector<fs::path> dest;
-	
-	for( auto const v : selected )
-	{
-		source.emplace_back( v );
-		dest.emplace_back( cur_path / v.filename().concat( "_rename" ) );
-	}
-	
-    FileManager::getInstance()->moveFiles(source,dest);
-    
-	clearSelected();
-}
-void MainController::moveInto()
-{
-	fs::path dest_p = curEntry().path();
-	std::vector<fs::path> source;
-	std::vector<fs::path> dest;
-	if (fs::is_directory(dest_p))
+	std::vector<fs::path> destination;
+	if (fs::is_directory(dest))
 	{
 		for( auto const v : selected )
 		{
+            fs::path dest_name = dest / v.filename();
+            if( fs::exists(dest_name) ) dest_name += "_copy";
 			source.emplace_back( v );
-			dest.emplace_back( dest_p / v.filename() );
+			destination.emplace_back( dest_name );
 		}
-		
-		FileManager::getInstance()->moveFiles(source,dest);
-		
-		clearSelected();
-	}
-}
-void MainController::moveUp()
-{
-	fs::path dest_p = cur_path.parent_path();
-	std::vector<fs::path> source;
-	std::vector<fs::path> dest;
-	
-	if (fs::is_directory(dest_p))
-	{
-		for( auto const v : selected )
-		{
-			source.emplace_back( v );
-			dest.emplace_back( dest_p / v.filename() );
-		}
-		
-		FileManager::getInstance()->moveFiles(source,dest);
-		
+
+        if( 0 < source.size() )
+        {
+            FileManager::getInstance()->moveFiles(source,destination);
+        }
+
 		clearSelected();
 	}
 }
@@ -242,35 +181,67 @@ void MainController::processEvent(Message* m)
     if (GESTURE == m->getType())
     {
         GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
+        std::cout << ge->getGesture() << " " << ge->getHand() << " " << ge->getDir() << std::endl;
         switch (ge->getGesture())
         {
         case PINCH:
-        {
-			copyCurrent();
-            break;
-        }
+            if( HAND_RIGHT == ge->getHand() )
+            {
+                select();
+                break;
+            }
+            else
+            {
+                copyInto( cur_path );
+            }
         case SCREEN_TAP:
-            std::cout << fs::absolute(cur_path) << std::endl;
+            if( HAND_RIGHT == ge->getHand() )
+            {
+                std::cout << cur_path << std::endl;
+            }
             break;
         case CIRCLE:
             break;
         case SWIPE:
-            switch (ge->getDir())
+            if( HAND_RIGHT == ge->getHand() )
             {
-            case UP:
-				chdirUp();
-                break;
-            case DOWN:
-				chdirDown();
-                break;
-            case RIGHT:
-				iterateForward();
-                break;
-			case LEFT:
-				iterateBack();
-				break;
-            default:
-                break;
+                switch (ge->getDir())
+                {
+                case UP:
+                    chdirUp();
+                    break;
+                case DOWN:
+                    chdirDown();
+                    break;
+                case RIGHT:
+                    iterateForward();
+                    break;
+                case LEFT:
+                    iterateBack();
+                    break;
+                default:
+                    break;
+                }
+            }
+            else
+            {
+                switch (ge->getDir())
+                {
+                case UP:
+                    copyInto(cur_path.parent_path());
+                    break;
+                case DOWN:
+                    copyInto(curEntry());
+                    break;
+                case RIGHT:
+                    moveInto(cur_path.parent_path());
+                    break;
+                case LEFT:
+                    moveInto(curEntry());
+                    break;
+                default:
+                    break;
+                }
             }
             break;
         default:
@@ -287,29 +258,29 @@ void MainController::processEvent(Message* m)
             case irr::EKEY_CODE::KEY_KEY_C:
 				if( ke->getShift() )
 				{
-					copyUp();
+					copyInto(cur_path.parent_path());
 				}
 				else if ( ke->getCtrl() )
 				{
-					copyInto();
+					copyInto(curEntry());
 				}
 				else
 				{
-					copyCurrent();
+					copyInto(cur_path);
 				}
 				break;
 			case irr::EKEY_CODE::KEY_KEY_M:
 				if( ke->getShift() )
 				{
-					moveUp();
+					moveInto(cur_path.parent_path());
 				}
 				else if ( ke->getCtrl() )
 				{
-					moveInto();
+					moveInto(curEntry());
 				}
 				else
 				{
-					moveCurrent();
+					moveInto(cur_path);
 				}
 				break;
             case irr::EKEY_CODE::KEY_KEY_S:
@@ -368,7 +339,7 @@ void MainController::sendCurrentPath()
     // TODO Also keep a copy of the list for ourselves, possibly with more information
     size_t length = new_dir_contents.size();
     dirObject* objs = nullptr;
-    
+
     if( length > 0 ) objs = new dirObject[length];
 
 	for (unsigned int i = 0; i < length; i++)

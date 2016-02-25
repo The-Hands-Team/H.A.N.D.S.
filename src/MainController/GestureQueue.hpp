@@ -25,6 +25,7 @@ protected:
     MessageType type;
 };
 
+
 enum GestureType {
     CIRCLE,
     PINCH,

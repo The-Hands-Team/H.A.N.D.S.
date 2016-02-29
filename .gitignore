@@ -1,7 +1,7 @@
 .cproject
 .project
 .settings
-lib/_output/*
+lib/_output/*.o
 Run
 .nfs*
 LeapTop.cbp

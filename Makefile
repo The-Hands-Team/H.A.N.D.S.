@@ -48,6 +48,7 @@ endef
 
 # Default target
 all: $(MY_LIBS) | lib/_output
+	rm $(TEMPFILE)
 	$(CXX) $(CXXFLAGS) $(MY_LIBS) $(LEAP_LIBRARY) $(IRR_LIB) $(STD_LIB) -o Run
 
 # Create Target Folder
@@ -57,7 +58,6 @@ lib/_output:
 # This creates the temporary makefile
 $(TEMPFILE):
 	touch $(TEMPFILE)
-	printf "rm $(TEMPFILE)\n\n"
 	$(foreach file, $(FILES), $(call createStatement,$(file)))
 
 ### Cleanup

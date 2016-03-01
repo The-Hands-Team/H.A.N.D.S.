@@ -34,7 +34,7 @@ Message* GestureQueue::peek()
 
 int GestureQueue::size()
 {
-    git q_mutex.lock();
+    q_mutex.lock();
     int ret =  gesture_q.size();
     q_mutex.unlock();
     return ret;

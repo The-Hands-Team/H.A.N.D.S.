@@ -41,6 +41,7 @@ endif
 # Function used to write rules in the temporary makefile
 define createStatement =
 	$(CXX) $(CXXFLAGS) -MM -MT $(addprefix lib/_output/,$(addsuffix .o,$(basename $(notdir $(1))))) $(1) >> $(TEMPFILE); \
+	printf "	@rm -f $(TEMPFILE)\n" >> $(TEMPFILE); \
 	printf "	$(CXX) $(CXXFLAGS) -c $$< -o \$$@\n\n" >> $(TEMPFILE);
 endef
 
@@ -48,7 +49,7 @@ endef
 
 # Default target
 all: $(MY_LIBS) | lib/_output
-	rm $(TEMPFILE)
+	@rm -f $(TEMPFILE)
 	$(CXX) $(CXXFLAGS) $(MY_LIBS) $(LEAP_LIBRARY) $(IRR_LIB) $(STD_LIB) -o Run
 
 # Create Target Folder

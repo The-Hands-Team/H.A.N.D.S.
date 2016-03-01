@@ -15,10 +15,7 @@
 
 using namespace Leap;
 
-const std::string fingerNames[] = {"Thumb", "Index", "Middle", "Ring", "Pinky"};
-const std::string boneNames[] = {"Metacarpal", "Proximal", "Middle", "Distal"};
-const std::string stateNames[] = {"STATE_INVALID", "STATE_START", "STATE_UPDATE", "STATE_END"};
-
+GestureCapture* GestureCapture::instance = nullptr;
 
 void GestureCapture::onConnect(const Controller& controller) {
   controller.enableGesture(Gesture::TYPE_CIRCLE);
@@ -126,22 +123,28 @@ void GestureCapture::checkHands(Frame frame, bool *curGestures)
   }
 }
 
-void initGesture(bool background) {
+GestureCapture::GestureCapture(bool background) : Listener()
+{
+    instance = this;
 
-  // Create a sample listener and controller
-  GestureCapture listener;
-  Controller controller;
+    if (background)
+        controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
 
-  // Have the sample listener receive events from the controller
-  controller.addListener(listener);
+   controller.addListener(*instance);
+}
 
-  if (background)
-    controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
+GestureCapture::~GestureCapture()
+{
+   controller.removeListener(*instance);
+   instance = nullptr;
+}
 
-  // Keep this process running until Enter is pressed
+GestureCapture* GestureCapture::getInstance()
+{
+    return instance;
+}
+
+void GestureCapture::mainLoop()
+{
   while(true);
-
-  // Remove the sample listener when done
-  controller.removeListener(listener);
-
 }

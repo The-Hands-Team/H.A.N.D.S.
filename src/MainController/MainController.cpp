@@ -9,47 +9,39 @@ MainController* MainController::curInstance = nullptr;
 
 MainController::MainController()
 {
+    curInstance = this;
     ignore_new = false;
+    GestureQueue::getInstance();
+
+    new_dir_i = 0;
+    cur_path = fs::path("tests/test_dir");
+    updateDirectory(cur_path);
+    sendCurrentPath();
 }
 
 MainController::~MainController()
 {
+    curInstance = nullptr;
 }
 
 MainController* MainController::getInstance()
 {
-    if (curInstance == nullptr)
-    {
-        curInstance = new MainController();
-    }
-
     return curInstance;
-}
-
-int main()
-{
-    std::thread graphics( Graphics::getInstance );
-    std::thread gesture( initGesture, false);
-    gesture.detach();
-    graphics.detach();
-    MainController::getInstance()->mainLoop();
 }
 
 void MainController::mainLoop()
 {
     GestureQueue* event_q = GestureQueue::getInstance();
-    cur_path = fs::path("tests/test_dir");
-	updateDirectory(cur_path);
-	new_dir_i = 0;
+    updateDirectory(cur_path);
 
-    while (true)
+    while(true)
     {
         sendCurrentPath();
         //got something in queue
-        Message* ev = event_q->pop();
-        processEvent(ev);
         while (event_q->size() != 0)
         {
+            Message* ev = event_q->pop();
+            processEvent(ev);
             ev = event_q->pop();
             processEvent(ev);
         }
@@ -58,121 +50,121 @@ void MainController::mainLoop()
 
 void MainController::updateDirectory(fs::path new_dir)
 {
-	if (fs::is_directory(new_dir))
-	{
-		new_dir_contents.clear();
-		//set us on the new_dir
-		//get the iterator
-		fs::directory_iterator d_it = fs::directory_iterator(new_dir);
-		int i = 0;
-		new_dir_i = i;
-		//iterate through
-		clearSelected();
-		while (d_it != fs::end(d_it))
-		{
-			//put the biz in there
-			new_dir_contents.push_back(*d_it);
-			if (d_it->path() == cur_path)
-			{
-				new_dir_i = i;
-			}
-			i++;
-			d_it++;
-		}
-		cur_path = new_dir;
-		//update graphiczz
-		sendCurrentPath();
-	}
+    if (fs::is_directory(new_dir))
+    {
+        new_dir_contents.clear();
+        //set us on the new_dir
+        //get the iterator
+        fs::directory_iterator d_it = fs::directory_iterator(new_dir);
+        int i = 0;
+        new_dir_i = i;
+        //iterate through
+        clearSelected();
+        while (d_it != fs::end(d_it))
+        {
+            //put the biz in there
+            new_dir_contents.push_back(*d_it);
+            if (d_it->path() == cur_path)
+            {
+                new_dir_i = i;
+            }
+            i++;
+            d_it++;
+        }
+        cur_path = new_dir;
+        //update graphiczz
+        sendCurrentPath();
+    }
 }
 
 void MainController::chdirUp()
 {
-	updateDirectory(cur_path.parent_path());
+    updateDirectory(cur_path.parent_path());
 }
 
 void MainController::chdirDown()
 {
-	updateDirectory(new_dir_contents[new_dir_i].path());
+    updateDirectory(new_dir_contents[new_dir_i].path());
 }
 
 void MainController::iterateForward()
 {
-	new_dir_i = (new_dir_i + 1) % new_dir_contents.size();
+    new_dir_i = (new_dir_i + 1) % new_dir_contents.size();
 }
 
 void MainController::iterateBack()
 {
-	new_dir_i = (new_dir_i + new_dir_contents.size() - 1) % new_dir_contents.size();
+    new_dir_i = (new_dir_i + new_dir_contents.size() - 1) % new_dir_contents.size();
 }
 
 
 void MainController::select()
 {
-	fs::path selection = curEntry().path();
-	if( 0 == selected.count( selection ) )
-	{
-		selected.emplace( selection );
-	}
-	else
-	{
-		selected.erase( selection );
-	}
+    fs::path selection = curEntry().path();
+    if( 0 == selected.count( selection ) )
+    {
+        selected.emplace( selection );
+    }
+    else
+    {
+        selected.erase( selection );
+    }
 }
 
 void MainController::copyInto(fs::path dest)
 {
-	std::vector<fs::path> source;
-	std::vector<fs::path> destination;
-	if (fs::is_directory(dest))
-	{
-		for( auto const v : selected )
-		{
+    std::vector<fs::path> source;
+    std::vector<fs::path> destination;
+    if (fs::is_directory(dest))
+    {
+        for( auto const v : selected )
+        {
             fs::path dest_name = dest / v.filename();
             if( fs::exists(dest_name) ) dest_name += "_copy";
-			source.emplace_back( v );
-			destination.emplace_back( dest_name );
-		}
+            source.emplace_back( v );
+            destination.emplace_back( dest_name );
+        }
 
         if( 0 < source.size() )
         {
             FileManager::getInstance()->copyFiles(source,destination);
         }
 
-		clearSelected();
-	}
+        clearSelected();
+    }
 }
 
 void MainController::moveInto(fs::path dest)
 {
-	std::vector<fs::path> source;
-	std::vector<fs::path> destination;
-	if (fs::is_directory(dest))
-	{
-		for( auto const v : selected )
-		{
+    std::vector<fs::path> source;
+    std::vector<fs::path> destination;
+    if (fs::is_directory(dest))
+    {
+        for( auto const v : selected )
+        {
             fs::path dest_name = dest / v.filename();
             if( fs::exists(dest_name) ) dest_name += "_copy";
-			source.emplace_back( v );
-			destination.emplace_back( dest_name );
-		}
+            source.emplace_back( v );
+            destination.emplace_back( dest_name );
+        }
 
         if( 0 < source.size() )
         {
             FileManager::getInstance()->moveFiles(source,destination);
         }
 
-		clearSelected();
-	}
+        clearSelected();
+    }
 }
 
 void MainController::clearSelected()
 {
-	selected.clear();
+    selected.clear();
 }
 
 fs::directory_entry MainController::curEntry()
 {
-	return new_dir_contents[new_dir_i];
+    return new_dir_contents[new_dir_i];
 }
 
 void MainController::processEvent(Message* m)
@@ -256,36 +248,36 @@ void MainController::processEvent(Message* m)
             switch(ke->getKey())
             {
             case irr::EKEY_CODE::KEY_KEY_C:
-				if( ke->getShift() )
-				{
-					copyInto(cur_path.parent_path());
-				}
-				else if ( ke->getCtrl() )
-				{
-					copyInto(curEntry());
-				}
-				else
-				{
-					copyInto(cur_path);
-				}
-				break;
-			case irr::EKEY_CODE::KEY_KEY_M:
-				if( ke->getShift() )
-				{
-					moveInto(cur_path.parent_path());
-				}
-				else if ( ke->getCtrl() )
-				{
-					moveInto(curEntry());
-				}
-				else
-				{
-					moveInto(cur_path);
-				}
-				break;
+                if( ke->getShift() )
+                {
+                    copyInto(cur_path.parent_path());
+                }
+                else if ( ke->getCtrl() )
+                {
+                    copyInto(curEntry());
+                }
+                else
+                {
+                    copyInto(cur_path);
+                }
+                break;
+            case irr::EKEY_CODE::KEY_KEY_M:
+                if( ke->getShift() )
+                {
+                    moveInto(cur_path.parent_path());
+                }
+                else if ( ke->getCtrl() )
+                {
+                    moveInto(curEntry());
+                }
+                else
+                {
+                    moveInto(cur_path);
+                }
+                break;
             case irr::EKEY_CODE::KEY_KEY_S:
                 {
-					select();
+                    select();
                     break;
                 }
             case irr::EKEY_CODE::KEY_KEY_D:
@@ -294,17 +286,17 @@ void MainController::processEvent(Message* m)
                 }
                 break;
             case irr::EKEY_CODE::KEY_UP:
-				chdirUp();
+                chdirUp();
                 break;
             case irr::EKEY_CODE::KEY_DOWN:
-				chdirDown();
+                chdirDown();
                 break;
             case irr::EKEY_CODE::KEY_RIGHT:
-				iterateForward();
+                iterateForward();
                 break;
-			case irr::EKEY_CODE::KEY_LEFT:
-				iterateBack();
-				break;
+            case irr::EKEY_CODE::KEY_LEFT:
+                iterateBack();
+                break;
             default:
                 break;
             }
@@ -339,14 +331,14 @@ void MainController::sendCurrentPath()
     // TODO Also keep a copy of the list for ourselves, possibly with more information
     std::vector<DirObject> objs;
 
-	for ( unsigned int i = 0; i < new_dir_contents.size(); i++ )
-	{
+    for ( unsigned int i = 0; i < new_dir_contents.size(); i++ )
+    {
         objs.emplace_back( fs::is_directory(new_dir_contents[i].path())?'d':'f'
                          , 0.25f*(i/5),0.25f*(i%5)
                          , new_dir_contents[i].path().filename().wstring()
                          , i == new_dir_i
                          , selected.count( new_dir_contents[i].path() ) );
-	}
+    }
 
     Graphics::getInstance()->newObjects(objs);
 

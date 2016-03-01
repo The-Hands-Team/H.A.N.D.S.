@@ -8,33 +8,33 @@
 
 class MainController {
 private:
-	static MainController* curInstance;
-	MainController();
-	~MainController();
+    static MainController* curInstance;
     void sendCurrentPath();
-	bool ignore_new;
-	void processEvent(Message*);
+    bool ignore_new;
+    void processEvent(Message*);
 
-	void chdirUp();
-	void chdirDown();
-	void iterateForward();
-	void iterateBack();
+    void chdirUp();
+    void chdirDown();
+    void iterateForward();
+    void iterateBack();
     void select();
     void copyInto(fs::path);
     void moveInto(fs::path);
     void clearSelected();
-	fs::directory_entry curEntry();
+    fs::directory_entry curEntry();
 
-	unsigned int new_dir_i;
-	std::vector<fs::directory_entry> new_dir_contents;
+    unsigned int new_dir_i;
+    std::vector<fs::directory_entry> new_dir_contents;
     std::unordered_set<fs::path> selected;
-	void updateDirectory(fs::path);
+    void updateDirectory(fs::path);
 
-	fs::path cur_path;
-	fs::directory_iterator dir_it;
+    fs::path cur_path;
+    fs::directory_iterator dir_it;
 public:
-	static MainController* getInstance();
-	static void initThread();
+    MainController();
+    ~MainController();
+    static MainController* getInstance();
+    static void initThread();
     void mainLoop();
 };
 

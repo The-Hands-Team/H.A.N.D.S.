@@ -32,6 +32,12 @@ using namespace Leap;
 
 class GestureCapture : public Listener {
     public:
+        GestureCapture(bool);
+        ~GestureCapture();
+
+        static GestureCapture* getInstance();
+
+        void mainLoop();
 
         virtual void onInit(const Controller&) {};
         virtual void onConnect(const Controller&);
@@ -43,10 +49,13 @@ class GestureCapture : public Listener {
         virtual void onDeviceChange(const Controller&) {};
         virtual void onServiceConnect(const Controller&) {};
         virtual void onServiceDisconnect(const Controller&) {};
-        void checkHands(Frame frame, bool *curGestures);
 
     private:
         bool activeGestures[INVALID_GESTURE]= { 0 };
+        void checkHands(Frame frame, bool *curGestures);
+
+        Controller controller;
+        static GestureCapture* instance;
 
 };
 

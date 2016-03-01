@@ -7,3 +7,4 @@ Run
 LeapTop.cbp
 LeapTop.layout
 tests/**/*
+temp.mk

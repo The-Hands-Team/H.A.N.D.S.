@@ -18,13 +18,70 @@ const int Graphics::unit_size = 5;
 const int Graphics::view_height = width*10;
 const int Graphics::max_text_length = 11;
 
+const std::array<video::E_DRIVER_TYPE, 6> Graphics::preferedDrivers = { video::EDT_DIRECT3D9
+                                                                      , video::EDT_DIRECT3D8
+                                                                      , video::EDT_OPENGL
+                                                                      , video::EDT_BURNINGSVIDEO
+                                                                      , video::EDT_SOFTWARE
+                                                                      , video::EDT_NULL };
+
 /*  Functions  */
+
+Graphics::Graphics()
+    : device(nullptr)
+    , driver(nullptr)
+    , smgr(nullptr)
+    , env(nullptr)
+    , tiltingR(false)
+    , tiltingL(false)
+    , tiltingU(false)
+    , tiltingD(false)
+{
+
+    instance = this;
+
+    for( size_t i = 0; nullptr == device && i < preferedDrivers.size(); i++ )
+    {
+        device = createDevice(preferedDrivers[i],
+                core::dimension2d<u32>(1366/2, 768), 16, false, false, false, &receiver);
+    }
+
+    if( nullptr == device )
+    {
+        //TODO handle gracefully
+        exit(1);
+    }
+
+    driver = device->getVideoDriver();
+    smgr = device->getSceneManager();
+    env = device->getGUIEnvironment();
+
+    createCameras();
+
+    smgr->addBillboardTextSceneNode
+            (
+                env->getFont("media/bigfont.png"),
+                L"Testing Things",
+                0,
+                core::dimension2d<f32>( 100 * 0.75, 3.0f),
+                core::vector3df(0,0,-7),
+                8888888,
+                video::SColor(100,255,255,255),
+                video::SColor(100,255,255,255)
+            );
+}
+
+Graphics::~Graphics()
+{
+    if( nullptr != device )
+        device->drop();
+
+    instance = nullptr;
+}
+
+
 Graphics* Graphics::getInstance()
 {
-    if( nullptr == instance )
-    {
-        return new Graphics();
-    }
     return instance;
 }
 
@@ -100,7 +157,8 @@ void Graphics::fillNodes()
             (
                 env->getFont("media/bigfont.png"),
                 finished_name.c_str(),
-                newNode,core::dimension2d<f32>( finished_name.length() * 0.75, 3.0f),
+                newNode,
+                core::dimension2d<f32>( finished_name.length() * 0.75, 3.0f),
                 core::vector3df(0,0,-7),
                 dirNodes.size(),
                 video::SColor(100,255,255,255),
@@ -126,11 +184,7 @@ void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener rece
    }
 }
 
-bool tiltingR = false;
-bool tiltingL = false;
-bool tiltingU = false;
-bool tiltingD = false;
-void checkTilt(irr::scene::ICameraSceneNode* cam, EventListener receiver)
+void Graphics::checkTilt(scene::ICameraSceneNode* cam, EventListener receiver)
 {
    if(receiver.IsKeyDown(irr::KEY_KEY_I) && !tiltingU)
    {
@@ -177,42 +231,11 @@ void checkTilt(irr::scene::ICameraSceneNode* cam, EventListener receiver)
    }
 }
 
-
-/*
-This is the main method. We can now use main() on every platform.
-*/
-Graphics::Graphics()
+void Graphics::createCameras()
 {
-    instance = this;
-    video::E_DRIVER_TYPE preferedDrivers[] = { video::EDT_DIRECT3D9
-                                             , video::EDT_DIRECT3D8
-                                             , video::EDT_OPENGL
-                                             , video::EDT_BURNINGSVIDEO
-                                             , video::EDT_SOFTWARE
-                                             , video::EDT_NULL
-                                             , video::EDT_COUNT};
-
-    // create device
-    EventListener receiver;
-
-    IrrlichtDevice* device = nullptr;
-
-    for( size_t i = 0; nullptr == device && video::EDT_COUNT != preferedDrivers[i]; i++ )
-    {
-        device = createDevice(preferedDrivers[i],
-                core::dimension2d<u32>(1366/2, 768), 16, false, false, false, &receiver);
-    }
-
-    if( nullptr == device )
-        exit(1);
-
-    driver = device->getVideoDriver();
-    smgr = device->getSceneManager();
-    env = device->getGUIEnvironment();
-
     //create persp camera
     float mid = (width * unit_size) / 2.0;
-    scene::ICameraSceneNode* camPersp = smgr->addCameraSceneNode(
+    cams[CAM_PERSP] = smgr->addCameraSceneNode(
                         0,
                         core::vector3df(mid,-mid,0),
                         core::vector3df(mid,-mid,view_height),
@@ -220,7 +243,7 @@ Graphics::Graphics()
                         true);
 
     //create orth camera
-    scene::ICameraSceneNode* camOrth = smgr->addCameraSceneNode(
+    cams[CAM_ORTH] = smgr->addCameraSceneNode(
                             0,
                             core::vector3df(mid,-mid,0),
                             core::vector3df(mid,-mid,view_height),
@@ -228,8 +251,11 @@ Graphics::Graphics()
                             true);
     core::matrix4 projMat;
     projMat.buildProjectionMatrixOrthoLH(75,75,10,100);
-    camOrth->setProjectionMatrix(projMat, true);
+    cams[CAM_ORTH]->setProjectionMatrix(projMat, true);
+}
 
+void Graphics::mainLoop()
+{
     /*
     We have done everything, so lets draw it. We also write the current
     frames per second and the name of the driver to the caption of the
@@ -241,23 +267,20 @@ Graphics::Graphics()
     // how long it was since the last frame
     // u32 then = device->getTimer()->getTime();
 
-    while(device->run())
+    while( device->run() )
     {
-        irr::scene::ICameraSceneNode* cam = smgr->getActiveCamera();
-        fillNodes();
 
-        if(receiver.IsKeyDown(irr::KEY_ESCAPE))
-        {
-            exit(0);
-        }
         if(receiver.IsKeyDown(irr::KEY_KEY_P))
         {
-            smgr->setActiveCamera(camPersp);
+            smgr->setActiveCamera(cams[CAM_PERSP]);
         }
         if(receiver.IsKeyDown(irr::KEY_KEY_O))
         {
-            smgr->setActiveCamera(camOrth);
+            smgr->setActiveCamera(cams[CAM_ORTH]);
         }
+
+        irr::scene::ICameraSceneNode* cam = smgr->getActiveCamera();
+        fillNodes();
 
         checkScroll(cam, receiver);
         checkTilt(cam, receiver);
@@ -281,16 +304,10 @@ Graphics::Graphics()
             device->setWindowCaption(tmp.c_str());
             lastFPS = fps;
         }
+
+        if(receiver.IsKeyDown(irr::KEY_ESCAPE))
+        {
+            device->closeDevice();
+        }
     }
-
-    /*
-    In the end, delete the Irrlicht device.
-    */
-    device->drop();
-
-    exit(0);
 }
-
-/*
-That's it. Compile and run.
-**/

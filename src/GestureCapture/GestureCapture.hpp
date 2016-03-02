@@ -6,55 +6,53 @@
 
 void initGesture(bool background);
 
-enum GestureType {
-    CIRCLE,
-    PINCH,
-    GRAB,
-    SCREEN_TAP,
-    SWIPE,
-    INVALID_GESTURE
-};
-
-enum Direction {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    NONE
-};
-
-enum Handedness {
-    LEFT_HAND,
-    RIGHT_HAND
-};
-
-using namespace Leap;
-
-class GestureCapture : public Listener {
+class GestureCapture : public Leap::Listener {
     public:
-        GestureCapture(bool);
+
+    enum GestureType {
+        CIRCLE,
+        PINCH,
+        GRAB,
+        SCREEN_TAP,
+        SWIPE,
+        INVALID_GESTURE
+    };
+
+    enum Direction {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT,
+        NONE
+    };
+
+    enum Handedness {
+        LEFT_HAND,
+        RIGHT_HAND
+    };
+            GestureCapture(bool);
         ~GestureCapture();
 
         static GestureCapture* getInstance();
 
         void mainLoop();
 
-        virtual void onInit(const Controller&) {};
-        virtual void onConnect(const Controller&);
-        virtual void onDisconnect(const Controller&) {};
-        virtual void onExit(const Controller&) {};
-        virtual void onFrame(const Controller&);
-        virtual void onFocusGained(const Controller&) {};
-        virtual void onFocusLost(const Controller&) {};
-        virtual void onDeviceChange(const Controller&) {};
-        virtual void onServiceConnect(const Controller&) {};
-        virtual void onServiceDisconnect(const Controller&) {};
+        virtual void onInit(const Leap::Controller&) {};
+        virtual void onConnect(const Leap::Controller&);
+        virtual void onDisconnect(const Leap::Controller&) {};
+        virtual void onExit(const Leap::Controller&) {};
+        virtual void onFrame(const Leap::Controller&);
+        virtual void onFocusGained(const Leap::Controller&) {};
+        virtual void onFocusLost(const Leap::Controller&) {};
+        virtual void onDeviceChange(const Leap::Controller&) {};
+        virtual void onServiceConnect(const Leap::Controller&) {};
+        virtual void onServiceDisconnect(const Leap::Controller&) {};
 
     private:
         bool activeGestures[INVALID_GESTURE]= { 0 };
-        void checkHands(Frame frame, bool *curGestures);
+        void checkHands(Leap::Frame frame, bool *curGestures);
 
-        Controller controller;
+        Leap::Controller controller;
         static GestureCapture* instance;
 
 };

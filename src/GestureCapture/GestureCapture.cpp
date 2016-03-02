@@ -13,20 +13,18 @@
 
 #include "GestureCapture.hpp"
 
-using namespace Leap;
-
 GestureCapture* GestureCapture::instance = nullptr;
 
-void GestureCapture::onConnect(const Controller& controller) {
-  controller.enableGesture(Gesture::TYPE_CIRCLE);
-  controller.enableGesture(Gesture::TYPE_SCREEN_TAP);
-  controller.enableGesture(Gesture::TYPE_SWIPE);
+void GestureCapture::onConnect(const Leap::Controller& controller) {
+  controller.enableGesture(Leap::Gesture::TYPE_CIRCLE);
+  controller.enableGesture(Leap::Gesture::TYPE_SCREEN_TAP);
+  controller.enableGesture(Leap::Gesture::TYPE_SWIPE);
 }
 
-void GestureCapture::onFrame(const Controller& controller) {
+void GestureCapture::onFrame(const Leap::Controller& controller) {
     // Get the most recent frame and report some basic information
-    const Frame frame = controller.frame();
-    const Frame prevFrame = controller.frame(1);
+    const Leap::Frame frame = controller.frame();
+    const Leap::Frame prevFrame = controller.frame(1);
     //Initialize all gestures to false
     bool curGestures[INVALID_GESTURE] = { 0 };
 
@@ -51,7 +49,7 @@ void GestureCapture::onFrame(const Controller& controller) {
                 break;
             case Leap::Gesture::TYPE_SWIPE:
             {
-                    SwipeGesture sg = *gl;
+                    Leap::SwipeGesture sg = *gl;
                     Leap::Vector v = sg.direction();
                     Direction swipeType = NONE;
                     if( std::abs(v.y) > std::abs(v.x) )
@@ -99,7 +97,7 @@ void GestureCapture::onFrame(const Controller& controller) {
     }
 }
 
-void GestureCapture::checkHands(Frame frame, bool *curGestures)
+void GestureCapture::checkHands(Leap::Frame frame, bool *curGestures)
 {
   Leap::HandList hands = frame.hands();
   for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)

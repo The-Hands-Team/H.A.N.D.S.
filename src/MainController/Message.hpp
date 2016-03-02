@@ -29,15 +29,15 @@ protected:
 class GestureMessage : public Message
 {
 public:
-    GestureMessage(GestureType g, Direction d, Handedness h);
-    GestureType getGesture();
-    Direction getDir();
-    Handedness getHandedness();
+    GestureMessage(GestureCapture::GestureType g, GestureCapture::Direction d, GestureCapture::Handedness h);
+    GestureCapture::GestureType getGesture();
+    GestureCapture::Direction getDir();
+    GestureCapture::Handedness getHandedness();
 
 private:
-    GestureType gesture;
-    Direction dir;
-    Handedness hand;
+    GestureCapture::GestureType gesture;
+    GestureCapture::Direction dir;
+    GestureCapture::Handedness hand;
 };
 
 class KeyMessage : public Message

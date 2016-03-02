@@ -15,8 +15,6 @@ MainController::MainController()
 
     new_dir_i = 0;
     cur_path = fs::path("tests/test_dir");
-    updateDirectory(cur_path);
-    sendCurrentPath();
 }
 
 MainController::~MainController()
@@ -32,19 +30,16 @@ MainController* MainController::getInstance()
 void MainController::mainLoop()
 {
     GestureQueue* event_q = GestureQueue::getInstance();
+    Message* ev;
     updateDirectory(cur_path);
 
     while(true)
     {
         sendCurrentPath();
         //got something in queue
-        while (event_q->size() != 0)
-        {
-            Message* ev = event_q->pop();
-            processEvent(ev);
-            ev = event_q->pop();
-            processEvent(ev);
-        }
+
+        ev = event_q->pop();
+        processEvent(ev);
     }
 }
 
@@ -176,8 +171,8 @@ void MainController::processEvent(Message* m)
         std::cout << ge->getGesture() << " " << ge->getHandedness() << " " << ge->getDir() << std::endl;
         switch (ge->getGesture())
         {
-        case PINCH:
-            if( RIGHT_HAND == ge->getHandedness() )
+        case GestureCapture::PINCH:
+            if( GestureCapture::RIGHT_HAND == ge->getHandedness() )
             {
                 select();
                 break;
@@ -186,29 +181,29 @@ void MainController::processEvent(Message* m)
             {
                 copyInto( cur_path );
             }
-        case SCREEN_TAP:
-            if( RIGHT_HAND == ge->getHandedness() )
+        case GestureCapture::SCREEN_TAP:
+            if( GestureCapture::RIGHT_HAND == ge->getHandedness() )
             {
                 std::cout << cur_path << std::endl;
             }
             break;
-        case CIRCLE:
+        case GestureCapture::CIRCLE:
             break;
-        case SWIPE:
-            if( RIGHT_HAND == ge->getHandedness() )
+        case GestureCapture::SWIPE:
+            if( GestureCapture::RIGHT_HAND == ge->getHandedness() )
             {
                 switch (ge->getDir())
                 {
-                case UP:
+                case GestureCapture::UP:
                     chdirUp();
                     break;
-                case DOWN:
+                case GestureCapture::DOWN:
                     chdirDown();
                     break;
-                case RIGHT:
+                case GestureCapture::RIGHT:
                     iterateForward();
                     break;
-                case LEFT:
+                case GestureCapture::LEFT:
                     iterateBack();
                     break;
                 default:
@@ -219,16 +214,16 @@ void MainController::processEvent(Message* m)
             {
                 switch (ge->getDir())
                 {
-                case UP:
+                case GestureCapture::UP:
                     copyInto(cur_path.parent_path());
                     break;
-                case DOWN:
+                case GestureCapture::DOWN:
                     copyInto(curEntry());
                     break;
-                case RIGHT:
+                case GestureCapture::RIGHT:
                     moveInto(cur_path.parent_path());
                     break;
-                case LEFT:
+                case GestureCapture::LEFT:
                     moveInto(curEntry());
                     break;
                 default:

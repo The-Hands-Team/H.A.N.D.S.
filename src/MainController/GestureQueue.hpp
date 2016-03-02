@@ -18,7 +18,6 @@ public:
     Message* peek ();
     int size ();
     std::condition_variable event_cv;
-    std::mutex event_m;
 };
 
 #endif

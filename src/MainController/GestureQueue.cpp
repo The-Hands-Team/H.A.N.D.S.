@@ -7,16 +7,17 @@ void GestureQueue::push(Message* ge)
 {
     q_mutex.lock();
     gesture_q.push(ge);
-    q_mutex.unlock();
     event_cv.notify_one();
+    q_mutex.unlock();
 }
 
 Message* GestureQueue::pop()
 {
-    std::unique_lock<std::mutex> lk(event_m);
+    std::unique_lock<std::mutex> lk(q_mutex);
     event_cv.wait(lk, [&]{return gesture_q.size() != 0;});
     Message* ret = gesture_q.front();
     gesture_q.pop();
+    event_cv.notify_all();
     lk.unlock();
     return ret;
 
@@ -44,7 +45,8 @@ GestureQueue* GestureQueue::getInstance()
 {
     if( nullptr == GestureQueue::instance )
     {
-        GestureQueue::instance = new GestureQueue();
+        std::cout << "Queue Created" << std::endl;
+        instance = new GestureQueue();
     }
     return GestureQueue::instance;
 }

@@ -16,18 +16,18 @@ Message::Message (Message::MessageType m) : type(m)
 }
 
 
-GestureMessage::GestureMessage( GestureCapture::GestureType g, GestureCapture::Direction d, GestureCapture::Handedness h): Message(GESTURE), gesture(g), dir(d), hand(h)
+GestureMessage::GestureMessage( GestType g, GestDir d, GestHand h): Message(GESTURE), gesture(g), dir(d), hand(h)
 {
 }
-GestureCapture::GestureType GestureMessage::getGesture()
+GestType GestureMessage::getGesture()
 {
     return gesture;
 }
-GestureCapture::Direction GestureMessage::getDir()
+GestDir GestureMessage::getDir()
 {
     return dir;
 }
-GestureCapture::Handedness GestureMessage::getHandedness()
+GestHand GestureMessage::getHandedness()
 {
     return hand;
 }

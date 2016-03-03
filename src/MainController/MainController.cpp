@@ -168,11 +168,10 @@ void MainController::processEvent(Message* m)
     if ( Message::GESTURE == m->getType() )
     {
         GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
-        std::cout << ge->getGesture() << " " << ge->getHandedness() << " " << ge->getDir() << std::endl;
         switch (ge->getGesture())
         {
-        case GestureCapture::PINCH:
-            if( GestureCapture::RIGHT_HAND == ge->getHandedness() )
+        case GestType::PINCH:
+            if( GestHand::RIGHT == ge->getHandedness() )
             {
                 select();
                 break;
@@ -181,29 +180,29 @@ void MainController::processEvent(Message* m)
             {
                 copyInto( cur_path );
             }
-        case GestureCapture::SCREEN_TAP:
-            if( GestureCapture::RIGHT_HAND == ge->getHandedness() )
+        case GestType::SCREEN_TAP:
+            if( GestHand::RIGHT == ge->getHandedness() )
             {
                 std::cout << cur_path << std::endl;
             }
             break;
-        case GestureCapture::CIRCLE:
+        case GestType::CIRCLE:
             break;
-        case GestureCapture::SWIPE:
-            if( GestureCapture::RIGHT_HAND == ge->getHandedness() )
+        case GestType::SWIPE:
+            if( GestHand::RIGHT == ge->getHandedness() )
             {
                 switch (ge->getDir())
                 {
-                case GestureCapture::UP:
+                case GestDir::UP:
                     chdirUp();
                     break;
-                case GestureCapture::DOWN:
+                case GestDir::DOWN:
                     chdirDown();
                     break;
-                case GestureCapture::RIGHT:
+                case GestDir::RIGHT:
                     iterateForward();
                     break;
-                case GestureCapture::LEFT:
+                case GestDir::LEFT:
                     iterateBack();
                     break;
                 default:
@@ -214,16 +213,16 @@ void MainController::processEvent(Message* m)
             {
                 switch (ge->getDir())
                 {
-                case GestureCapture::UP:
+                case GestDir::UP:
                     copyInto(cur_path.parent_path());
                     break;
-                case GestureCapture::DOWN:
+                case GestDir::DOWN:
                     copyInto(curEntry());
                     break;
-                case GestureCapture::RIGHT:
+                case GestDir::RIGHT:
                     moveInto(cur_path.parent_path());
                     break;
-                case GestureCapture::LEFT:
+                case GestDir::LEFT:
                     moveInto(curEntry());
                     break;
                 default:

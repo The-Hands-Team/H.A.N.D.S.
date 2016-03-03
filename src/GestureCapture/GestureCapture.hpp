@@ -3,12 +3,13 @@
 #define GESTURE_CAPTURE
 
 #include "LeapMotion/Leap.h"
+#include <map>
 
 void initGesture(bool background);
 
-enum class GestureType;
-enum class GestureDir;
-enum class GestureHand;
+enum class GestType;
+enum class GestDir;
+enum class GestHand;
 
 class GestureCapture : public Leap::Listener {
     public:
@@ -32,7 +33,12 @@ class GestureCapture : public Leap::Listener {
         virtual void onServiceDisconnect(const Leap::Controller&) {};
 
     private:
-        bool activeGestures[INVALID_GESTURE]= { 0 };
+        // This should be removed soon anyway
+        std::map<GestType, bool> activeGestures {{CIRCLE, false},
+                                                 {PINCH, false},
+                                                 {GRAB, false},
+                                                 {SCREEN_TAP, false},
+                                                 {SWIPE, false}};
         void checkHands(Leap::Frame frame, bool *curGestures);
 
         Leap::Controller controller;

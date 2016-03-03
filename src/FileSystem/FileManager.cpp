@@ -26,7 +26,7 @@ FileManager* FileManager::getInstance()
     return currentInstance;
 }
 
-t_id FileManager::FileManager::deleteFiles( v_paths& files, fs::copy_options options )
+t_id FileManager::FileManager::deleteFiles( fs::paths& files, fs::copy_options options )
 {
     std::thread t = std::thread( &static_DeleteFiles, files, options );
     t_id ret = t.get_id();
@@ -35,12 +35,12 @@ t_id FileManager::FileManager::deleteFiles( v_paths& files, fs::copy_options opt
 }
 t_id FileManager::FileManager::deleteFile( const fs::path& file )
 {
-    v_paths v = v_paths(1, file);
+    fs::paths v = fs::paths(1, file);
     return deleteFiles( v );
 }
 
-t_id FileManager::copyFiles( v_paths& from
-             , v_paths& to
+t_id FileManager::copyFiles( fs::paths& from
+             , fs::paths& to
              , fs::copy_options options )
 {
     std::thread t = std::thread( &static_CopyFiles, from, to, options );
@@ -48,24 +48,24 @@ t_id FileManager::copyFiles( v_paths& from
     threads.emplace(ret,std::move(t));
     return ret;
 }
-t_id FileManager::copyFiles( v_paths& from
+t_id FileManager::copyFiles( fs::paths& from
              , const fs::path &to
              , fs::copy_options options )
 {
-    v_paths v = v_paths(1, to);
+    fs::paths v = fs::paths(1, to);
     return copyFiles( from, v, options );
 }
 t_id FileManager::copyFile( const fs::path &from
              , const fs::path &to
              , fs::copy_options options )
 {
-    v_paths v1 = v_paths( 1, from );
-    v_paths v2 = v_paths( 1, to );
+    fs::paths v1 = fs::paths( 1, from );
+    fs::paths v2 = fs::paths( 1, to );
     return copyFiles( v1, v2, options );
 }
 
-t_id FileManager::moveFiles( v_paths& from
-             , v_paths& to
+t_id FileManager::moveFiles( fs::paths& from
+             , fs::paths& to
              , fs::copy_options options )
 {
     std::thread t = std::thread( &static_MoveFiles, from, to, options );
@@ -73,44 +73,44 @@ t_id FileManager::moveFiles( v_paths& from
     threads.emplace(ret,std::move(t));
     return ret;
 }
-t_id FileManager::moveFiles( v_paths& from
+t_id FileManager::moveFiles( fs::paths& from
              , const fs::path &to
              , fs::copy_options options )
 {
-    v_paths v = v_paths(1, to);
+    fs::paths v = fs::paths(1, to);
     return moveFiles( from, v, options );
 }
 t_id FileManager::moveFile( const fs::path &from
              , const fs::path &to
              , fs::copy_options options )
 {
-    v_paths v1 = v_paths( 1, from );
-    v_paths v2 = v_paths( 1, to );
+    fs::paths v1 = fs::paths( 1, from );
+    fs::paths v2 = fs::paths( 1, to );
     return moveFiles( v1, v2, options );
 }
 
-void FileManager::static_DeleteFiles( v_paths files, fs::copy_options options )
+void FileManager::static_DeleteFiles( fs::paths files, fs::copy_options options )
 {
     getInstance()->doDeleteFiles( files, options );
 }
 
 
-void FileManager::static_CopyFiles( v_paths from, v_paths to, fs::copy_options options )
+void FileManager::static_CopyFiles( fs::paths from, fs::paths to, fs::copy_options options )
 {
     getInstance()->doCopyFiles( from, to, options );
 }
 
-void FileManager::static_MoveFiles( v_paths from, v_paths to, fs::copy_options options )
+void FileManager::static_MoveFiles( fs::paths from, fs::paths to, fs::copy_options options )
 {
     getInstance()->doMoveFiles( from, to, options );
 }
 
-void FileManager::doDeleteFiles( v_paths files, fs::copy_options options )
+void FileManager::doDeleteFiles( fs::paths files, fs::copy_options options )
 {
     std::error_code ec;
-    v_paths canonicals;
+    fs::paths canonicals;
     canonicals.reserve( files.size() );
-    for( v_paths::iterator it = files.begin(); files.end() != it; it++ )
+    for( fs::paths::iterator it = files.begin(); files.end() != it; it++ )
     {
         fs::path to_delete = *it;
         if( fs::is_symlink( *it ) )
@@ -162,7 +162,7 @@ void FileManager::doDeleteFiles( v_paths files, fs::copy_options options )
     }
     signalThreadEnd( DELETE );
 }
-void FileManager::doCopyFiles( v_paths from, v_paths to, fs::copy_options options )
+void FileManager::doCopyFiles( fs::paths from, fs::paths to, fs::copy_options options )
 
 {
     std::error_code ec;
@@ -188,7 +188,7 @@ void FileManager::doCopyFiles( v_paths from, v_paths to, fs::copy_options option
 
     } while( ec );
 
-    for( v_paths::iterator from_it = from.begin(), to_it = to.begin();
+    for( fs::paths::iterator from_it = from.begin(), to_it = to.begin();
          from.end() != from_it;
          from_it++, ( to_dir ? to_it : to_it++ ) )
     {
@@ -232,7 +232,7 @@ void FileManager::doCopyFiles( v_paths from, v_paths to, fs::copy_options option
     }
     signalThreadEnd( COPY );
 }
-void FileManager::doMoveFiles( v_paths from, v_paths to, fs::copy_options options )
+void FileManager::doMoveFiles( fs::paths from, fs::paths to, fs::copy_options options )
 {
     std::error_code ec;
     bool to_dir = 1 == to.size() && 1 < from.size();
@@ -258,7 +258,7 @@ void FileManager::doMoveFiles( v_paths from, v_paths to, fs::copy_options option
     } while( ec );
 
 
-    for( v_paths::iterator from_it = from.begin(), to_it = to.begin(); from.end() != from_it; from_it++, ( to_dir ? to_it : to_it++ ) )
+    for( fs::paths::iterator from_it = from.begin(), to_it = to.begin(); from.end() != from_it; from_it++, ( to_dir ? to_it : to_it++ ) )
     {
         if( !compare_options( options, fs::copy_options::recursive ) && fs::is_directory( *from_it, ec ) )
         {

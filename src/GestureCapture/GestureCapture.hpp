@@ -3,13 +3,16 @@
 #define GESTURE_CAPTURE
 
 #include "LeapMotion/Leap.h"
-#include <map>
+#include <bitset>
 
 void initGesture(bool background);
 
-enum class GestType;
 enum class GestDir;
 enum class GestHand;
+enum class GestType;
+
+//Temporary mesure. Should be removed soon
+constexpr std::size_t operator+ (GestType i);
 
 class GestureCapture : public Leap::Listener {
     public:
@@ -34,11 +37,7 @@ class GestureCapture : public Leap::Listener {
 
     private:
         // This should be removed soon anyway
-        std::map<GestType, bool> activeGestures {{CIRCLE, false},
-                                                 {PINCH, false},
-                                                 {GRAB, false},
-                                                 {SCREEN_TAP, false},
-                                                 {SWIPE, false}};
+        std::bitset<+GestType::INVALID_GESTURE> activeGestures;
         void checkHands(Leap::Frame frame, bool *curGestures);
 
         Leap::Controller controller;

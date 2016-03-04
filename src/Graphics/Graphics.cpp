@@ -2,6 +2,12 @@
 #include <irrlicht/irrlicht.h>
 
 using namespace irr;
+using namespace std;
+using namespace core;
+using namespace scene;
+using namespace video;
+using namespace io;
+using namespace gui;
 
     #ifdef _IRR_WINDOWS_
     #pragma comment(lib, "Irrlicht.lib")
@@ -153,7 +159,7 @@ void Graphics::fillNodes()
                 newNode->setMaterialFlag(video::EMF_WIREFRAME, true);
             }
             newNode->setMaterialFlag(video::EMF_LIGHTING, false);
-            smgr->addBillboardTextSceneNode
+            /*smgr->addBillboardTextSceneNode
             (
                 env->getFont("media/bigfont.png"),
                 finished_name.c_str(),
@@ -163,7 +169,15 @@ void Graphics::fillNodes()
                 dirNodes.size(),
                 video::SColor(100,255,255,255),
                 video::SColor(100,255,255,255)
-            );
+            );*/
+            irr::video::ITexture* rt = driver->addRenderTargetTexture(core::dimension2d<u32>(512,512), "rt", ECF_R8G8B8);
+            
+            driver->setRenderTarget(rt, true, true, video::SColor(255,255,255,255));
+            driver->draw2DImage(driver->getTexture("media/unselected.jpg"), position2d<s32>(0, 0));
+            env->getBuiltInFont()->draw(finished_name.c_str(), rect<s32>(0,0,unit_size,unit_size), SColor(255, 0, 0, 255), true, true, 0);
+            driver->setRenderTarget(0);
+            
+            newNode->setMaterialTexture(0, rt);
 
         }
     }

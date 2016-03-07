@@ -16,18 +16,18 @@ Message::Message (Message::MessageType m) : type(m)
 }
 
 
-GestureMessage::GestureMessage( GestureCapture::GestureType g, GestureCapture::Direction d, GestureCapture::Handedness h): Message(GESTURE), gesture(g), dir(d), hand(h)
+GestureMessage::GestureMessage( GestType g, GestDir d, GestHand h): Message(GESTURE), gesture(g), dir(d), hand(h)
 {
 }
-GestureCapture::GestureType GestureMessage::getGesture()
+GestType GestureMessage::getGesture()
 {
     return gesture;
 }
-GestureCapture::Direction GestureMessage::getDir()
+GestDir GestureMessage::getDir()
 {
     return dir;
 }
-GestureCapture::Handedness GestureMessage::getHandedness()
+GestHand GestureMessage::getHandedness()
 {
     return hand;
 }
@@ -54,7 +54,7 @@ bool KeyMessage::getPressed()
 
 
 
-FileSystemMessage::FileSystemMessage(std::thread::id id, std::error_condition err, FileManager::FileSystemAction act, fs::path p1, fs::path p2 ) : Message(FILESYSTEM),t_id(id)
+FileSystemMessage::FileSystemMessage(std::thread::id id, std::error_condition err, FileSystemAction act, fs::path p1, fs::path p2 ) : Message(FILESYSTEM),t_id(id)
                                                                                                                  , errCode(err), action(act)
                                                                                                                  , path1(p1), path2(p2)
 {
@@ -67,7 +67,7 @@ std::error_condition FileSystemMessage::getErrCode()
 {
     return errCode;
 }
-FileManager::FileSystemAction FileSystemMessage::getAction()
+FileSystemAction FileSystemMessage::getAction()
 {
     return action;
 }

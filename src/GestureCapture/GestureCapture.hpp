@@ -3,34 +3,41 @@
 #define GESTURE_CAPTURE
 
 #include "LeapMotion/Leap.h"
+#include <bitset>
 
 void initGesture(bool background);
+
+enum class GestType {
+    CIRCLE,
+    PINCH,
+    GRAB,
+    SCREEN_TAP,
+    SWIPE,
+    INVALID_GESTURE
+};
+
+enum class GestDir {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    NONE
+};
+
+enum class GestHand {
+    LEFT,
+    RIGHT
+};
+
+//Temporary mesure. Should be removed soon
+constexpr std::size_t operator+ (GestType i){ return static_cast<std::size_t>(i); }
+
+using GestFlags = std::bitset<+GestType::INVALID_GESTURE>;
 
 class GestureCapture : public Leap::Listener {
     public:
 
-    enum GestureType {
-        CIRCLE,
-        PINCH,
-        GRAB,
-        SCREEN_TAP,
-        SWIPE,
-        INVALID_GESTURE
-    };
-
-    enum Direction {
-        UP,
-        DOWN,
-        LEFT,
-        RIGHT,
-        NONE
-    };
-
-    enum Handedness {
-        LEFT_HAND,
-        RIGHT_HAND
-    };
-            GestureCapture(bool);
+        GestureCapture(bool);
         ~GestureCapture();
 
         static GestureCapture* getInstance();
@@ -49,8 +56,9 @@ class GestureCapture : public Leap::Listener {
         virtual void onServiceDisconnect(const Leap::Controller&) {};
 
     private:
-        bool activeGestures[INVALID_GESTURE]= { 0 };
-        void checkHands(Leap::Frame frame, bool *curGestures);
+        // This should be removed soon anyway
+        GestFlags activeGestures;
+        void checkHands(Leap::Frame frame, GestFlags& curGestures);
 
         Leap::Controller controller;
         static GestureCapture* instance;

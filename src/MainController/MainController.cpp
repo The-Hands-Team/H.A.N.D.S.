@@ -306,12 +306,12 @@ void MainController::processEvent(Message* m)
                 break;
             case EIO:
                 std::cerr << fe->getErrCode().value() << fe->getErrCode().message() << " " << fe->getPath1() << " " << fe->getPath2() << std::endl;
-                FileManager::getInstance()->replyToError( fe->get_t_id(), FileManager::IGNORE );
+                FileManager::getInstance()->replyToError( fe->get_t_id(), HandleErrorCommand::IGNORE );
                 updateDirectory(cur_path);
                 break;
             default:
                 std::cerr << fe->getErrCode().value() << fe->getErrCode().message() << " " << fe->getPath1() << " " << fe->getPath2() << std::endl;
-                FileManager::getInstance()->replyToError( fe->get_t_id(), FileManager::TERMINATE );
+                FileManager::getInstance()->replyToError( fe->get_t_id(), HandleErrorCommand::TERMINATE );
                 updateDirectory(cur_path);
                 break;
                 //we don't know;

@@ -7,12 +7,32 @@
 
 void initGesture(bool background);
 
-enum class GestDir;
-enum class GestHand;
-enum class GestType;
+enum class GestType {
+    CIRCLE,
+    PINCH,
+    GRAB,
+    SCREEN_TAP,
+    SWIPE,
+    INVALID_GESTURE
+};
+
+enum class GestDir {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    NONE
+};
+
+enum class GestHand {
+    LEFT,
+    RIGHT
+};
 
 //Temporary mesure. Should be removed soon
-constexpr std::size_t operator+ (GestType i);
+constexpr std::size_t operator+ (GestType i){ return static_cast<std::size_t>(i); }
+
+using GestFlags = std::bitset<+GestType::INVALID_GESTURE>;
 
 class GestureCapture : public Leap::Listener {
     public:
@@ -37,8 +57,8 @@ class GestureCapture : public Leap::Listener {
 
     private:
         // This should be removed soon anyway
-        std::bitset<+GestType::INVALID_GESTURE> activeGestures;
-        void checkHands(Leap::Frame frame, bool *curGestures);
+        GestFlags activeGestures;
+        void checkHands(Leap::Frame frame, GestFlags& curGestures);
 
         Leap::Controller controller;
         static GestureCapture* instance;

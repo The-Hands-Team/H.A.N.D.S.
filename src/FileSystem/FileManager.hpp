@@ -14,10 +14,16 @@ namespace fs = std::experimental::filesystem;
 #define FILEMANAGER_HPP
 
 using t_id = std::thread::id;
-namespace fs
-{
-    using paths = std::vector<fs::path>;
+namespace std{
+	namespace experimental{
+		namespace filesystem{
+			using paths = vector<path>;
+		}
+	}
 }
+
+
+
 
 namespace std
 {
@@ -38,24 +44,25 @@ namespace std
     };
 }
 
+
+enum class HandleErrorCommand
+{
+	TERMINATE,
+	IGNORE,
+	RETRY,
+	NO_ERROR
+};
+
+enum class FileSystemAction
+{
+	COPY,
+	MOVE,
+	DELETE
+};
+
 class FileManager
 {
     public:
-
-    enum HandleErrorCommand
-    {
-        TERMINATE,
-        IGNORE,
-        RETRY,
-        NO_ERROR
-    };
-
-    enum FileSystemAction
-    {
-        COPY,
-        MOVE,
-        DELETE
-    };
 
     static FileManager* getInstance();
 

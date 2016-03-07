@@ -125,16 +125,16 @@ void FileManager::doDeleteFiles( fs::paths files, fs::copy_options options )
             }
         }
 
-        switch( checkError( ec, DELETE, *it ) )
+        switch( checkError( ec, FileSystemAction::DELETE, *it ) )
         {
-            case TERMINATE:
-                return signalThreadEnd( DELETE );
-            case RETRY:
+            case HandleErrorCommand::TERMINATE:
+                return signalThreadEnd( FileSystemAction::DELETE );
+            case HandleErrorCommand::RETRY:
                 it--;
             /* break intentionally omitted */
-            case IGNORE:
+            case HandleErrorCommand::IGNORE:
                 continue;
-            case NO_ERROR:
+            case HandleErrorCommand::NO_ERROR:
                 break;
         }
 
@@ -147,20 +147,20 @@ void FileManager::doDeleteFiles( fs::paths files, fs::copy_options options )
             fs::remove( *it, ec );
         }
         // TODO move to trash
-        switch( checkError( ec, DELETE, *it ) )
+        switch( checkError( ec, FileSystemAction::DELETE, *it ) )
         {
-            case TERMINATE:
-                return signalThreadEnd( DELETE );
-            case RETRY:
+            case HandleErrorCommand::TERMINATE:
+                return signalThreadEnd( FileSystemAction::DELETE );
+            case HandleErrorCommand::RETRY:
                 it--;
             /* break intentionally omitted */
-            case IGNORE:
+            case HandleErrorCommand::IGNORE:
                 continue;
-            case NO_ERROR:
+            case HandleErrorCommand::NO_ERROR:
                 break;
         }
     }
-    signalThreadEnd( DELETE );
+    signalThreadEnd( FileSystemAction::DELETE );
 }
 void FileManager::doCopyFiles( fs::paths from, fs::paths to, fs::copy_options options )
 
@@ -172,19 +172,19 @@ void FileManager::doCopyFiles( fs::paths from, fs::paths to, fs::copy_options op
         !( to_dir &&
            fs::is_directory( to[0], ec ) ) ) do
     {
-       switch( checkError( ec, COPY, to[0] ) )
+       switch( checkError( ec, FileSystemAction::COPY, to[0] ) )
        {
-           case TERMINATE:
-               return signalThreadEnd( COPY );
-           case RETRY:
-           case IGNORE:
+           case HandleErrorCommand::TERMINATE:
+               return signalThreadEnd( FileSystemAction::COPY );
+           case HandleErrorCommand::RETRY:
+           case HandleErrorCommand::IGNORE:
                continue;
-           case NO_ERROR:
+           case HandleErrorCommand::NO_ERROR:
                break;
        }
 
     ec.assign( EDOM, std::generic_category() );
-    checkError( ec, COPY, to[0] );
+    checkError( ec, FileSystemAction::COPY, to[0] );
 
     } while( ec );
 
@@ -200,37 +200,37 @@ void FileManager::doCopyFiles( fs::paths from, fs::paths to, fs::copy_options op
         {
             ec.assign( EISDIR, std::generic_category() );
         }
-        switch( checkError( ec, COPY, *from_it ) )
+        switch( checkError( ec, FileSystemAction::COPY, *from_it ) )
         {
-            case TERMINATE:
-                return signalThreadEnd( COPY );
-            case RETRY:
+            case HandleErrorCommand::TERMINATE:
+                return signalThreadEnd( FileSystemAction::COPY );
+            case HandleErrorCommand::RETRY:
                 from_it--;
                 if( to_dir ) to_it--;
             /* break intentionally omitted */
-            case IGNORE:
+            case HandleErrorCommand::IGNORE:
                 continue;
-            case NO_ERROR:
+            case HandleErrorCommand::NO_ERROR:
                 break;
         }
 
         fs::copy( *from_it, *to_it, options, ec );
 
-        switch( checkError( ec, COPY, *from_it, *to_it ) )
+        switch( checkError( ec, FileSystemAction::COPY, *from_it, *to_it ) )
         {
-            case TERMINATE:
-                return signalThreadEnd( COPY );
-            case RETRY:
+            case HandleErrorCommand::TERMINATE:
+                return signalThreadEnd( FileSystemAction::COPY );
+            case HandleErrorCommand::RETRY:
                 from_it--;
                 if( to_dir ) to_it--;
             /* break intentionally omitted */
-            case IGNORE:
+            case HandleErrorCommand::IGNORE:
                 continue;
-            case NO_ERROR:
+            case HandleErrorCommand::NO_ERROR:
                 break;
         }
     }
-    signalThreadEnd( COPY );
+    signalThreadEnd( FileSystemAction::COPY );
 }
 void FileManager::doMoveFiles( fs::paths from, fs::paths to, fs::copy_options options )
 {
@@ -241,19 +241,19 @@ void FileManager::doMoveFiles( fs::paths from, fs::paths to, fs::copy_options op
         !( to_dir &&
            fs::is_directory( to[0], ec ) ) ) do
     {
-       switch( checkError( ec, MOVE, to[0] ) )
+       switch( checkError( ec, FileSystemAction::MOVE, to[0] ) )
        {
-           case TERMINATE:
-               return signalThreadEnd( MOVE );
-           case RETRY:
-           case IGNORE:
+           case HandleErrorCommand::TERMINATE:
+               return signalThreadEnd( FileSystemAction::MOVE );
+           case HandleErrorCommand::RETRY:
+           case HandleErrorCommand::IGNORE:
                continue;
-           case NO_ERROR:
+           case HandleErrorCommand::NO_ERROR:
                break;
        }
 
     ec.assign( EDOM, std::generic_category() );
-    checkError( ec, MOVE, to[0]);
+    checkError( ec, FileSystemAction::MOVE, to[0]);
 
     } while( ec );
 
@@ -264,37 +264,37 @@ void FileManager::doMoveFiles( fs::paths from, fs::paths to, fs::copy_options op
         {
             ec.assign( EISDIR, std::generic_category() );
         }
-        switch( checkError( ec, MOVE, *from_it ) )
+        switch( checkError( ec, FileSystemAction::MOVE, *from_it ) )
         {
-            case TERMINATE:
-                return signalThreadEnd( MOVE );
-            case RETRY:
+            case HandleErrorCommand::TERMINATE:
+                return signalThreadEnd( FileSystemAction::MOVE );
+            case HandleErrorCommand::RETRY:
                 from_it--;
                 if( to_dir ) to_it--;
             /* break intentionally omitted */
-            case IGNORE:
+            case HandleErrorCommand::IGNORE:
                 continue;
-            case NO_ERROR:
+            case HandleErrorCommand::NO_ERROR:
                 break;
         }
 
         fs::rename( *from_it, *to_it, ec );
 
-        switch( checkError( ec, MOVE, *from_it, *to_it ) )
+        switch( checkError( ec, FileSystemAction::MOVE, *from_it, *to_it ) )
         {
-            case TERMINATE:
-                return signalThreadEnd( MOVE );
-            case RETRY:
+            case HandleErrorCommand::TERMINATE:
+                return signalThreadEnd( FileSystemAction::MOVE );
+            case HandleErrorCommand::RETRY:
                 from_it--;
                 if( to_dir ) to_it--;
             /* break intentionally omitted */
-            case IGNORE:
+            case HandleErrorCommand::IGNORE:
                 continue;
-            case NO_ERROR:
+            case HandleErrorCommand::NO_ERROR:
                 break;
         }
     }
-    signalThreadEnd( MOVE );
+    signalThreadEnd( FileSystemAction::MOVE );
 }
 
 void FileManager::replyToError( t_id message_address, HandleErrorCommand message )
@@ -308,9 +308,9 @@ void FileManager::replyToError( t_id message_address, HandleErrorCommand message
     cond_var.notify_all();
 }
 
-FileManager::HandleErrorCommand FileManager::checkError( std::error_code& ec, FileSystemAction act, const fs::path p1, const fs::path p2 )
+HandleErrorCommand FileManager::checkError( std::error_code& ec, FileSystemAction act, const fs::path p1, const fs::path p2 )
 {
-    HandleErrorCommand ret = NO_ERROR;
+    HandleErrorCommand ret = HandleErrorCommand::NO_ERROR;
     if( ec )
     {
         GestureQueue::getInstance()->push(new FileSystemMessage(std::this_thread::get_id(), ec.default_error_condition(), act, p1, p2 ));
@@ -321,7 +321,7 @@ FileManager::HandleErrorCommand FileManager::checkError( std::error_code& ec, Fi
         lk.unlock();
         cond_var.notify_all();
     }
-    if( TERMINATE == ret ) std::cerr << "Terminating thread: " << std::this_thread::get_id() << std::endl;
+    if( HandleErrorCommand::TERMINATE == ret ) std::cerr << "Terminating thread: " << std::this_thread::get_id() << std::endl;
     return ret;
 }
 void FileManager::signalThreadEnd( FileSystemAction act)

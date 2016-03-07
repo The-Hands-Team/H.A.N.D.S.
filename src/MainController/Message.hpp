@@ -59,17 +59,17 @@ private:
 class FileSystemMessage : public Message
 {
 public:
-    FileSystemMessage(std::thread::id id, std::error_condition err, FileManager::FileSystemAction act, fs::path p1, fs::path p2 );
+    FileSystemMessage(std::thread::id id, std::error_condition err, FileSystemAction act, fs::path p1, fs::path p2 );
     std::thread::id get_t_id();
     std::error_condition getErrCode();
-    FileManager::FileSystemAction getAction();
+    FileSystemAction getAction();
     fs::path getPath1();
     fs::path getPath2();
 
 private:
     std::thread::id t_id;
     std::error_condition errCode;
-    FileManager::FileSystemAction action;
+    FileSystemAction action;
     fs::path path1;
     fs::path path2;
 };

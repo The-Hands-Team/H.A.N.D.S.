@@ -141,8 +141,3 @@ GestureCapture* GestureCapture::getInstance()
 {
     return instance;
 }
-
-void GestureCapture::mainLoop()
-{
-  while(true);
-}

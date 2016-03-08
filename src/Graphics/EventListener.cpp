@@ -23,8 +23,7 @@ bool EventListener::IsKeyDown(irr::EKEY_CODE keyCode) const
     return KeyIsDown[keyCode];
 }
 
-EventListener::EventListener()
+EventListener::~EventListener()
 {
-    for (irr::u32 i=0; i< irr::KEY_KEY_CODES_COUNT; ++i)
-        KeyIsDown[i] = false;
+    GestureQueue::getInstance()->push(new Message());
 }

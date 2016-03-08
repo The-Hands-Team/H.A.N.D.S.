@@ -3,12 +3,16 @@
 
 #include <vector>
 #include <unordered_set>
+#include <thread>
 #include "GestureQueue.hpp"
 #include "FileSystem/FileManager.hpp"
 
 class MainController {
 private:
     static MainController* curInstance;
+    GestureQueue gq;
+    GestureCapture gc;
+    std::thread graphics_t;
     void sendCurrentPath();
     bool ignore_new;
     void processEvent(Message*);

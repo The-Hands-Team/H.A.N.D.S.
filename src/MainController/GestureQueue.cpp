@@ -41,14 +41,14 @@ int GestureQueue::size()
     return ret;
 }
 
+GestureQueue::GestureQueue()
+{
+    instance = this;
+}
+
 GestureQueue* GestureQueue::getInstance()
 {
-    if( nullptr == GestureQueue::instance )
-    {
-        std::cout << "Queue Created" << std::endl;
-        instance = new GestureQueue();
-    }
-    return GestureQueue::instance;
+    return instance;
 }
 
 GestureQueue::~GestureQueue()

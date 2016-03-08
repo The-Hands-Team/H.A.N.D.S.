@@ -32,6 +32,7 @@ Graphics::Graphics()
     , driver(nullptr)
     , smgr(nullptr)
     , env(nullptr)
+    , run (true)
     , tiltingR(false)
     , tiltingL(false)
     , tiltingU(false)
@@ -77,6 +78,7 @@ Graphics::~Graphics()
         device->drop();
 
     instance = nullptr;
+
 }
 
 
@@ -170,7 +172,7 @@ void Graphics::fillNodes()
     objLock.unlock();
 }
 
-void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener receiver)
+void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener& receiver)
 {
    if(receiver.IsKeyDown(irr::KEY_KEY_Z))
    {
@@ -184,7 +186,7 @@ void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener rece
    }
 }
 
-void Graphics::checkTilt(scene::ICameraSceneNode* cam, EventListener receiver)
+void Graphics::checkTilt(scene::ICameraSceneNode* cam, EventListener& receiver)
 {
    if(receiver.IsKeyDown(irr::KEY_KEY_I) && !tiltingU)
    {
@@ -267,7 +269,7 @@ void Graphics::mainLoop()
     // how long it was since the last frame
     // u32 then = device->getTimer()->getTime();
 
-    while( device->run() )
+    while( run && device->run() )
     {
 
         if(receiver.IsKeyDown(irr::KEY_KEY_P))
@@ -309,5 +311,22 @@ void Graphics::mainLoop()
         {
             device->closeDevice();
         }
+    }
+}
+
+
+//Because Irrlicht is either too dumb or too smart for its own good
+void Graphics::initGraphics()
+{
+    Graphics g{};
+    g.mainLoop();
+}
+void Graphics::killGraphics()
+{
+    Graphics* g = getInstance();
+    if( g )
+    {
+    g->run = false;
+
     }
 }

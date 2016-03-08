@@ -42,8 +42,6 @@ class GestureCapture : public Leap::Listener {
 
         static GestureCapture* getInstance();
 
-        void mainLoop();
-
         virtual void onInit(const Leap::Controller&) {};
         virtual void onConnect(const Leap::Controller&);
         virtual void onDisconnect(const Leap::Controller&) {};

@@ -19,9 +19,9 @@ public:
     };
 
     MessageType getType();
+    Message();
     virtual ~Message();
 protected:
-    Message ();
     Message (MessageType m);
     MessageType type;
 };

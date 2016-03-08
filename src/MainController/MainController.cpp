@@ -8,17 +8,22 @@
 MainController* MainController::curInstance = nullptr;
 
 MainController::MainController()
+: gq()  // This one should be first
+, gc(false)
+, graphics_t(Graphics::initGraphics)
+, ignore_new(false)
+, new_dir_i(0)
+, cur_path("tests/test_dir")
 {
     curInstance = this;
-    ignore_new = false;
     GestureQueue::getInstance();
 
-    new_dir_i = 0;
-    cur_path = fs::path("tests/test_dir");
 }
 
 MainController::~MainController()
 {
+    Graphics::killGraphics(); //Just in case
+    graphics_t.join();
     curInstance = nullptr;
 }
 
@@ -33,7 +38,7 @@ void MainController::mainLoop()
     Message* ev;
     updateDirectory(cur_path);
 
-    while(true)
+    while(Graphics::getInstance())
     {
         sendCurrentPath();
         //got something in queue
@@ -165,7 +170,11 @@ fs::directory_entry MainController::curEntry()
 void MainController::processEvent(Message* m)
 {
 
-    if ( Message::GESTURE == m->getType() )
+    if ( Message::INVALID_MESSAGE == m->getType() )
+    {
+        Graphics::killGraphics(); //This will terminate the program
+    }
+    else if ( Message::GESTURE == m->getType() )
     {
         GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
         switch (ge->getGesture())
@@ -335,5 +344,16 @@ void MainController::sendCurrentPath()
     }
 
     Graphics::getInstance()->newObjects(objs);
+
+}
+
+// Start it all.
+int main()
+{
+    MainController mc{};
+
+    mc.mainLoop();
+
+    return 0;
 
 }

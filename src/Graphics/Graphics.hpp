@@ -26,10 +26,11 @@ public:
 
     void newObjects( const std::vector<DirObject>& );
 
+    static void initGraphics();
+    static void killGraphics();
+
 
 private:
-
-
 
     enum
     {
@@ -51,6 +52,7 @@ private:
     gui::IGUIEnvironment* env;
     EventListener         receiver;
 
+    bool run;
 
     bool tiltingR;
     bool tiltingL;
@@ -65,8 +67,8 @@ private:
     void createCameras();
     void emptyNodes();
     void fillNodes();
-    void checkScroll(scene::ICameraSceneNode*, EventListener);
-    void checkTilt(scene::ICameraSceneNode* cam, EventListener receiver);
+    void checkScroll(scene::ICameraSceneNode*, EventListener&);
+    void checkTilt(scene::ICameraSceneNode* cam, EventListener& receiver);
 
 };
 

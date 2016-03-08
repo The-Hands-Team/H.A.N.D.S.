@@ -12,6 +12,7 @@ private:
     static GestureQueue* instance;
 public:
     ~GestureQueue();
+    GestureQueue();
     static GestureQueue* getInstance();
     void push (Message*);
     Message* pop ();

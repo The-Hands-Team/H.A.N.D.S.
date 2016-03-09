@@ -10,7 +10,9 @@ bool EventListener::OnEvent(const irr::SEvent& event)
     if (event.EventType == irr::EET_KEY_INPUT_EVENT)
     {
         if( event.KeyInput.PressedDown != KeyIsDown[event.KeyInput.Key])
-            GestureQueue::getInstance()->push(new KeyMessage(event.KeyInput.Key,event.KeyInput.Shift,event.KeyInput.Control,event.KeyInput.PressedDown));
+        {
+            GestureQueue::getInstance()->push(std::make_unique<KeyMessage>(event.KeyInput.Key,event.KeyInput.Shift,event.KeyInput.Control,event.KeyInput.PressedDown));
+        }
         KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
     }
 
@@ -25,5 +27,5 @@ bool EventListener::IsKeyDown(irr::EKEY_CODE keyCode) const
 
 EventListener::~EventListener()
 {
-    GestureQueue::getInstance()->push(new Message());
+    GestureQueue::getInstance()->push(std::make_unique<Message>());
 }

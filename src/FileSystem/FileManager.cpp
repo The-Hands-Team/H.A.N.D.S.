@@ -295,7 +295,7 @@ HandleErrorCommand FileManager::checkError( std::error_code& ec, FileSystemActio
     HandleErrorCommand ret = HandleErrorCommand::NO_ERROR;
     if( ec )
     {
-        auto m = new FileSystemMessage
+        auto m = std::make_unique<FileSystemMessage>
                     (
                     std::this_thread::get_id(),
                     ec.default_error_condition(),
@@ -304,7 +304,7 @@ HandleErrorCommand FileManager::checkError( std::error_code& ec, FileSystemActio
                     p2
                     );
         auto fut = m->getPromise().get_future();
-        GestureQueue::getInstance()->push( m );
+        GestureQueue::getInstance()->push(std::move(m));
 
         ret = fut.get();
     }
@@ -313,10 +313,9 @@ HandleErrorCommand FileManager::checkError( std::error_code& ec, FileSystemActio
 }
 void FileManager::signalThreadEnd( FileSystemAction act )
 {
-    auto m = new FileSystemMessage(std::this_thread::get_id(), std::error_condition(), act, fs::path(), fs::path() );
-    std::promise<HandleErrorCommand>& p = m->getPromise();
-    auto fut = p.get_future();
-    GestureQueue::getInstance()->push(m);
+    auto m = std::make_unique<FileSystemMessage>(std::this_thread::get_id(), std::error_condition(), act, fs::path(), fs::path() );
+    auto fut = m->getPromise().get_future();
+    GestureQueue::getInstance()->push(std::move(m));
     fut.wait();
 }
 

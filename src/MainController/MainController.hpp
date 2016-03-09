@@ -15,7 +15,7 @@ private:
     std::thread graphics_t;
     void sendCurrentPath();
     bool ignore_new;
-    void processEvent(Message*);
+    void processEvent(std::unique_ptr<Message>&);
 
     void chdirUp();
     void chdirDown();

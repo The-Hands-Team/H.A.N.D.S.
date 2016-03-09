@@ -15,7 +15,7 @@ FILES := $(shell find src/ -name *.cpp -printf "%p ")
 # Every .cpp file has a corresponding .o file
 MY_LIBS = $(addprefix lib/_output/,$(addsuffix .o,$(basename $(notdir $(FILES)))))
 # Compiler flags
-CXXFLAGS = -std=c++11 -Wall -Wextra -Wpedantic -g -isysteminclude/ -Isrc/
+CXXFLAGS = -std=c++14 -Wall -Wextra -Wpedantic -g -isysteminclude/ -Isrc/
 # The temporary makefile to use
 TEMPFILE := temp.mk
 

@@ -2,6 +2,7 @@
 #include <future>
 #include <iostream>
 #include <errno.h>
+#include <memory>
 
 #include "Graphics/Graphics.hpp"
 #include "GestureCapture/GestureCapture.hpp"
@@ -36,7 +37,7 @@ MainController* MainController::getInstance()
 void MainController::mainLoop()
 {
     GestureQueue* event_q = GestureQueue::getInstance();
-    Message* ev;
+    std::unique_ptr<Message> ev;
     updateDirectory(cur_path);
 
     while(Graphics::getInstance())
@@ -168,178 +169,184 @@ fs::directory_entry MainController::curEntry()
     return new_dir_contents[new_dir_i];
 }
 
-void MainController::processEvent(Message* m)
+void MainController::processEvent(std::unique_ptr<Message>& m)
 {
-
-    if ( Message::INVALID_MESSAGE == m->getType() )
+    // TODO Break into smaller functions i.e. handleGestureMessage
+    switch (m->getType())
     {
-        Graphics::killGraphics(); //This will terminate the program
-    }
-    else if ( Message::GESTURE == m->getType() )
-    {
-        GestureMessage* ge = dynamic_cast<GestureMessage*>(m);
-        switch (ge->getGesture())
+        case Message::INVALID_MESSAGE:
         {
-        case GestType::PINCH:
-            if( GestHand::RIGHT == ge->getHandedness() )
+            Graphics::killGraphics(); //This will terminate the program
+        }
+        break;
+        case Message::GESTURE:
+        {
+            auto ge = dynamic_unique_move<GestureMessage>(std::move(m));
+            switch (ge->getGesture())
             {
-                select();
+            case GestType::PINCH:
+                if( GestHand::RIGHT == ge->getHandedness() )
+                {
+                    select();
+                    break;
+                }
+                else
+                {
+                    copyInto( cur_path );
+                }
+            case GestType::SCREEN_TAP:
+                if( GestHand::RIGHT == ge->getHandedness() )
+                {
+                    std::cout << cur_path << std::endl;
+                }
+                break;
+            case GestType::CIRCLE:
+                break;
+            case GestType::SWIPE:
+                if( GestHand::RIGHT == ge->getHandedness() )
+                {
+                    switch (ge->getDir())
+                    {
+                    case GestDir::UP:
+                        chdirUp();
+                        break;
+                    case GestDir::DOWN:
+                        chdirDown();
+                        break;
+                    case GestDir::RIGHT:
+                        iterateForward();
+                        break;
+                    case GestDir::LEFT:
+                        iterateBack();
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                else
+                {
+                    switch (ge->getDir())
+                    {
+                    case GestDir::UP:
+                        copyInto(cur_path.parent_path());
+                        break;
+                    case GestDir::DOWN:
+                        copyInto(curEntry());
+                        break;
+                    case GestDir::RIGHT:
+                        moveInto(cur_path.parent_path());
+                        break;
+                    case GestDir::LEFT:
+                        moveInto(curEntry());
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                break;
+            default:
+                std::cout << "Gesture not supported\n";
                 break;
             }
-            else
-            {
-                copyInto( cur_path );
-            }
-        case GestType::SCREEN_TAP:
-            if( GestHand::RIGHT == ge->getHandedness() )
-            {
-                std::cout << cur_path << std::endl;
-            }
-            break;
-        case GestType::CIRCLE:
-            break;
-        case GestType::SWIPE:
-            if( GestHand::RIGHT == ge->getHandedness() )
-            {
-                switch (ge->getDir())
+        }
+        break;
+        case Message::KEYPRESS:
+        {
+            auto ke = dynamic_unique_move<KeyMessage>(std::move(m));
+            if(ke->getPressed())
+                switch(ke->getKey())
                 {
-                case GestDir::UP:
+                case irr::EKEY_CODE::KEY_KEY_C:
+                    if( ke->getShift() )
+                    {
+                        copyInto(cur_path.parent_path());
+                    }
+                    else if ( ke->getCtrl() )
+                    {
+                        copyInto(curEntry());
+                    }
+                    else
+                    {
+                        copyInto(cur_path);
+                    }
+                    break;
+                case irr::EKEY_CODE::KEY_KEY_M:
+                    if( ke->getShift() )
+                    {
+                        moveInto(cur_path.parent_path());
+                    }
+                    else if ( ke->getCtrl() )
+                    {
+                        moveInto(curEntry());
+                    }
+                    else
+                    {
+                        moveInto(cur_path);
+                    }
+                    break;
+                case irr::EKEY_CODE::KEY_KEY_S:
+                    {
+                        select();
+                        break;
+                    }
+                case irr::EKEY_CODE::KEY_KEY_D:
+                    {
+                        std::cout << ke->getShift() << ke->getCtrl() << std::endl;
+                    }
+                    break;
+                case irr::EKEY_CODE::KEY_UP:
                     chdirUp();
                     break;
-                case GestDir::DOWN:
+                case irr::EKEY_CODE::KEY_DOWN:
                     chdirDown();
                     break;
-                case GestDir::RIGHT:
+                case irr::EKEY_CODE::KEY_RIGHT:
                     iterateForward();
                     break;
-                case GestDir::LEFT:
+                case irr::EKEY_CODE::KEY_LEFT:
                     iterateBack();
                     break;
                 default:
                     break;
                 }
-            }
-            else
-            {
-                switch (ge->getDir())
-                {
-                case GestDir::UP:
-                    copyInto(cur_path.parent_path());
-                    break;
-                case GestDir::DOWN:
-                    copyInto(curEntry());
-                    break;
-                case GestDir::RIGHT:
-                    moveInto(cur_path.parent_path());
-                    break;
-                case GestDir::LEFT:
-                    moveInto(curEntry());
-                    break;
-                default:
-                    break;
-                }
-            }
-            break;
-        default:
-            std::cout << "Gesture not supported\n";
-            break;
         }
-    }
-    else if( Message::KEYPRESS == m->getType() )
-    {
-        KeyMessage* ke = dynamic_cast<KeyMessage*>(m);
-        if(ke->getPressed())
-            switch(ke->getKey())
-            {
-            case irr::EKEY_CODE::KEY_KEY_C:
-                if( ke->getShift() )
-                {
-                    copyInto(cur_path.parent_path());
-                }
-                else if ( ke->getCtrl() )
-                {
-                    copyInto(curEntry());
-                }
-                else
-                {
-                    copyInto(cur_path);
-                }
-                break;
-            case irr::EKEY_CODE::KEY_KEY_M:
-                if( ke->getShift() )
-                {
-                    moveInto(cur_path.parent_path());
-                }
-                else if ( ke->getCtrl() )
-                {
-                    moveInto(curEntry());
-                }
-                else
-                {
-                    moveInto(cur_path);
-                }
-                break;
-            case irr::EKEY_CODE::KEY_KEY_S:
-                {
-                    select();
-                    break;
-                }
-            case irr::EKEY_CODE::KEY_KEY_D:
-                {
-                    std::cout << ke->getShift() << ke->getCtrl() << std::endl;
-                }
-                break;
-            case irr::EKEY_CODE::KEY_UP:
-                chdirUp();
-                break;
-            case irr::EKEY_CODE::KEY_DOWN:
-                chdirDown();
-                break;
-            case irr::EKEY_CODE::KEY_RIGHT:
-                iterateForward();
-                break;
-            case irr::EKEY_CODE::KEY_LEFT:
-                iterateBack();
-                break;
-            default:
-                break;
-            }
-    }
-    else if( Message::FILESYSTEM == m->getType() )
-    {
-        FileSystemMessage* fe = dynamic_cast<FileSystemMessage*>(m);
-
-        switch( fe->getErrCode().value() )
+        break;
+        case Message::FILESYSTEM:
         {
-            case 0:
-                fe->getPromise().set_value( HandleErrorCommand::NO_ERROR );
-                FileManager::getInstance()->joinThread(fe->get_t_id());
-                updateDirectory(cur_path);
-                break;
-            case EIO:
-                // This happens when copying empty file.
-                if( FileSystemAction::COPY == fe->getAction() &&
-                    fs::exists( fe->getPath2() ) &&
-                    fs::exists( fe->getPath1() ) &&
-                    fs::file_size(fe->getPath1()) == fs::file_size(fe->getPath2()))
-                {
-                    std::cout << fs::file_size(fe->getPath1()) << std::endl;
-                    auto stats = fs::status(fe->getPath1());
-                    fs::permissions(fe->getPath2(), stats.permissions());
-                    fe->getPromise().set_value( HandleErrorCommand::IGNORE );
+            auto fe = dynamic_unique_move<FileSystemMessage>(std::move(m));
+
+            switch( fe->getErrCode().value() )
+            {
+                case 0:
+                    fe->getPromise().set_value( HandleErrorCommand::NO_ERROR );
+                    FileManager::getInstance()->joinThread(fe->get_t_id());
                     updateDirectory(cur_path);
                     break;
-                }
-                // Break intentionally ommitted
-            default:
-                FileSystemMessage::prettyPrintMessage( *fe, std::cerr );
-                fe->getPromise().set_value( HandleErrorCommand::TERMINATE );
-                updateDirectory(cur_path);
-                break;
-                //we don't know;
+                case EIO:
+                    // This happens when copying empty file.
+                    if( FileSystemAction::COPY == fe->getAction() &&
+                        fs::exists( fe->getPath2() ) &&
+                        fs::exists( fe->getPath1() ) &&
+                        fs::file_size(fe->getPath1()) == fs::file_size(fe->getPath2()))
+                    {
+                        std::cout << fs::file_size(fe->getPath1()) << std::endl;
+                        auto stats = fs::status(fe->getPath1());
+                        fs::permissions(fe->getPath2(), stats.permissions());
+                        fe->getPromise().set_value( HandleErrorCommand::IGNORE );
+                        updateDirectory(cur_path);
+                        break;
+                    }
+                    // Break intentionally ommitted
+                default:
+                    FileSystemMessage::prettyPrintMessage( *fe, std::cerr );
+                    fe->getPromise().set_value( HandleErrorCommand::TERMINATE );
+                    updateDirectory(cur_path);
+                    break;
+                    //we don't know;
+            }
         }
+        break;
     }
-    delete m;
 }
 
 void MainController::sendCurrentPath()

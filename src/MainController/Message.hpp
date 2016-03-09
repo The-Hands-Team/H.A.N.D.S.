@@ -6,6 +6,8 @@
 #include <system_error>
 #include "GestureCapture/GestureCapture.hpp"
 
+
+
 class Message
 {
 public:

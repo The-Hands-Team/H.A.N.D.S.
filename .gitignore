@@ -6,5 +6,5 @@ Run
 .nfs*
 LeapTop.cbp
 LeapTop.layout
-tests/**/*
+tests/
 temp.mk

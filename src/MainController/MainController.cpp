@@ -308,10 +308,7 @@ void MainController::processEvent(Message* m)
     else if( Message::FILESYSTEM == m->getType() )
     {
         FileSystemMessage* fe = dynamic_cast<FileSystemMessage*>(m);
-        if( fe->getErrCode().value() )
-        {
-            FileSystemMessage::prettyPrintMessage( *fe, std::cerr );
-        }
+
         switch( fe->getErrCode().value() )
         {
             case 0:
@@ -320,10 +317,22 @@ void MainController::processEvent(Message* m)
                 updateDirectory(cur_path);
                 break;
             case EIO:
-                fe->getPromise().set_value( HandleErrorCommand::IGNORE );
-                updateDirectory(cur_path);
-                break;
+                // This happens when copying empty file.
+                if( FileSystemAction::COPY == fe->getAction() &&
+                    fs::exists( fe->getPath2() ) &&
+                    fs::exists( fe->getPath1() ) &&
+                    fs::file_size(fe->getPath1()) == fs::file_size(fe->getPath2()))
+                {
+                    std::cout << fs::file_size(fe->getPath1()) << std::endl;
+                    auto stats = fs::status(fe->getPath1());
+                    fs::permissions(fe->getPath2(), stats.permissions());
+                    fe->getPromise().set_value( HandleErrorCommand::IGNORE );
+                    updateDirectory(cur_path);
+                    break;
+                }
+                // Break intentionally ommitted
             default:
+                FileSystemMessage::prettyPrintMessage( *fe, std::cerr );
                 fe->getPromise().set_value( HandleErrorCommand::TERMINATE );
                 updateDirectory(cur_path);
                 break;

@@ -185,7 +185,7 @@ void FileManager::doCopyFiles( fs::paths from, fs::paths to, fs::copy_options op
          from_it++, ( to_dir ? to_it : to_it++ ) )
     {
 
-		std::cout << *from_it << " " << *to_it << std::endl;
+        std::cout << *from_it << " " << *to_it << std::endl;
 
         if( !compare_options( options, fs::copy_options::recursive )
             && fs::is_directory( *from_it, ec ) )

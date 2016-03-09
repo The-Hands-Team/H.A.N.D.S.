@@ -3,6 +3,7 @@
 
 #include "Message.hpp"
 #include <mutex>
+#include <condition_variable>
 #include <queue>
 
 class GestureQueue {

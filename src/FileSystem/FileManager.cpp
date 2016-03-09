@@ -1,20 +1,12 @@
 
 #include <cerrno>
 #include <functional>
-#include <iostream>
 #include "FileManager.hpp"
 #include "MainController/GestureQueue.hpp"
+#include <utility>
 namespace fs = std::experimental::filesystem;
 
 FileManager* FileManager::currentInstance = nullptr;
-
-FileManager::FileManager() : mess_ready(false)
-{
-}
-
-FileManager::~FileManager()
-{
-}
 
 FileManager* FileManager::getInstance()
 {
@@ -192,7 +184,7 @@ void FileManager::doCopyFiles( fs::paths from, fs::paths to, fs::copy_options op
          from.end() != from_it;
          from_it++, ( to_dir ? to_it : to_it++ ) )
     {
-		
+
 		std::cout << *from_it << " " << *to_it << std::endl;
 
         if( !compare_options( options, fs::copy_options::recursive )
@@ -297,36 +289,35 @@ void FileManager::doMoveFiles( fs::paths from, fs::paths to, fs::copy_options op
     signalThreadEnd( FileSystemAction::MOVE );
 }
 
-void FileManager::replyToError( t_id message_address, HandleErrorCommand message )
-{
-    std::unique_lock<std::mutex> lk(cond_mutex);
-    cond_var.wait(lk, [=]{return !mess_ready;});
-    mess_addr = message_address;
-    mess = message;
-    mess_ready = true;
-    lk.unlock();
-    cond_var.notify_all();
-}
 
 HandleErrorCommand FileManager::checkError( std::error_code& ec, FileSystemAction act, const fs::path p1, const fs::path p2 )
 {
     HandleErrorCommand ret = HandleErrorCommand::NO_ERROR;
     if( ec )
     {
-        GestureQueue::getInstance()->push(new FileSystemMessage(std::this_thread::get_id(), ec.default_error_condition(), act, p1, p2 ));
-        std::unique_lock<std::mutex> lk(cond_mutex);
-        cond_var.wait(lk, [=]{return mess_ready && std::this_thread::get_id() == mess_addr;});
-        ret = mess;
-        mess_ready = false;
-        lk.unlock();
-        cond_var.notify_all();
+        auto m = new FileSystemMessage
+                    (
+                    std::this_thread::get_id(),
+                    ec.default_error_condition(),
+                    act,
+                    p1,
+                    p2
+                    );
+        auto fut = m->getPromise().get_future();
+        GestureQueue::getInstance()->push( m );
+
+        ret = fut.get();
     }
     if( HandleErrorCommand::TERMINATE == ret ) std::cerr << "Terminating thread: " << std::this_thread::get_id() << std::endl;
     return ret;
 }
-void FileManager::signalThreadEnd( FileSystemAction act)
+void FileManager::signalThreadEnd( FileSystemAction act )
 {
-    GestureQueue::getInstance()->push(new FileSystemMessage(std::this_thread::get_id(), std::error_condition(), act, fs::path(), fs::path() ));
+    auto m = new FileSystemMessage(std::this_thread::get_id(), std::error_condition(), act, fs::path(), fs::path() );
+    std::promise<HandleErrorCommand>& p = m->getPromise();
+    auto fut = p.get_future();
+    GestureQueue::getInstance()->push(m);
+    fut.wait();
 }
 
 void FileManager::joinThread( t_id tid )
@@ -335,4 +326,71 @@ void FileManager::joinThread( t_id tid )
     threads.erase(tid);
 
 
+}
+
+FileSystemMessage::FileSystemMessage
+    (
+    std::thread::id tid,
+    std::error_condition err,
+    FileSystemAction act,
+    fs::path p1,
+    fs::path p2
+    )
+: Message(FILESYSTEM)
+, id(tid)
+, errCode(err)
+, action(act)
+, path1(p1)
+, path2(p2)
+{
+}
+t_id FileSystemMessage::get_t_id() const
+{
+    return id;
+}
+std::error_condition FileSystemMessage::getErrCode() const
+{
+    return errCode;
+}
+FileSystemAction FileSystemMessage::getAction() const
+{
+    return action;
+}
+fs::path FileSystemMessage::getPath1() const
+{
+    return path1;
+}
+fs::path FileSystemMessage::getPath2() const
+{
+    return path2;
+}
+std::promise<HandleErrorCommand>& FileSystemMessage::getPromise()
+{
+  return std::ref(p);
+}
+
+
+void FileSystemMessage::prettyPrintMessage(const FileSystemMessage& m, std::ostream& out)
+{
+    out << "Error: " << m.getErrCode().message() << " while ";
+    switch( m.getAction() )
+    {
+        case FileSystemAction::COPY:
+            out << "copying ";
+            break;
+        case FileSystemAction::MOVE:
+            out << "moving ";
+            break;
+        case FileSystemAction::DELETE:
+            out << "deleteing ";
+            break;
+    }
+
+    out << m.getPath1();
+    if( FileSystemAction::DELETE != m.getAction() )
+    {
+        out << " to " << m.getPath2();
+    }
+
+    std::endl(out);
 }

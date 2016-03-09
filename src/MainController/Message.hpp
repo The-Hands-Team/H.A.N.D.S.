@@ -4,7 +4,6 @@
 #include <irrlicht/Keycodes.h>
 #include <thread>
 #include <system_error>
-#include "FileSystem/FileManager.hpp"
 #include "GestureCapture/GestureCapture.hpp"
 
 class Message
@@ -54,24 +53,6 @@ private:
     bool shift;
     bool ctrl;
     bool pressed;
-};
-
-class FileSystemMessage : public Message
-{
-public:
-    FileSystemMessage(std::thread::id id, std::error_condition err, FileSystemAction act, fs::path p1, fs::path p2 );
-    std::thread::id get_t_id();
-    std::error_condition getErrCode();
-    FileSystemAction getAction();
-    fs::path getPath1();
-    fs::path getPath2();
-
-private:
-    std::thread::id t_id;
-    std::error_condition errCode;
-    FileSystemAction action;
-    fs::path path1;
-    fs::path path2;
 };
 
 #endif //MESSAGE_HPP

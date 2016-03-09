@@ -1,4 +1,5 @@
 #include "MainController.hpp"
+#include <future>
 #include <iostream>
 #include <errno.h>
 
@@ -307,20 +308,23 @@ void MainController::processEvent(Message* m)
     else if( Message::FILESYSTEM == m->getType() )
     {
         FileSystemMessage* fe = dynamic_cast<FileSystemMessage*>(m);
+        if( fe->getErrCode().value() )
+        {
+            FileSystemMessage::prettyPrintMessage( *fe, std::cerr );
+        }
         switch( fe->getErrCode().value() )
         {
             case 0:
+                fe->getPromise().set_value( HandleErrorCommand::NO_ERROR );
                 FileManager::getInstance()->joinThread(fe->get_t_id());
                 updateDirectory(cur_path);
                 break;
             case EIO:
-                std::cerr << fe->getErrCode().value() << fe->getErrCode().message() << " " << fe->getPath1() << " " << fe->getPath2() << std::endl;
-                FileManager::getInstance()->replyToError( fe->get_t_id(), HandleErrorCommand::IGNORE );
+                fe->getPromise().set_value( HandleErrorCommand::IGNORE );
                 updateDirectory(cur_path);
                 break;
             default:
-                std::cerr << fe->getErrCode().value() << fe->getErrCode().message() << " " << fe->getPath1() << " " << fe->getPath2() << std::endl;
-                FileManager::getInstance()->replyToError( fe->get_t_id(), HandleErrorCommand::TERMINATE );
+                fe->getPromise().set_value( HandleErrorCommand::TERMINATE );
                 updateDirectory(cur_path);
                 break;
                 //we don't know;

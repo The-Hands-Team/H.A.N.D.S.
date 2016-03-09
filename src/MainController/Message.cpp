@@ -51,32 +51,3 @@ bool KeyMessage::getPressed()
 {
     return pressed;
 }
-
-
-
-FileSystemMessage::FileSystemMessage(std::thread::id id, std::error_condition err, FileSystemAction act, fs::path p1, fs::path p2 ) : Message(FILESYSTEM),t_id(id)
-                                                                                                                 , errCode(err), action(act)
-                                                                                                                 , path1(p1), path2(p2)
-{
-}
-std::thread::id FileSystemMessage::get_t_id()
-{
-    return t_id;
-}
-std::error_condition FileSystemMessage::getErrCode()
-{
-    return errCode;
-}
-FileSystemAction FileSystemMessage::getAction()
-{
-    return action;
-}
-fs::path FileSystemMessage::getPath1()
-{
-    return path1;
-}
-fs::path FileSystemMessage::getPath2()
-{
-    return path2;
-}
-

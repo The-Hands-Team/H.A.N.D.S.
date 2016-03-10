@@ -7,7 +7,6 @@
 #include <future>
 #include <ostream>
 #include <thread>
-#include <unordered_map>
 
 
 namespace fs = std::experimental::filesystem;
@@ -19,11 +18,7 @@ namespace std{
             using paths = vector<path>;
         }
     }
-}
 
-
-namespace std
-{
     template <>
     struct hash<fs::path>
     {
@@ -40,7 +35,6 @@ namespace std
         }
     };
 }
-
 
 enum class HandleErrorCommand
 {
@@ -59,92 +53,61 @@ enum class FileSystemAction
 
 class FileManager
 {
-    public:
+public:
 
-    static FileManager* getInstance();
-
-    t_id deleteFile( const fs::path &file );
-    t_id deleteFiles( fs::paths& file, fs::copy_options options = fs::copy_options::none  );
-    t_id copyFiles( fs::paths& from
-                 , fs::paths& to
-                 , fs::copy_options options = fs::copy_options::none );
-    t_id copyFiles( fs::paths& from
-                 , const fs::path &to
-                 , fs::copy_options options = fs::copy_options::none );
-    t_id copyFile( const fs::path &from
-                 , const fs::path &to
-                 , fs::copy_options options = fs::copy_options::none );
-    t_id moveFiles( fs::paths& from
-                 , fs::paths& to
-                 , fs::copy_options options = fs::copy_options::none );
-    t_id moveFiles( fs::paths& from
-                 , const fs::path &to
-                 , fs::copy_options options = fs::copy_options::none );
-    t_id moveFile( const fs::path &from
-                 , const fs::path &to
-                 , fs::copy_options options = fs::copy_options::none );
-
-    void joinThread( t_id tid );
+    static void deleteFiles
+    (
+        fs::paths& file,
+        fs::copy_options options = fs::copy_options::none
+    );
+    static void copyFiles
+    (
+        fs::paths& from,
+        fs::paths& to,
+        fs::copy_options options = fs::copy_options::none
+    );
+    static void moveFiles
+    (
+        fs::paths& from,
+        fs::paths& to,
+        fs::copy_options options = fs::copy_options::none
+    );
 
 
-    private:
+private:
 
-    FileManager() = default;
-    ~FileManager() = default;
+    FileManager() = delete;
+    ~FileManager() = delete;
 
-    static FileManager* currentInstance;
-
-
-    static void static_DeleteFiles( fs::paths file, fs::copy_options options );
-    static void static_CopyFiles( fs::paths from, fs::paths to, fs::copy_options options );
-    static void static_MoveFiles( fs::paths from, fs::paths to, fs::copy_options options );
-
-    void doDeleteFiles( fs::paths file, fs::copy_options options );
-    void doCopyFiles( fs::paths from, fs::paths to, fs::copy_options options );
-    void doMoveFiles( fs::paths from, fs::paths to, fs::copy_options options );
+    static void performAction
+    (
+        FileSystemAction act,
+        fs::paths from,
+        fs::paths to,
+        fs::copy_options options
+    );
 
 
-    HandleErrorCommand checkError( std::error_code& ec, FileSystemAction act, const fs::path p1 = fs::path(), const fs::path p2 = fs::path() );
-    void signalThreadEnd( FileSystemAction act );
-    std::unordered_map<t_id, std::thread> threads;
+    static HandleErrorCommand checkError
+    (
+        std::error_code& ec,
+        FileSystemAction act,
+        const fs::path p1 = fs::path(),
+        const fs::path p2 = fs::path()
+    );
 
-    inline bool compare_options( fs::copy_options lhs, fs::copy_options rhs)
+    static void signalThreadEnd( FileSystemAction act );
+
+    inline static bool compare_options
+    (
+        fs::copy_options lhs,
+        fs::copy_options rhs
+    )
     {
         return ( lhs & rhs ) != fs::copy_options::none;
     }
 
 
-};
-
-
-
-class FileSystemMessage : public Message
-{
-public:
-    FileSystemMessage
-        (
-        std::thread::id tid,
-        std::error_condition err,
-        FileSystemAction act,
-        fs::path p1,
-        fs::path p2
-        );
-    t_id get_t_id() const;
-    std::error_condition getErrCode() const;
-    FileSystemAction getAction() const;
-    fs::path getPath1() const;
-    fs::path getPath2() const;
-    std::promise<HandleErrorCommand>& getPromise();
-
-    static void prettyPrintMessage(const FileSystemMessage& m, std::ostream& out);
-
-private:
-    t_id id;
-    std::error_condition errCode;
-    FileSystemAction action;
-    fs::path path1;
-    fs::path path2;
-    std::promise<HandleErrorCommand> p;
 };
 
 #endif //FILEMANAGER_HPP

@@ -129,7 +129,7 @@ void MainController::copyInto(fs::path dest)
 
         if( 0 < source.size() )
         {
-            FileManager::getInstance()->copyFiles(source,destination);
+            FileManager::copyFiles(source,destination);
         }
 
         clearSelected();
@@ -152,7 +152,7 @@ void MainController::moveInto(fs::path dest)
 
         if( 0 < source.size() )
         {
-            FileManager::getInstance()->moveFiles(source,destination);
+            FileManager::moveFiles(source,destination);
         }
 
         clearSelected();
@@ -319,7 +319,6 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
             {
                 case 0:
                     fe->getPromise().set_value( HandleErrorCommand::NO_ERROR );
-                    FileManager::getInstance()->joinThread(fe->get_t_id());
                     updateDirectory(cur_path);
                     break;
                 case EIO:
@@ -338,7 +337,7 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                     }
                     // Break intentionally ommitted
                 default:
-                    FileSystemMessage::prettyPrintMessage( *fe, std::cerr );
+                    fe->prettyPrintMessage(std::cerr);
                     fe->getPromise().set_value( HandleErrorCommand::TERMINATE );
                     updateDirectory(cur_path);
                     break;

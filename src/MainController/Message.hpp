@@ -34,6 +34,8 @@ public:
     GestType getGesture();
     GestDir getDir();
     GestHand getHandedness();
+    bool isStarted;
+    bool isLongGesture;
 
 private:
     GestType gesture;

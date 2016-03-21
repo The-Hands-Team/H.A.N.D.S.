@@ -157,7 +157,6 @@
     {
         auto m = std::make_unique<FileSystemMessage>
                     (
-                        std::this_thread::get_id(),
                         ec.default_error_condition(),
                         act,
                         p1,
@@ -180,7 +179,6 @@ void FileManager::signalThreadEnd( FileSystemAction act )
 {
     auto m = std::make_unique<FileSystemMessage>
                 (
-                    std::this_thread::get_id(),
                     std::error_condition(),
                     act,
                     fs::path(),

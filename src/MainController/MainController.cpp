@@ -6,6 +6,7 @@
 
 #include "Graphics/Graphics.hpp"
 #include "GestureCapture/GestureCapture.hpp"
+#include "FileSystem/FileSystemMessage.hpp"
 
 MainController* MainController::curInstance = nullptr;
 

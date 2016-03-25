@@ -11,7 +11,7 @@ public:
   int getHandID();
   bool isRight();
   bool isLeft();
-	float* getPalmLocation();
+  float* getPalmLocation();
 };
 
 #endif

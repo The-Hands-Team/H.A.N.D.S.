@@ -4,15 +4,14 @@
 class Hand{
 private:
   Leap::Hand hand;
-  //coordinatesForLDS convertToLDS(Leap coordinates);
 
 public:
   std::vector<dirObject> objects;
-  Hand();
+  Hand(Leap::Hand newHand);
   int getHandID();
   bool isRight();
   bool isLeft();
-  //coordinatesForLDS getPinchLocation(); //get location of thumb in float32s
+	float* getPalmLocation();
 };
 
 #endif

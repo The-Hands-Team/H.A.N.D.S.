@@ -58,18 +58,6 @@ Graphics::Graphics()
     env = device->getGUIEnvironment();
 
     createCameras();
-
-    smgr->addBillboardTextSceneNode
-            (
-                env->getFont("media/bigfont.png"),
-                L"Testing Things",
-                0,
-                core::dimension2d<f32>( 100 * 0.75, 3.0f),
-                core::vector3df(0,0,-7),
-                8888888,
-                video::SColor(100,255,255,255),
-                video::SColor(100,255,255,255)
-            );
 }
 
 Graphics::~Graphics()
@@ -87,11 +75,11 @@ Graphics* Graphics::getInstance()
     return instance;
 }
 
-void Graphics::newObjects( const std::vector<DirObject>& objs )
+void Graphics::newObjects( std::vector<DirObject> objs )
 {
     objLock.lock();
     dirObjects.clear();
-    dirObjects = objs;
+    dirObjects = std::move(objs);
     objLock.unlock();
 }
 
@@ -239,10 +227,11 @@ void Graphics::createCameras()
     float mid = (width * unit_size) / 2.0;
     cams[CAM_PERSP] = smgr->addCameraSceneNode(
                         0,
-                        core::vector3df(mid,-mid,0),
+                        core::vector3df(mid,-mid,-view_height),
                         core::vector3df(mid,-mid,view_height),
                         -1,
                         true);
+    cams[CAM_PERSP]->setFOV( 3.1415 / 6.5f );
 
     //create orth camera
     cams[CAM_ORTH] = smgr->addCameraSceneNode(

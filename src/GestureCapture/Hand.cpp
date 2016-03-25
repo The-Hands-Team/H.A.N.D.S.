@@ -16,9 +16,8 @@ bool Hand::isLeft(){
   return hand.isLeft();
 }
 
-float* Hand::getPalmLocation(){
+std::tuple<float,float,float> Hand::getPalmLocation(){
   Leap::Vector palmPos = hand.palmPosition();
   Leap::InteractionBox iBox = hand.frame().interactionBox();
-  float pos [3] = {palmPos.x/iBox.width(), palmPos.y/iBox.height(), palmPos.z/iBox.depth()};
-  return pos;
+  return std::make_tuple(palmPos.x/iBox.width(), palmPos.y/iBox.height(), palmPos.z/iBox.depth());
 }

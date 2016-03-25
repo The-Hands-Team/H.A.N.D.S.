@@ -24,7 +24,7 @@ public:
     void mainLoop();
     static Graphics* getInstance();
 
-    void newObjects( const std::vector<DirObject>& );
+    void newObjects( std::vector<DirObject> );
 
     static void initGraphics();
     static void killGraphics();

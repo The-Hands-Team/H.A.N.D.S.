@@ -43,11 +43,18 @@ void MainController::mainLoop()
 
     while(Graphics::getInstance())
     {
+		try 
+		{
         sendCurrentPath();
         //got something in queue
 
         ev = event_q->pop();
         processEvent(ev);
+		}
+		catch (const std::exception& e)
+		{
+			std::cerr << e.what() << std::endl;
+		}
     }
 }
 
@@ -352,7 +359,7 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
 void MainController::sendCurrentPath()
 {
     // TODO Also keep a copy of the list for ourselves, possibly with more information
-    std::vector<DirObject> objs;
+    std::vector<DirObject> objs{};
 
     for ( unsigned int i = 0; i < new_dir_contents.size(); i++ )
     {
@@ -363,7 +370,7 @@ void MainController::sendCurrentPath()
                          , selected.count( new_dir_contents[i].path() ) );
     }
 
-    Graphics::getInstance()->newObjects(objs);
+    Graphics::getInstance()->newObjects(std::move(objs));
 
 }
 

@@ -137,7 +137,7 @@ void MainController::copyInto(fs::path dest)
 
         if( 0 < source.size() )
         {
-            FileManager::copyFiles(source,destination);
+            FileManager::copyFiles(source,destination, fs::copy_options::recursive);
         }
 
         clearSelected();
@@ -160,7 +160,7 @@ void MainController::moveInto(fs::path dest)
 
         if( 0 < source.size() )
         {
-            FileManager::moveFiles(source,destination);
+            FileManager::moveFiles(source,destination, fs::copy_options::recursive);
         }
 
         clearSelected();
@@ -334,6 +334,8 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                     if( FileSystemAction::COPY == fe->getAction() &&
                         fs::exists( fe->getPath2() ) &&
                         fs::exists( fe->getPath1() ) &&
+			!fs::is_directory( fe->getPath1() ) &&
+			!fs::is_directory( fe->getPath2() ) &&
                         fs::file_size(fe->getPath1()) == fs::file_size(fe->getPath2()))
                     {
                         std::cout << fs::file_size(fe->getPath1()) << std::endl;

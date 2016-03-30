@@ -52,7 +52,7 @@ Graphics::Graphics()
         //TODO handle gracefully
         exit(1);
     }
-
+    device->setResizable(false);
     driver = device->getVideoDriver();
     smgr = device->getSceneManager();
     env = device->getGUIEnvironment();

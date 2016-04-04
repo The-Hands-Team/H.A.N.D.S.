@@ -1,6 +1,7 @@
 #include "DirObject.hpp"
 #include <vector>
 #include <array>
+#include <atomic>
 #include <mutex>
 #include "EventListener.hpp"
 #include "irrlicht/ISceneNode.h"
@@ -51,8 +52,12 @@ private:
     scene::ISceneManager* smgr;
     gui::IGUIEnvironment* env;
     EventListener         receiver;
+    GHand leftHand;
+    GHand rightHand;
 
     bool run;
+
+    std::atomic_bool need_node_update;
 
     bool tiltingR;
     bool tiltingL;

@@ -33,6 +33,7 @@ Graphics::Graphics()
     , smgr(nullptr)
     , env(nullptr)
     , run (true)
+    , need_node_update(false)
     , tiltingR(false)
     , tiltingL(false)
     , tiltingU(false)
@@ -56,6 +57,8 @@ Graphics::Graphics()
     driver = device->getVideoDriver();
     smgr = device->getSceneManager();
     env = device->getGUIEnvironment();
+    leftHand = GHand(smgr);
+    rightHand = GHand(smgr);
 
     createCameras();
 }
@@ -80,6 +83,7 @@ void Graphics::newObjects( std::vector<DirObject> objs )
     objLock.lock();
     dirObjects.clear();
     dirObjects = std::move(objs);
+    need_node_update.store(true);
     objLock.unlock();
 }
 
@@ -95,69 +99,103 @@ void Graphics::emptyNodes()
 
 void Graphics::fillNodes()
 {
-    objLock.lock();
-    emptyNodes();
-    for(DirObject dirObj : dirObjects)
+    if(need_node_update.exchange(false))
     {
-        scene::ISceneNode* newNode;
-        if(dirObj.getType() == 'f')
+        objLock.lock();
+        emptyNodes();
+        for(DirObject dirObj : dirObjects)
         {
-            newNode = smgr->addSphereSceneNode();
-        }
-        else
-        {
-            newNode = smgr->addCubeSceneNode();
-        }
-
-        //std::wcout << dirObj.getName() << std::endl;
-
-        if(newNode)
-        {
-            dirNodes.push_back(newNode);
-
-            newNode->setPosition(core::vector3df
-                (
-                    dirObj.getX() * unit_size*width,
-                    -dirObj.getY() * unit_size*width,
-                    50
-                ));
-
-            std::wstring finished_name( *(dirObj.getName()) );
-
-            if( !dirObj.isHighlighted && finished_name.length() > max_text_length )
+            scene::ISceneNode* newNode;
+            if(dirObj.getType() == 'f')
             {
-                finished_name.erase( max_text_length - 3 );
-                finished_name += L"...";
-            }
-
-            if(dirObj.isHighlighted)
-            {
-                newNode->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
+                newNode = smgr->addSphereSceneNode();
             }
             else
             {
-                newNode->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
+                newNode = smgr->addCubeSceneNode();
             }
-            if(dirObj.isSelected)
-            {
-                newNode->setMaterialFlag(video::EMF_WIREFRAME, true);
-            }
-            newNode->setMaterialFlag(video::EMF_LIGHTING, false);
-            smgr->addBillboardTextSceneNode
-            (
-                env->getFont("media/bigfont.png"),
-                finished_name.c_str(),
-                newNode,
-                core::dimension2d<f32>( finished_name.length() * 0.75, 3.0f),
-                core::vector3df(0,0,-7),
-                dirNodes.size(),
-                video::SColor(100,255,255,255),
-                video::SColor(100,255,255,255)
-            );
 
+            //std::wcout << dirObj.getName() << std::endl;
+
+            if(newNode)
+            {
+                dirNodes.push_back(newNode);
+
+                newNode->setPosition(core::vector3df
+                    (
+                        dirObj.getX() * unit_size*width,
+                        -dirObj.getY() * unit_size*width,
+                        50
+                    ));
+
+                std::wstring finished_name( *(dirObj.getName()) );
+
+                if( !dirObj.isHighlighted && finished_name.length() > max_text_length )
+                {
+                    finished_name.erase( max_text_length - 3 );
+                    finished_name += L"...";
+                }
+
+                if(dirObj.isHighlighted)
+                {
+                    newNode->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
+                }
+                else
+                {
+                    newNode->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
+                }
+                if(dirObj.isSelected)
+                {
+                    newNode->setMaterialFlag(video::EMF_WIREFRAME, true);
+                }
+                newNode->setMaterialFlag(video::EMF_LIGHTING, false);
+                smgr->addBillboardTextSceneNode
+                (
+                    env->getFont("media/bigfont.png"),
+                    finished_name.c_str(),
+                    newNode,
+                    core::dimension2d<f32>( finished_name.length() * 0.75, 3.0f),
+                    core::vector3df(0,0,-7),
+                    dirNodes.size(),
+                    video::SColor(100,255,255,255),
+                    video::SColor(100,255,255,255)
+                );
+
+            }
+        }
+        objLock.unlock();
+    }
+}
+
+void Graphics::drawHands()
+{
+    bool leftHandFound = false;
+    bool rightHandFound = false;
+    std::vector<Hand> hands = GestureCapture::getInstance()->getHands();
+
+    for(int i = 0; i < hands.size() && i < 2; i++)
+    {
+        if(hands[i].isRight())
+        {
+            rightHand.setthings();
+            rightHandFound = true;
+        }
+        else
+        {
+            leftHand.setthings();
+            leftHandFound = true;
         }
     }
-    objLock.unlock();
+    if( !leftHandFound )
+    {
+        leftHand.setInvisible();
+        leftHand.000;
+    }
+    if( !rightHandFound )
+    {
+        rightHand.setthings();
+        rightHand.000;
+    }
 }
 
 void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener& receiver)

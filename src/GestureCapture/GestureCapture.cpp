@@ -27,6 +27,12 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
     const Leap::Frame prevFrame = controller.frame(1);
     //Initialize all gestures to false
     std::bitset<+GestType::INVALID_GESTURE> curGestures{};
+    
+    Leap::HandList handList = frame.hands();
+    handsInFrame.clear();
+    for (int i=0; i<handList.count() && i<2; i++) {
+        handsInFrame.push_back(Hand(handList.get(i)));
+    }
 
     // TODO don't HandleErrorCommand::IGNORE when the same gesture is made simultaneously by different fingers
 
@@ -140,4 +146,9 @@ GestureCapture::~GestureCapture()
 GestureCapture* GestureCapture::getInstance()
 {
     return instance;
+}
+
+static std::vector<Hand> GestureCapture::getHands()
+{
+    return handsInFrame;
 }

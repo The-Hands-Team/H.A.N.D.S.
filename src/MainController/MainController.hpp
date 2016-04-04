@@ -16,6 +16,7 @@ private:
     void sendCurrentPath();
     bool ignore_new;
     void processEvent(std::unique_ptr<Message>&);
+	void handleGestureMessage(std::unique_ptr<GestureMessage>);
 
     void chdirUp();
     void chdirDown();
@@ -31,7 +32,6 @@ private:
     std::vector<fs::directory_entry> new_dir_contents;
     std::unordered_set<fs::path> selected;
     void updateDirectory(fs::path);
-
     fs::path cur_path;
     fs::directory_iterator dir_it;
 public:

@@ -107,7 +107,6 @@ void MainController::iterateBack()
     new_dir_i = (new_dir_i + new_dir_contents.size() - 1) % new_dir_contents.size();
 }
 
-
 void MainController::select()
 {
     fs::path selection = curEntry().path();
@@ -177,6 +176,80 @@ fs::directory_entry MainController::curEntry()
     return new_dir_contents[new_dir_i];
 }
 
+void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
+{
+	//lonk or short
+	//the handz
+		//keep track of hands and their gestures
+	//
+	switch (ge->getGesture())
+	{
+	case GestType::PINCH:
+		if( GestHand::RIGHT == ge->getHandedness() )
+		{
+			select();
+			break;
+		}
+		else
+		{
+			copyInto( cur_path );
+		}
+	case GestType::SCREEN_TAP:
+		if( GestHand::RIGHT == ge->getHandedness() )
+		{
+			std::cout << cur_path << std::endl;
+		}
+		break;
+	case GestType::CIRCLE:
+		break;
+	case GestType::SWIPE:
+		if( GestHand::RIGHT == ge->getHandedness() )
+		{
+			switch (ge->getDir())
+			{
+			case GestDir::UP:
+				chdirUp();
+				break;
+			case GestDir::DOWN:
+				chdirDown();
+				break;
+			case GestDir::RIGHT:
+				iterateForward();
+				break;
+			case GestDir::LEFT:
+				iterateBack();
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			switch (ge->getDir())
+			{
+			case GestDir::UP:
+				copyInto(cur_path.parent_path());
+				break;
+			case GestDir::DOWN:
+				copyInto(curEntry());
+				break;
+			case GestDir::RIGHT:
+				moveInto(cur_path.parent_path());
+				break;
+			case GestDir::LEFT:
+				moveInto(curEntry());
+				break;
+			default:
+				break;
+			}
+		}
+		break;
+	default:
+		std::cout << "Gesture not supported\n";
+		break;
+	}
+}
+
 void MainController::processEvent(std::unique_ptr<Message>& m)
 {
     // TODO Break into smaller functions i.e. handleGestureMessage
@@ -189,74 +262,8 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
         break;
         case Message::GESTURE:
         {
-            auto ge = dynamic_unique_move<GestureMessage>(std::move(m));
-            switch (ge->getGesture())
-            {
-            case GestType::PINCH:
-                if( GestHand::RIGHT == ge->getHandedness() )
-                {
-                    select();
-                    break;
-                }
-                else
-                {
-                    copyInto( cur_path );
-                }
-            case GestType::SCREEN_TAP:
-                if( GestHand::RIGHT == ge->getHandedness() )
-                {
-                    std::cout << cur_path << std::endl;
-                }
-                break;
-            case GestType::CIRCLE:
-                break;
-            case GestType::SWIPE:
-                if( GestHand::RIGHT == ge->getHandedness() )
-                {
-                    switch (ge->getDir())
-                    {
-                    case GestDir::UP:
-                        chdirUp();
-                        break;
-                    case GestDir::DOWN:
-                        chdirDown();
-                        break;
-                    case GestDir::RIGHT:
-                        iterateForward();
-                        break;
-                    case GestDir::LEFT:
-                        iterateBack();
-                        break;
-                    default:
-                        break;
-                    }
-                }
-                else
-                {
-                    switch (ge->getDir())
-                    {
-                    case GestDir::UP:
-                        copyInto(cur_path.parent_path());
-                        break;
-                    case GestDir::DOWN:
-                        copyInto(curEntry());
-                        break;
-                    case GestDir::RIGHT:
-                        moveInto(cur_path.parent_path());
-                        break;
-                    case GestDir::LEFT:
-                        moveInto(curEntry());
-                        break;
-                    default:
-                        break;
-                    }
-                }
-                break;
-            default:
-                std::cout << "Gesture not supported\n";
-                break;
-            }
-        }
+            handleGestureMessage(dynamic_unique_move<GestureMessage>(std::move(m)));
+		}
         break;
         case Message::KEYPRESS:
         {

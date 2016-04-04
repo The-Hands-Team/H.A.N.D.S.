@@ -41,6 +41,7 @@ class GestureCapture : public Leap::Listener {
         ~GestureCapture();
 
         static GestureCapture* getInstance();
+        static std::vector<Hand> getHands();
 
         virtual void onInit(const Leap::Controller&) {};
         virtual void onConnect(const Leap::Controller&);
@@ -60,6 +61,7 @@ class GestureCapture : public Leap::Listener {
 
         Leap::Controller controller;
         static GestureCapture* instance;
+        static std::vector<Hand> handsInFrame;
 
 };
 

@@ -10,6 +10,7 @@
 #include "irrlicht/ISceneManager.h"
 #include "irrlicht/IGUIEnvironment.h"
 #include "irrlicht/IrrlichtDevice.h"
+#include "GHand.hpp"
 
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
@@ -74,6 +75,7 @@ private:
     void fillNodes();
     void checkScroll(scene::ICameraSceneNode*, EventListener&);
     void checkTilt(scene::ICameraSceneNode* cam, EventListener& receiver);
+    void drawHands();
 
 };
 

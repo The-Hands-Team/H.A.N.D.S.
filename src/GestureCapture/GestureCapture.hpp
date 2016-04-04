@@ -3,6 +3,7 @@
 #define GESTURE_CAPTURE
 
 #include "LeapMotion/Leap.h"
+#include "Hand.hpp"
 #include <bitset>
 
 void initGesture(bool background);
@@ -41,6 +42,7 @@ class GestureCapture : public Leap::Listener {
         ~GestureCapture();
 
         static GestureCapture* getInstance();
+        std::vector<Hand> getHands();
 
         virtual void onInit(const Leap::Controller&) {};
         virtual void onConnect(const Leap::Controller&);
@@ -60,6 +62,7 @@ class GestureCapture : public Leap::Listener {
 
         Leap::Controller controller;
         static GestureCapture* instance;
+        std::vector<Hand> handsInFrame;
 
 };
 

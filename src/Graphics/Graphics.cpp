@@ -1,4 +1,5 @@
 #include "Graphics.hpp"
+#include "GestureCapture/GestureCapture.hpp"
 #include <irrlicht/irrlicht.h>
 
 using namespace irr;
@@ -32,6 +33,8 @@ Graphics::Graphics()
     , driver(nullptr)
     , smgr(nullptr)
     , env(nullptr)
+    , leftHand()
+    , rightHand()
     , run (true)
     , need_node_update(false)
     , tiltingR(false)
@@ -45,7 +48,7 @@ Graphics::Graphics()
     for( size_t i = 0; nullptr == device && i < preferedDrivers.size(); i++ )
     {
         device = createDevice(preferedDrivers[i],
-                core::dimension2d<u32>(1366/2, 768), 16, false, false, false, &receiver);
+                core::dimension2d<u32>(800, 800), 16, false, false, false, &receiver);
     }
 
     if( nullptr == device )
@@ -57,10 +60,12 @@ Graphics::Graphics()
     driver = device->getVideoDriver();
     smgr = device->getSceneManager();
     env = device->getGUIEnvironment();
+
+    createCameras();
+
     leftHand = GHand(smgr);
     rightHand = GHand(smgr);
 
-    createCameras();
 }
 
 Graphics::~Graphics()
@@ -173,28 +178,34 @@ void Graphics::drawHands()
     bool rightHandFound = false;
     std::vector<Hand> hands = GestureCapture::getInstance()->getHands();
 
-    for(int i = 0; i < hands.size() && i < 2; i++)
+    std::cout << hands.size() << std::endl;
+
+    for(size_t i = 0; i < hands.size() && i < 2; i++)
     {
         if(hands[i].isRight())
         {
-            rightHand.setthings();
+            rightHand.copyHand(hands[i]);
             rightHandFound = true;
+            float x,y,z;
+            std::tie(x,y,z) = hands[i].getPalmLocation();
+            std::cout << "Right: " << x << ',' << y << ',' << z << std::endl;
         }
         else
         {
-            leftHand.setthings();
+            leftHand.copyHand(hands[i]);
             leftHandFound = true;
+            float x,y,z;
+            std::tie(x,y,z) = hands[i].getPalmLocation();
+            std::cout << "Left : " << x << ',' << y << ',' << z << std::endl;
         }
     }
     if( !leftHandFound )
     {
-        leftHand.setInvisible();
-        leftHand.000;
+        leftHand.setVisible(false);
     }
     if( !rightHandFound )
     {
-        rightHand.setthings();
-        rightHand.000;
+        rightHand.setVisible(false);
     }
 }
 
@@ -310,6 +321,7 @@ void Graphics::mainLoop()
 
         irr::scene::ICameraSceneNode* cam = smgr->getActiveCamera();
         fillNodes();
+        drawHands();
 
         checkScroll(cam, receiver);
         checkTilt(cam, receiver);

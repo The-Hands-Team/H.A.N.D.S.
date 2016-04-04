@@ -17,6 +17,7 @@ public:
   bool isRight();
   bool isLeft();
   std::tuple<float,float,float> getPalmLocation();
+  std::tuple<float,float,float> getFingerLocation(int fingerIndex);
 };
 
 #endif

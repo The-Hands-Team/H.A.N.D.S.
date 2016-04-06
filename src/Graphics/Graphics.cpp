@@ -33,8 +33,9 @@ Graphics::Graphics()
     , driver(nullptr)
     , smgr(nullptr)
     , env(nullptr)
-    , leftHand()
-    , rightHand()
+    , receiver()
+    , leftHand(nullptr)
+    , rightHand(nullptr)
     , run (true)
     , need_node_update(false)
     , tiltingR(false)
@@ -63,9 +64,10 @@ Graphics::Graphics()
 
     createCameras();
 
-    leftHand = GHand(smgr);
-    rightHand = GHand(smgr);
-
+    leftHand = new GHand(smgr);
+    leftHand->setXYZ(50,50,50);
+    leftHand->setVisible(true);
+    rightHand = new GHand(smgr);
 }
 
 Graphics::~Graphics()
@@ -178,13 +180,13 @@ void Graphics::drawHands()
     bool rightHandFound = false;
     std::vector<Hand> hands = GestureCapture::getInstance()->getHands();
 
-    std::cout << hands.size() << std::endl;
+	std::cout << hands.size() << std::endl;
 
     for(size_t i = 0; i < hands.size() && i < 2; i++)
     {
-        if(hands[i].isRight())
+        if(  hands[i].isRight())
         {
-            rightHand.copyHand(hands[i]);
+            rightHand->copyHand(hands[i]);
             rightHandFound = true;
             float x,y,z;
             std::tie(x,y,z) = hands[i].getPalmLocation();
@@ -192,7 +194,7 @@ void Graphics::drawHands()
         }
         else
         {
-            leftHand.copyHand(hands[i]);
+            leftHand->copyHand(hands[i]);
             leftHandFound = true;
             float x,y,z;
             std::tie(x,y,z) = hands[i].getPalmLocation();
@@ -201,11 +203,11 @@ void Graphics::drawHands()
     }
     if( !leftHandFound )
     {
-        leftHand.setVisible(false);
+        leftHand->setVisible(false);
     }
     if( !rightHandFound )
     {
-        rightHand.setVisible(false);
+        rightHand->setVisible(false);
     }
 }
 

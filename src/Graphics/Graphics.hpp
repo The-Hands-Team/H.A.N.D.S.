@@ -53,8 +53,8 @@ private:
     scene::ISceneManager* smgr;
     gui::IGUIEnvironment* env;
     EventListener         receiver;
-    GHand leftHand;
-    GHand rightHand;
+    GHand* leftHand;
+    GHand* rightHand;
 
     bool run;
 

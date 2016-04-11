@@ -16,7 +16,7 @@ private:
 
 public:
   std::vector<DirObject> objects;
-  Hand(Leap::Hand newHand);
+  Hand(Leap::Hand hand);
   ~Hand();
   int getHandID();
   bool isRight();

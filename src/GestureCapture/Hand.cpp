@@ -19,15 +19,11 @@ Hand::Hand(Leap::Hand hand){
   palm[1] = palmPos.y;
   palm[2] = palmPos.z;
   
-  int i = 0;
   Leap::FingerList allTheFingers = hand.frame().fingers();
   for(Leap::FingerList::const_iterator fl=allTheFingers.begin(); fl!=allTheFingers.end(); fl++)
   {
     Leap::Vector fingerPos = (*fl).tipPosition();
-	  fingers[i][0] = fingerPos.x;
-    fingers[i][1] = fingerPos.y;
-    fingers[i][2] = fingerPos.z;
-	  i++;
+    fingers.push_back( std::array<float, 3>{fingerPos.x, fingerPos.y,  fingerPos.z} );
   }
 }
 

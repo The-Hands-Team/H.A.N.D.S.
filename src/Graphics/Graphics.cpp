@@ -14,9 +14,22 @@ using namespace irr;
 /* Static Members */
 Graphics* Graphics::instance = nullptr;
 
-const int Graphics::width = 10;
+/*const int Graphics::width = 10;
 const int Graphics::unit_size = 5;
-const int Graphics::view_height = width*10;
+const int Graphics::view_height = width*10;*/
+
+const int Graphics::CELL_WIDTH = 5;
+const int Graphics::OBJ_WIDTH = CELL_WIDTH * 0.75;
+const int Graphics::GRID_WIDTH = 5;
+const int Graphics::GRID_HEIGHT = GRID_WIDTH;
+const int Graphics::GRID_DEPTH = GRID_HEIGHT;
+const int Graphics::VIEW_WIDTH = CELL_WIDTH * (GRID_WIDTH + 1);
+const int Graphics::VIEW_HEIGHT = CELL_WIDTH * (GRID_HEIGHT + 1);
+const int Graphics::VIEW_DEPTH = CELL_WIDTH * (GRID_DEPTH + 1);
+const int Graphics::CAM_HEIGHT = CELL_WIDTH * GRID_WIDTH * 0.5;
+
+
+
 const int Graphics::max_text_length = 11;
 
 const std::array<video::E_DRIVER_TYPE, 6> Graphics::preferedDrivers = { video::EDT_DIRECT3D9
@@ -115,11 +128,11 @@ void Graphics::fillNodes()
             scene::ISceneNode* newNode;
             if(dirObj.getType() == 'f')
             {
-                newNode = smgr->addSphereSceneNode();
+                newNode = smgr->addSphereSceneNode(0.5*OBJ_WIDTH);
             }
             else
             {
-                newNode = smgr->addCubeSceneNode();
+                newNode = smgr->addCubeSceneNode(OBJ_WIDTH);
             }
 
             //std::wcout << dirObj.getName() << std::endl;
@@ -130,9 +143,9 @@ void Graphics::fillNodes()
 
                 newNode->setPosition(core::vector3df
                     (
-                        dirObj.getX() * unit_size*width,
-                        -dirObj.getY() * unit_size*width,
-                        50
+                        dirObj.getX() * CELL_WIDTH + CELL_WIDTH/2.0,
+                        -(dirObj.getY() * CELL_WIDTH + CELL_WIDTH/2.0),
+                        CAM_HEIGHT
                     ));
 
                 std::wstring finished_name( *(dirObj.getName()) );
@@ -161,7 +174,7 @@ void Graphics::fillNodes()
                     env->getFont("media/bigfont.png"),
                     finished_name.c_str(),
                     newNode,
-                    core::dimension2d<f32>( finished_name.length() * 0.75, 3.0f),
+                    core::dimension2d<f32>( finished_name.length() * (CELL_WIDTH/(float) max_text_length), CELL_WIDTH*0.2),
                     core::vector3df(0,0,-7),
                     dirNodes.size(),
                     video::SColor(100,255,255,255),
@@ -275,11 +288,11 @@ void Graphics::checkTilt(scene::ICameraSceneNode* cam, EventListener& receiver)
 void Graphics::createCameras()
 {
     //create persp camera
-    float mid = (width * unit_size) / 2.0;
+    float mid = VIEW_WIDTH / 2.0;
     cams[CAM_PERSP] = smgr->addCameraSceneNode(
                         0,
-                        core::vector3df(mid,-mid,-view_height),
-                        core::vector3df(mid,-mid,view_height),
+                        core::vector3df(mid,-mid,-CAM_HEIGHT),
+                        core::vector3df(mid,-mid,CAM_HEIGHT),
                         -1,
                         true);
     cams[CAM_PERSP]->setFOV( 3.1415 / 6.5f );
@@ -288,11 +301,11 @@ void Graphics::createCameras()
     cams[CAM_ORTH] = smgr->addCameraSceneNode(
                             0,
                             core::vector3df(mid,-mid,0),
-                            core::vector3df(mid,-mid,view_height),
+                            core::vector3df(mid,-mid,CAM_HEIGHT),
                             -1,
                             true);
     core::matrix4 projMat;
-    projMat.buildProjectionMatrixOrthoLH(75,75,10,100);
+    projMat.buildProjectionMatrixOrthoLH(VIEW_WIDTH,VIEW_HEIGHT,0,CAM_HEIGHT+VIEW_DEPTH);
     cams[CAM_ORTH]->setProjectionMatrix(projMat, true);
 }
 

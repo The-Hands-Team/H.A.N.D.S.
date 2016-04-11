@@ -373,7 +373,7 @@ void MainController::sendCurrentPath()
     for ( unsigned int i = 0; i < new_dir_contents.size(); i++ )
     {
         objs.emplace_back( fs::is_directory(new_dir_contents[i].path())?'d':'f'
-                         , 0.25f*(i/5),0.25f*(i%5)
+                         , (i%Graphics::GRID_WIDTH),(i/Graphics::GRID_HEIGHT)
                          , new_dir_contents[i].path().filename().wstring()
                          , i == new_dir_i
                          , selected.count( new_dir_contents[i].path() ) );

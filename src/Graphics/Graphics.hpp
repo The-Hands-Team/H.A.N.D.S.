@@ -32,6 +32,13 @@ public:
     static void killGraphics();
 
 
+    static const int CELL_WIDTH;
+    static const int OBJ_WIDTH;
+    static const int GRID_WIDTH;
+    static const int GRID_HEIGHT;
+    static const int GRID_DEPTH;
+    static const int CAM_HEIGHT;
+
 private:
 
     enum
@@ -42,9 +49,9 @@ private:
     };
 
     static Graphics* instance;
-    static const int width;
-    static const int unit_size;
-    static const int view_height;
+    static const int VIEW_WIDTH;
+    static const int VIEW_HEIGHT;
+    static const int VIEW_DEPTH;
     static const int max_text_length;
     static const std::array<video::E_DRIVER_TYPE, 6> preferedDrivers;
 

@@ -13,6 +13,7 @@ private:
   float* box;
   float* palm;
   std::vector<std::array<float, 3> > fingers;
+  std::array<std::array<std::tuple<float,float,float>, 4>, 5> wow;
 
 public:
   std::vector<DirObject> objects;
@@ -23,6 +24,7 @@ public:
   bool isLeft();
   std::tuple<float,float,float> getPalmLocation();
   std::tuple<float,float,float> getFingerLocation(int fingerIndex);
+  std::array<std::array<std::tuple<float,float,float>, 4>, 5> getFingers();
 };
 
 #endif

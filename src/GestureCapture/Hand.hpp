@@ -8,11 +8,16 @@
 
 class Hand{
 private:
-  Leap::Hand hand;
+  bool isRightHand;
+  int handID;
+  float* box;
+  float* palm;
+  std::vector<std::array<float, 3> > fingers;
 
 public:
   std::vector<DirObject> objects;
   Hand(Leap::Hand newHand);
+  ~Hand();
   int getHandID();
   bool isRight();
   bool isLeft();

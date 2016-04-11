@@ -117,7 +117,7 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
             GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::GRAB, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
         activeGestures[+GestType::GRAB] = true;
     }
-    else if(1==pinchStr && .7>grabStr)
+    else if(1==pinchStr && .5>grabStr)
     {
         curGestures[+GestType::PINCH] = true;
         if(!activeGestures[+GestType::PINCH])

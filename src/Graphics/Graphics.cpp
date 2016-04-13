@@ -13,6 +13,7 @@ using namespace irr;
 
 /* Static Members */
 Graphics* Graphics::instance = nullptr;
+std::promise<bool> Graphics::isGraphicsReady{};
 
 /*const int Graphics::width = 10;
 const int Graphics::unit_size = 5;
@@ -47,8 +48,8 @@ Graphics::Graphics()
     , smgr(nullptr)
     , env(nullptr)
     , receiver()
-    , leftHand(nullptr)
-    , rightHand(nullptr)
+    , leftHand()
+    , rightHand()
     , run (true)
     , need_node_update(false)
     , tiltingR(false)
@@ -77,10 +78,8 @@ Graphics::Graphics()
 
     createCameras();
 
-    leftHand = new GHand(smgr);
-    leftHand->setXYZ(50,50,50);
-    leftHand->setVisible(true);
-    rightHand = new GHand(smgr);
+    leftHand.init(smgr);
+    rightHand.init(smgr);
 }
 
 Graphics::~Graphics()
@@ -199,7 +198,7 @@ void Graphics::drawHands()
     {
         if(  hands[i].isRight())
         {
-            rightHand->copyHand(hands[i]);
+            rightHand.copyHand(hands[i]);
             rightHandFound = true;
             float x,y,z;
             std::tie(x,y,z) = hands[i].getPalmLocation();
@@ -207,7 +206,7 @@ void Graphics::drawHands()
         }
         else
         {
-            leftHand->copyHand(hands[i]);
+            leftHand.copyHand(hands[i]);
             leftHandFound = true;
             float x,y,z;
             std::tie(x,y,z) = hands[i].getPalmLocation();
@@ -216,11 +215,11 @@ void Graphics::drawHands()
     }
     if( !leftHandFound )
     {
-        leftHand->setVisible(false);
+        leftHand.setVisible(false);
     }
     if( !rightHandFound )
     {
-        rightHand->setVisible(false);
+        rightHand.setVisible(false);
     }
 }
 
@@ -368,11 +367,17 @@ void Graphics::mainLoop()
     }
 }
 
+void Graphics::waitForInit()
+{
+	isGraphicsReady.get_future().wait();
+}
+
 
 //Because Irrlicht is either too dumb or too smart for its own good
 void Graphics::initGraphics()
 {
     Graphics g{};
+    isGraphicsReady.set_value(true);
     g.mainLoop();
 }
 void Graphics::killGraphics()

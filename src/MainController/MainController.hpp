@@ -38,7 +38,6 @@ public:
     MainController();
     ~MainController();
     static MainController* getInstance();
-    static void initThread();
     void mainLoop();
 };
 

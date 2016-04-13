@@ -3,6 +3,7 @@
 #include <array>
 #include <atomic>
 #include <mutex>
+#include <future>
 #include "EventListener.hpp"
 #include "irrlicht/ISceneNode.h"
 #include "irrlicht/ICameraSceneNode.h"
@@ -21,14 +22,12 @@ class Graphics
 {
 
 public:
-    Graphics();
-    ~Graphics();
-    void mainLoop();
     static Graphics* getInstance();
 
     void newObjects( std::vector<DirObject> );
-
+    
     static void initGraphics();
+    static void waitForInit();
     static void killGraphics();
 
 
@@ -47,8 +46,14 @@ private:
         CAM_ORTH,
         NUM_CAMS
     };
+    
+    Graphics();
+    ~Graphics();
+    void mainLoop();
 
     static Graphics* instance;
+    static std::promise<bool> isGraphicsReady;
+    
     static const int VIEW_WIDTH;
     static const int VIEW_HEIGHT;
     static const int VIEW_DEPTH;
@@ -60,8 +65,8 @@ private:
     scene::ISceneManager* smgr;
     gui::IGUIEnvironment* env;
     EventListener         receiver;
-    GHand* leftHand;
-    GHand* rightHand;
+    GHand leftHand;
+    GHand rightHand;
 
     bool run;
 

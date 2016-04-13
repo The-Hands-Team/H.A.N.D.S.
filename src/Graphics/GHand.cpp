@@ -6,7 +6,7 @@ GHand::GHand()
 : node(nullptr)
 {}
 
-GHand::GHand(irr::scene::ISceneManager* smgr)
+void GHand::init(irr::scene::ISceneManager* smgr)
 {
     node = smgr->addSphereSceneNode();
     node->setVisible(false);
@@ -22,21 +22,25 @@ setXYZ(50,50,50);
 
 GHand::~GHand()
 {
-    if(node) node->remove();
+    if(node)
+	    node->remove();
 }
 
 void GHand::setXYZ(irr::f32 x,irr::f32 y, irr::f32 z)
 {
-    irr::core::vector3df thing = irr::core::vector3df(x,y,z);
-    node->setPosition(thing);
+	if(node)
+        node->setPosition(irr::core::vector3df(x,y,z));
 }
 void GHand::setVisible(bool vis)
 {
-    node->setVisible(vis);
-    if( false == vis )
-    {
-    node->setPosition(irr::core::vector3df(-1,-1,-1));
-    }
+	if(node)
+	{
+		node->setVisible(vis);
+		if( false == vis )
+		{
+		node->setPosition(irr::core::vector3df(-1,-1,-1));
+		}
+	}
 }
 void GHand::setTexture(irr::video::ITexture* texture)
 {
@@ -44,10 +48,13 @@ void GHand::setTexture(irr::video::ITexture* texture)
 
 void GHand::copyHand(Hand& hand)
 {
-    float x,y,z;
-    std::tie(x,y,z) = hand.getPalmLocation();
-    //node->setPosition(irr::core::vector3df(x*100+100,z*100+100,(1.5-y)*100-100));
-    node->setPosition(irr::core::vector3df(25+50*x,-25+50*(y-1),25+50*(-z)));
-    node->setVisible(true);
+	if(node)
+	{
+		float x,y,z;
+		std::tie(x,y,z) = hand.getPalmLocation();
+		//node->setPosition(irr::core::vector3df(x*100+100,z*100+100,(1.5-y)*100-100));
+		node->setPosition(irr::core::vector3df(25+50*x,-25+50*(y-1),25+50*(-z)));
+		node->setVisible(true);
+	}
 
 }

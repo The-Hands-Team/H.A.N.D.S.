@@ -19,7 +19,11 @@ MainController::MainController()
 , cur_path("tests/test_dir")
 {
     curInstance = this;
-    GestureQueue::getInstance();
+    
+    //blocks until Graphics Initialized
+    Graphics::waitForInit();
+
+    updateDirectory(cur_path);
 
 }
 
@@ -39,8 +43,7 @@ void MainController::mainLoop()
 {
     GestureQueue* event_q = GestureQueue::getInstance();
     std::unique_ptr<Message> ev;
-    updateDirectory(cur_path);
-
+    
     while(Graphics::getInstance())
     {
 		try 

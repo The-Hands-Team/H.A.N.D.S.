@@ -9,7 +9,7 @@ class GHand
 {
 public:
     GHand();
-    GHand(irr::scene::ISceneManager*);
+    void init(irr::scene::ISceneManager*);
     ~GHand();
     void setXYZ(float x,float y, float z);
     void copyHand(Hand& h);

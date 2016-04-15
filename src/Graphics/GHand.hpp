@@ -1,6 +1,8 @@
 #ifndef GHAND_HPP
 #define GHAND_HPP
 
+#include <tuple>
+
 #include "irrlicht/ISceneManager.h"
 #include "irrlicht/ISceneNode.h"
 #include "GestureCapture/Hand.hpp"
@@ -12,6 +14,7 @@ public:
     void init(irr::scene::ISceneManager*);
     ~GHand();
     void setXYZ(float x,float y, float z);
+    std::tuple<float,float,float> getXYZ();
     void copyHand(Hand& h);
     void setVisible(bool vis);
     void setTexture(irr::video::ITexture*);

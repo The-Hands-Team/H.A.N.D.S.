@@ -73,6 +73,7 @@ private:
     static const int GRID_HEIGHT;
     static const int GRID_DEPTH;
     static const int CAM_HEIGHT;
+    static const gridcoord INVALID_POSITION;
 
     static const int max_text_length;
     static const std::array<video::E_DRIVER_TYPE, 6> preferedDrivers;
@@ -98,6 +99,7 @@ private:
     std::unordered_map<gridcoord,DirObject> dirObjects;
     std::vector<scene::ISceneNode*> dirNodes;
     std::array<scene::ICameraSceneNode*, NUM_CAMS> cams;
+    gridcoord currentHighlightPosition;
 
     void createCameras();
     void emptyNodes();
@@ -106,6 +108,7 @@ private:
     void checkTilt(scene::ICameraSceneNode* cam, EventListener& receiver);
     void drawHands();
     gridcoord convertToLDS(float x, float y, float z);
+    gridcoord convertToLDS(std::tuple<float,float,float>);
     //std::pair<gridcoord, DirObject> 
 
 };

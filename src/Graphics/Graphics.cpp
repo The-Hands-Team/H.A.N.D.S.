@@ -28,7 +28,7 @@ const int Graphics::VIEW_WIDTH = CELL_WIDTH * (GRID_WIDTH + 1);
 const int Graphics::VIEW_HEIGHT = CELL_WIDTH * (GRID_HEIGHT + 1);
 const int Graphics::VIEW_DEPTH = CELL_WIDTH * (GRID_DEPTH + 1);
 const int Graphics::CAM_HEIGHT = CELL_WIDTH * GRID_WIDTH * 0.5;
-
+const gridcoord Graphics::INVALID_POSITION = gridcoord(-1,-1,-1);
 
 
 const int Graphics::max_text_length = 11;
@@ -56,6 +56,7 @@ Graphics::Graphics()
     , tiltingL(false)
     , tiltingU(false)
     , tiltingD(false)
+    , currentHighlightPosition(INVALID_POSITION)
 {
 
     instance = this;
@@ -204,6 +205,7 @@ void Graphics::fillNodes()
             }
         }
 
+        std::cout << dirObjects.at(std::make_tuple(0,0,0)).isSelected << std::endl;
         objLock.unlock();
     }
 }
@@ -241,6 +243,24 @@ void Graphics::drawHands()
     {
         rightHand.setVisible(false);
     }
+    else
+    {
+	objLock.lock();
+        if( INVALID_POSITION != currentHighlightPosition
+            && dirObjects.count(currentHighlightPosition) )
+        {
+            // TODO remove highlight from following
+            //dirObjects.at(currentHighlightPosition) 
+        }
+        gridcoord pos = convertToLDS(rightHand.getXYZ());
+        if( dirObjects.count(pos) )
+        {
+            // TODO add highlight to following
+            //dirObjects.at(pos) 
+            
+        }
+	objLock.unlock();
+    }
 }
 
 gridcoord Graphics::convertToLDS(float x, float y, float z)
@@ -248,6 +268,11 @@ gridcoord Graphics::convertToLDS(float x, float y, float z)
     return std::make_tuple((x - CELL_WIDTH/2.0)/CELL_WIDTH,
                            (-y - CELL_WIDTH/2.0)/CELL_WIDTH,
                            (z - CELL_WIDTH/2.0)/CELL_WIDTH);
+}
+
+gridcoord Graphics::convertToLDS(std::tuple<float,float,float> coords)
+{
+    return convertToLDS(std::get<0>(coords), std::get<1>(coords), std::get<2>(coords));
 }
 
 void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener& receiver)

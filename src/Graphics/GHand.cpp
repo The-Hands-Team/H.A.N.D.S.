@@ -31,6 +31,17 @@ void GHand::setXYZ(irr::f32 x,irr::f32 y, irr::f32 z)
 	if(node)
         node->setPosition(irr::core::vector3df(x,y,z));
 }
+std::tuple<float,float,float> GHand::getXYZ()
+{
+    irr::core::vector3df pos(-1,-1,-1);
+
+    if(node)
+    {
+        pos = node->getPosition();
+    }
+
+    return std::make_tuple( pos.X, pos.Y, pos.Z );
+}
 void GHand::setVisible(bool vis)
 {
 	if(node)

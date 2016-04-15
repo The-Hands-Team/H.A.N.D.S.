@@ -4,6 +4,8 @@
 #include <atomic>
 #include <mutex>
 #include <future>
+#include <unordered_map>
+#include <tuple>
 #include "EventListener.hpp"
 #include "irrlicht/ISceneNode.h"
 #include "irrlicht/ICameraSceneNode.h"
@@ -18,6 +20,21 @@
 
 using namespace irr;
 
+using gridcoord = std::tuple<int,int,int>;
+
+namespace std{
+    template <>
+    struct hash<std::tuple<int,int,int>>
+    {
+        size_t operator()(const std::tuple<int,int,int>& key) const
+        {
+            int x,y,z;
+            tie(x,y,z) = key;
+            return z*100 + y*10 + x;
+        }
+    };
+}
+
 class Graphics
 {
 
@@ -30,13 +47,6 @@ public:
     static void waitForInit();
     static void killGraphics();
 
-
-    static const int CELL_WIDTH;
-    static const int OBJ_WIDTH;
-    static const int GRID_WIDTH;
-    static const int GRID_HEIGHT;
-    static const int GRID_DEPTH;
-    static const int CAM_HEIGHT;
 
 private:
 
@@ -57,6 +67,13 @@ private:
     static const int VIEW_WIDTH;
     static const int VIEW_HEIGHT;
     static const int VIEW_DEPTH;
+    static const int CELL_WIDTH;
+    static const int OBJ_WIDTH;
+    static const int GRID_WIDTH;
+    static const int GRID_HEIGHT;
+    static const int GRID_DEPTH;
+    static const int CAM_HEIGHT;
+
     static const int max_text_length;
     static const std::array<video::E_DRIVER_TYPE, 6> preferedDrivers;
 
@@ -78,7 +95,7 @@ private:
     bool tiltingD;
 
     std::mutex objLock;
-    std::vector<DirObject> dirObjects;
+    std::unordered_map<gridcoord,DirObject> dirObjects;
     std::vector<scene::ISceneNode*> dirNodes;
     std::array<scene::ICameraSceneNode*, NUM_CAMS> cams;
 
@@ -88,6 +105,8 @@ private:
     void checkScroll(scene::ICameraSceneNode*, EventListener&);
     void checkTilt(scene::ICameraSceneNode* cam, EventListener& receiver);
     void drawHands();
+    gridcoord convertToLDS(float x, float y, float z);
+    //std::pair<gridcoord, DirObject> 
 
 };
 

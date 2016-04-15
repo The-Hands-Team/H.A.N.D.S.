@@ -101,7 +101,26 @@ void Graphics::newObjects( std::vector<DirObject> objs )
 {
     objLock.lock();
     dirObjects.clear();
-    dirObjects = std::move(objs);
+    bool vecEmpty = objs.empty();
+    for (int z = 0; z < GRID_DEPTH && !vecEmpty; z++)
+    {
+        for (int y = 0; y < GRID_HEIGHT && !vecEmpty; y++)
+        {
+            for (int x = 0; x < GRID_WIDTH && !vecEmpty; x++)
+            {
+                if (objs.empty())
+                {
+                    vecEmpty = true;
+                }
+                else
+                {
+                    dirObjects.insert(std::make_pair<gridcoord, DirObject>(std::make_tuple(x,y,z), std::move(objs.back())));
+                    objs.pop_back();
+                }
+            }
+        }
+    }
+
     need_node_update.store(true);
     objLock.unlock();
 }
@@ -122,8 +141,12 @@ void Graphics::fillNodes()
     {
         objLock.lock();
         emptyNodes();
-        for(DirObject dirObj : dirObjects)
+        //for(std::pair<gridcoord, DirObject&> entry : dirObjects)
+        for(auto entry = dirObjects.begin(); entry != dirObjects.end(); entry++)
         {
+            DirObject& dirObj = entry->second;
+            float Xpos,Ypos,Zpos;
+            std::tie(Xpos,Ypos,Zpos) = entry->first;
             scene::ISceneNode* newNode;
             if(dirObj.getType() == 'f')
             {
@@ -134,17 +157,15 @@ void Graphics::fillNodes()
                 newNode = smgr->addCubeSceneNode(OBJ_WIDTH);
             }
 
-            //std::wcout << dirObj.getName() << std::endl;
-
             if(newNode)
             {
                 dirNodes.push_back(newNode);
 
                 newNode->setPosition(core::vector3df
                     (
-                        dirObj.getX() * CELL_WIDTH + CELL_WIDTH/2.0,
-                        -(dirObj.getY() * CELL_WIDTH + CELL_WIDTH/2.0),
-                        CAM_HEIGHT
+                        Xpos * CELL_WIDTH + CELL_WIDTH/2.0,
+                        -(Ypos * CELL_WIDTH + CELL_WIDTH/2.0),
+                        Zpos * CELL_WIDTH + CAM_HEIGHT
                     ));
 
                 std::wstring finished_name( *(dirObj.getName()) );
@@ -182,6 +203,7 @@ void Graphics::fillNodes()
 
             }
         }
+
         objLock.unlock();
     }
 }
@@ -191,8 +213,6 @@ void Graphics::drawHands()
     bool leftHandFound = false;
     bool rightHandFound = false;
     std::vector<Hand> hands = GestureCapture::getInstance()->getHands();
-
-	std::cout << hands.size() << std::endl;
 
     for(size_t i = 0; i < hands.size() && i < 2; i++)
     {
@@ -221,6 +241,13 @@ void Graphics::drawHands()
     {
         rightHand.setVisible(false);
     }
+}
+
+gridcoord Graphics::convertToLDS(float x, float y, float z)
+{
+    return std::make_tuple((x - CELL_WIDTH/2.0)/CELL_WIDTH,
+                           (-y - CELL_WIDTH/2.0)/CELL_WIDTH,
+                           (z - CELL_WIDTH/2.0)/CELL_WIDTH);
 }
 
 void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener& receiver)

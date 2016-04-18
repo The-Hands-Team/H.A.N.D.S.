@@ -5,6 +5,7 @@
 #include "LeapMotion/Leap.h"
 #include "Hand.hpp"
 #include <bitset>
+#include <mutex>
 
 void initGesture(bool background);
 
@@ -58,6 +59,7 @@ class GestureCapture : public Leap::Listener {
     private:
         // This should be removed soon anyway
         GestFlags activeGestures;
+        std::mutex handLock;
         void checkHands(Leap::Frame frame, GestFlags& curGestures);
 
         Leap::Controller controller;

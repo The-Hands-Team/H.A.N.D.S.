@@ -8,16 +8,12 @@ Hand::Hand(Leap::Hand hand){
   handID = hand.id();
   
   Leap::InteractionBox iBox = hand.frame().interactionBox();
-  box = new float[3];
   box[0] = iBox.width();
   box[1] = iBox.height();
   box[2] = iBox.depth();
   
   Leap::Vector palmPos = hand.palmPosition();
-  palm = new float[3];
-  palm[0] = palmPos.x;
-  palm[1] = palmPos.y;
-  palm[2] = palmPos.z;
+  palm = std::make_tuple(palmPos.x, palmPos.y, palmPos.z);
   
   int f = 0;
   Leap::FingerList allTheFingers = hand.frame().fingers();
@@ -52,7 +48,9 @@ bool Hand::isLeft(){
 }
 
 std::tuple<float,float,float> Hand::getPalmLocation(){
-  return std::make_tuple(palm[0]/box[0], palm[1]/box[1], palm[2]/box[2]);
+    float palmX, palmY, palmZ;
+    std::tie( palmX, palmY, palmZ ) = palm;
+  return std::make_tuple(palmX/box[0], palmY/box[1], palmZ/box[2]);
 }
 
 std::tuple<float,float,float> Hand::getFingerLocation(int fingerIndex){
@@ -73,8 +71,4 @@ std::array<std::array<std::tuple<float,float,float>, 4>, 5> Hand::getFingers(){
 }
 
 Hand::~Hand(){
-  if(box)
-    delete[] box;
-  if(palm)
-    delete[] palm;
 }

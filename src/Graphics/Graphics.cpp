@@ -215,6 +215,8 @@ void Graphics::drawHands()
     bool leftHandFound = false;
     bool rightHandFound = false;
     std::vector<Hand> hands = GestureCapture::getInstance()->getHands();
+    
+    std::cout << hands.size() << std::endl;
 
     for(size_t i = 0; i < hands.size() && i < 2; i++)
     {

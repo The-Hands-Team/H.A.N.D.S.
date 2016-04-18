@@ -1,8 +1,10 @@
 #include "Graphics.hpp"
 #include "GestureCapture/GestureCapture.hpp"
+#include "GraphicsConsts.hpp"
 #include <irrlicht/irrlicht.h>
 
 using namespace irr;
+using namespace GraphicsConsts;
 
     #ifdef _IRR_WINDOWS_
     #pragma comment(lib, "Irrlicht.lib")
@@ -19,15 +21,6 @@ std::promise<bool> Graphics::isGraphicsReady{};
 const int Graphics::unit_size = 5;
 const int Graphics::view_height = width*10;*/
 
-const int Graphics::CELL_WIDTH = 5;
-const int Graphics::OBJ_WIDTH = CELL_WIDTH * 0.75;
-const int Graphics::GRID_WIDTH = 5;
-const int Graphics::GRID_HEIGHT = GRID_WIDTH;
-const int Graphics::GRID_DEPTH = GRID_HEIGHT;
-const int Graphics::VIEW_WIDTH = CELL_WIDTH * (GRID_WIDTH + 1);
-const int Graphics::VIEW_HEIGHT = CELL_WIDTH * (GRID_HEIGHT + 1);
-const int Graphics::VIEW_DEPTH = CELL_WIDTH * (GRID_DEPTH + 1);
-const int Graphics::CAM_HEIGHT = CELL_WIDTH * GRID_WIDTH * 0.5;
 const gridcoord Graphics::INVALID_POSITION = gridcoord(-1,-1,-1);
 
 
@@ -128,20 +121,19 @@ void Graphics::newObjects( std::vector<DirObject> objs )
 
 void Graphics::emptyNodes()
 {
-    for( scene::ISceneNode* node : dirNodes )
+    /*for( scene::ISceneNode* node : dirNodes )
     {
         node->remove();
     }
-    dirNodes.clear();
+    dirNodes.clear();*/
 }
-
 
 void Graphics::fillNodes()
 {
     if(need_node_update.exchange(false))
     {
         objLock.lock();
-        emptyNodes();
+        //emptyNodes();
         //for(std::pair<gridcoord, DirObject&> entry : dirObjects)
         for(auto entry = dirObjects.begin(); entry != dirObjects.end(); entry++)
         {
@@ -160,7 +152,8 @@ void Graphics::fillNodes()
 
             if(newNode)
             {
-                dirNodes.push_back(newNode);
+                //dirNodes.push_back(newNode);
+                dirObj.setNode(newNode);
 
                 newNode->setPosition(core::vector3df
                     (
@@ -197,7 +190,8 @@ void Graphics::fillNodes()
                     newNode,
                     core::dimension2d<f32>( finished_name.length() * (CELL_WIDTH/(float) max_text_length), CELL_WIDTH*0.2),
                     core::vector3df(0,0,-7),
-                    dirNodes.size(),
+                    -1,
+                    //dirNodes.size(),
                     video::SColor(100,255,255,255),
                     video::SColor(100,255,255,255)
                 );
@@ -252,15 +246,16 @@ void Graphics::drawHands()
             && dirObjects.count(currentHighlightPosition) )
         {
             // TODO remove highlight from following
-            //dirObjects.at(currentHighlightPosition) 
+            dirObjects.at(currentHighlightPosition).setIsHighlighted(false, driver);
         }
         gridcoord pos = convertToLDS(rightHand.getXYZ());
         if( dirObjects.count(pos) )
         {
             // TODO add highlight to following
-            //dirObjects.at(pos) 
+            dirObjects.at(pos).setIsHighlighted(true, driver);
             
         }
+        currentHighlightPosition = pos;
 	objLock.unlock();
     }
 }

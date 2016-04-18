@@ -64,15 +64,6 @@ private:
     static Graphics* instance;
     static std::promise<bool> isGraphicsReady;
     
-    static const int VIEW_WIDTH;
-    static const int VIEW_HEIGHT;
-    static const int VIEW_DEPTH;
-    static const int CELL_WIDTH;
-    static const int OBJ_WIDTH;
-    static const int GRID_WIDTH;
-    static const int GRID_HEIGHT;
-    static const int GRID_DEPTH;
-    static const int CAM_HEIGHT;
     static const gridcoord INVALID_POSITION;
 
     static const int max_text_length;
@@ -97,7 +88,7 @@ private:
 
     std::mutex objLock;
     std::unordered_map<gridcoord,DirObject> dirObjects;
-    std::vector<scene::ISceneNode*> dirNodes;
+    //std::vector<scene::ISceneNode*> dirNodes;
     std::array<scene::ICameraSceneNode*, NUM_CAMS> cams;
     gridcoord currentHighlightPosition;
 

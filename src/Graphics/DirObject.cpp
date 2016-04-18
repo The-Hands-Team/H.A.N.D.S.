@@ -22,7 +22,17 @@ DirObject::DirObject( char i_type
     , y( i_y )
     , name( i_name )
     {
+        node = nullptr;
     }
+
+DirObject::~DirObject()
+{
+    if (nullptr != node)
+    {
+        node->remove();
+    }
+}
+
 char DirObject::getType()
     {
         return type;
@@ -39,3 +49,25 @@ char DirObject::getType()
     {
         return &name;
     }
+void DirObject::setNode(irr::scene::ISceneNode* node_p)
+{
+    node = node_p;
+}
+
+irr::scene::ISceneNode* DirObject::getNode()
+{
+    return node;
+}
+
+void DirObject::setIsHighlighted(bool h, irr::video::IVideoDriver* driver)
+{
+    isHighlighted = h;
+    if(isHighlighted)
+    {
+        node->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
+    }
+    else
+    {
+        node->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
+    }
+}

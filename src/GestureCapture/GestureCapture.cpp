@@ -19,6 +19,8 @@ void GestureCapture::onConnect(const Leap::Controller& controller) {
   controller.enableGesture(Leap::Gesture::TYPE_CIRCLE);
   controller.enableGesture(Leap::Gesture::TYPE_SCREEN_TAP);
   controller.enableGesture(Leap::Gesture::TYPE_SWIPE);
+  controller.config().setFloat("Gesture.Circle.MinRadius", 50.0);
+  controller.config().save();
 }
 
 void GestureCapture::onFrame(const Leap::Controller& controller) {
@@ -45,8 +47,13 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
         switch (gl.type()) {
             case Leap::Gesture::TYPE_CIRCLE:
                 curGestures[+GestType::CIRCLE] = true;
+                GestDir dir;
+                if(((Leap::CircleGesture)gl).pointable().direction().angleTo(((Leap::CircleGesture)gl).normal()) <= Leap::PI/2)
+                    dir = GestDir::RIGHT;
+                else
+                    dir = GestDir::LEFT;
                 if(!activeGestures[+GestType::CIRCLE])
-                    GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::CIRCLE, GestDir::NONE, hand));
+                    GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::CIRCLE, dir, hand));
                 activeGestures[+GestType::CIRCLE] = true;
                 break;
             case Leap::Gesture::TYPE_SCREEN_TAP:

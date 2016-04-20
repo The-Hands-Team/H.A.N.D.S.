@@ -62,6 +62,7 @@ class GestureCapture : public Leap::Listener {
         GestFlags activeGestures;
         std::mutex handLock;
         void checkHands(Leap::Frame frame, GestFlags& curGestures);
+        float pinchStrength(Leap::Hand h);
 
         Leap::Controller controller;
         static GestureCapture* instance;

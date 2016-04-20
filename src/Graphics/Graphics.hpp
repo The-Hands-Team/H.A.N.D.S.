@@ -50,6 +50,8 @@ public:
     static const int VIEW_DEPTH = CELL_WIDTH * (GRID_DEPTH + 1);
     static const int CAM_HEIGHT = CELL_WIDTH * GRID_WIDTH * 0.5;
 
+    static irr::core::vector3df convertLeapToIrr(float,float,float);
+
     static Graphics* getInstance();
 
     void newObjects( std::vector<DirObject> );

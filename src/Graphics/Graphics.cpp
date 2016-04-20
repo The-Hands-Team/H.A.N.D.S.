@@ -272,6 +272,11 @@ gridcoord Graphics::convertToLDS(std::tuple<float,float,float> coords)
     return convertToLDS(std::get<0>(coords), std::get<1>(coords), std::get<2>(coords));
 }
 
+irr::core::vector3df Graphics::convertLeapToIrr(float x, float y, float z)
+{
+   return irr::core::vector3df(Graphics::VIEW_WIDTH/2.0+50*x,-Graphics::VIEW_HEIGHT/2.0+50*(y-1),Graphics::CAM_HEIGHT+50*(-z));
+}
+
 void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener& receiver)
 {
    if(receiver.IsKeyDown(irr::KEY_KEY_Z))

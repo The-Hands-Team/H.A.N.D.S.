@@ -20,7 +20,8 @@ public:
     void setTexture(irr::video::ITexture*);
 private:
 
-    irr::scene::ISceneNode* node;
+    irr::scene::ISceneNode* palm;
+    std::array<std::array<irr::scene::ISceneNode*,7>,5> fingers;
 };
 
 #endif

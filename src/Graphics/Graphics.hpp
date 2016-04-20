@@ -58,6 +58,7 @@ public:
     static void waitForInit();
     static void killGraphics();
 
+	std::wstring* currentHighlightedPath();
 
 private:
 

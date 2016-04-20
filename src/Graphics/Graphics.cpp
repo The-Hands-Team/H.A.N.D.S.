@@ -438,3 +438,15 @@ void Graphics::killGraphics()
 
     }
 }
+
+std::wstring* Graphics::currentHighlightedPath()
+{
+	if (dirObjects.count(currentHighlightPosition))
+	{
+        return dirObjects.at(currentHighlightPosition).getName();
+	}
+	else
+	{
+        return nullptr;
+	}
+}

@@ -177,6 +177,7 @@ void MainController::clearSelected()
 
 fs::directory_entry MainController::curEntry()
 {
+	//instead of new_dir_i, call da biz
     return new_dir_contents[new_dir_i];
 }
 
@@ -186,6 +187,14 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 	//the handz
 		//keep track of hands and their gestures
 	//
+	try
+	{
+	    std::cout << "Here is where I would do something with this: " << pathToIndex(Graphics::getInstance()->currentHighlightedPath()) << std::endl;
+	}
+	catch (...)
+	{
+		std::cout << "Couldn't do debug text! MainController line 192" << std::endl;
+	}
 	switch (ge->getGesture())
 	{
 	case GestType::PINCH:
@@ -385,6 +394,22 @@ void MainController::sendCurrentPath()
 
     Graphics::getInstance()->newObjects(std::move(objs));
 
+}
+
+unsigned int MainController::pathToIndex(std::wstring* p)
+{
+	if (nullptr == p)
+	{
+        return -1;
+	}
+    for ( unsigned int i = 0; i < new_dir_contents.size(); i++)
+	{
+        if (*p == new_dir_contents[i].path().filename().wstring())
+		{
+            return i;
+	    }
+	}
+	return -1;
 }
 
 // Start it all.

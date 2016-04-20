@@ -28,7 +28,7 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
     const Leap::Frame frame = controller.frame();
     const Leap::Frame prevFrame = controller.frame(1);
     //Initialize all gestures to false
-    std::bitset<+GestType::INVALID_GESTURE> curGestures{};
+    GestFlags curGestures{};
 
     Leap::HandList handList = frame.hands();
     handLock.lock();
@@ -120,7 +120,7 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
     float pinchStr = pinchStrength(*hl); //(*hl).pinchStrength();
     float grabStr = (*hl).grabStrength();
     
-    if(activeGestures[+GestType::PINCH])
+    if(activeGestures[+GestType::GRAB])
     {
       Leap::FingerList fingers = (*hl).fingers();
       bool isOpen = true;
@@ -135,8 +135,9 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
         std::cout<<"OPEN"<<std::endl;
         if(!activeGestures[+GestType::OPEN])
           GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::OPEN, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
-        activeGestures[+GestType::OPEN] = true;
+        
       }
+      
     }
     
     if(1==grabStr && 1>pinchStr)
@@ -146,7 +147,7 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
             GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::GRAB, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
         activeGestures[+GestType::GRAB] = true;
     }
-    else if(1==pinchStr && .5>grabStr)
+    else if(1>=pinchStr && .5>grabStr)
     {
         curGestures[+GestType::PINCH] = true;
         if(!activeGestures[+GestType::PINCH])
@@ -159,7 +160,7 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
 float GestureCapture::pinchStrength(Leap::Hand h)
 {
   Leap::FingerList fingers = h.fingers();
-  float distance = 1 - fingers[0].tipPosition().distanceTo(fingers[1].tipPosition());
+  float distance = 25 - fingers[0].tipPosition().distanceTo(fingers[1].tipPosition());
   for(Leap::FingerList::const_iterator fl = fingers.begin()++; fl != fingers.end(); fl++)
   {
     if(fingers.begin()++ != fl &&

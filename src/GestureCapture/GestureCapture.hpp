@@ -33,7 +33,7 @@ enum class GestHand {
 };
 
 //Temporary mesure. Should be removed soon
-constexpr std::size_t operator+ (GestType i){ return static_cast<std::size_t>(i); }
+constexpr inline std::size_t operator+ (GestType i){ return static_cast<std::size_t>(i); }
 
 using GestFlags = std::bitset<+GestType::INVALID_GESTURE>;
 

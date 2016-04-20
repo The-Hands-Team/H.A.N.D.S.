@@ -210,7 +210,7 @@ void Graphics::drawHands()
     bool rightHandFound = false;
     std::vector<Hand> hands = GestureCapture::getInstance()->getHands();
 
-    std::cout << hands.size() << std::endl;
+    //std::cout << hands.size() << std::endl;
 
     for(size_t i = 0; i < hands.size() && i < 2; i++)
     {
@@ -220,7 +220,7 @@ void Graphics::drawHands()
             rightHandFound = true;
             float x,y,z;
             std::tie(x,y,z) = hands[i].getPalmLocation();
-            std::cout << "Right: " << x << ',' << y << ',' << z << std::endl;
+            //std::cout << "Right: " << x << ',' << y << ',' << z << std::endl;
         }
         else
         {
@@ -228,7 +228,7 @@ void Graphics::drawHands()
             leftHandFound = true;
             float x,y,z;
             std::tie(x,y,z) = hands[i].getPalmLocation();
-            std::cout << "Left : " << x << ',' << y << ',' << z << std::endl;
+            //std::cout << "Left : " << x << ',' << y << ',' << z << std::endl;
         }
     }
     if( !leftHandFound )

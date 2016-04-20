@@ -15,6 +15,7 @@ enum class GestType {
     GRAB,
     SCREEN_TAP,
     SWIPE,
+    OPEN,
     INVALID_GESTURE
 };
 

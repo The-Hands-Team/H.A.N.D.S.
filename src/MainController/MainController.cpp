@@ -13,6 +13,7 @@ MainController* MainController::curInstance = nullptr;
 MainController::MainController()
 : gq()  // This one should be first
 , gc(false)
+, fm()
 , graphics_t(Graphics::initGraphics)
 , ignore_new(false)
 , new_dir_i(0)
@@ -139,7 +140,7 @@ void MainController::copyInto(fs::path dest)
 
         if( 0 < source.size() )
         {
-            FileManager::copyFiles(source,destination, fs::copy_options::recursive);
+            fm.copyFiles(source,destination, fs::copy_options::recursive);
         }
 
         clearSelected();
@@ -162,7 +163,7 @@ void MainController::moveInto(fs::path dest)
 
         if( 0 < source.size() )
         {
-            FileManager::moveFiles(source,destination, fs::copy_options::recursive);
+            fm.moveFiles(source,destination, fs::copy_options::recursive);
         }
 
         clearSelected();

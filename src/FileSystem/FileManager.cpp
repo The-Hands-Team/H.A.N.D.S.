@@ -1,14 +1,20 @@
 #include "FileManager.hpp"
 
+#include <ostream>
+#include <thread>
+
 #include "FileSystemMessage.hpp"
 #include "MainController/GestureQueue.hpp"
 
-/*static*/ void FileManager::FileManager::deleteFiles
+
+void FileManager::deleteFiles
 (
     fs::paths& files,
     fs::copy_options options // = fs::copy_options::none
 )
 {
+    undoStack.push( FileSystemAction::DELETE, files, fs::paths(), options );
+
     std::thread(
         &performAction,
         FileSystemAction::DELETE,
@@ -18,13 +24,15 @@
     ).detach();
 }
 
-/*static*/ void FileManager::copyFiles
+void FileManager::copyFiles
 (
     fs::paths& from,
     fs::paths& to,
     fs::copy_options options // = fs::copy_options::none
 )
 {
+    undoStack.push( FileSystemAction::COPY, from, to, options );
+    
     std::thread(
         &performAction,
         FileSystemAction::COPY,
@@ -34,13 +42,15 @@
     ).detach();
 }
 
-/*static*/ void FileManager::moveFiles
+void FileManager::moveFiles
 (
     fs::paths& from,
     fs::paths& to,
     fs::copy_options options // = fs::copy_options::none
 )
 {
+    undoStack.push( FileSystemAction::MOVE, from, to, options );
+    
     std::thread(
         &performAction,
         FileSystemAction::MOVE,
@@ -50,7 +60,17 @@
     ).detach();
 }
 
-/*static*/ void FileManager::performAction
+void FileManager::undo()
+{
+    undoStack.undo();
+}
+
+void FileManager::redo()
+{
+    undoStack.redo();
+}
+
+/*static */ void FileManager::performAction
 (
     FileSystemAction act,
     fs::paths from,
@@ -144,7 +164,7 @@
 }
 
 
-/*static*/ HandleErrorCommand FileManager::checkError
+/*static */ HandleErrorCommand FileManager::checkError
 (
     std::error_code& ec,
     FileSystemAction act,
@@ -175,7 +195,7 @@
     }
     return ret;
 }
-void FileManager::signalThreadEnd( FileSystemAction act )
+/*static */ void FileManager::signalThreadEnd( FileSystemAction act )
 {
     auto m = std::make_unique<FileSystemMessage>
                 (

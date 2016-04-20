@@ -12,6 +12,7 @@ private:
     static MainController* curInstance;
     GestureQueue gq;
     GestureCapture gc;
+    FileManager fm;
     std::thread graphics_t;
     void sendCurrentPath();
     bool ignore_new;

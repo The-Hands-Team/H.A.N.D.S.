@@ -1,10 +1,8 @@
 #include "Graphics.hpp"
 #include "GestureCapture/GestureCapture.hpp"
-#include "GraphicsConsts.hpp"
 #include <irrlicht/irrlicht.h>
 
 using namespace irr;
-using namespace GraphicsConsts;
 
     #ifdef _IRR_WINDOWS_
     #pragma comment(lib, "Irrlicht.lib")

@@ -3,15 +3,13 @@
 
 #include "MainController/Message.hpp"
 
-#include <experimental/filesystem>
+#include <deque>
 #include <future>
-#include <ostream>
-#include <thread>
 
+#include <experimental/filesystem>
 
 namespace fs = std::experimental::filesystem;
 
-using t_id = std::thread::id;
 namespace std{
     namespace experimental{
         namespace filesystem{
@@ -44,6 +42,8 @@ enum class HandleErrorCommand
     NO_ERROR
 };
 
+
+
 enum class FileSystemAction
 {
     COPY,
@@ -55,29 +55,32 @@ class FileManager
 {
 public:
 
-    static void deleteFiles
+    FileManager() = default;
+    ~FileManager() = default;
+
+    void deleteFiles
     (
         fs::paths& file,
         fs::copy_options options = fs::copy_options::none
     );
-    static void copyFiles
+    void copyFiles
     (
         fs::paths& from,
         fs::paths& to,
         fs::copy_options options = fs::copy_options::none
     );
-    static void moveFiles
+    void moveFiles
     (
         fs::paths& from,
         fs::paths& to,
         fs::copy_options options = fs::copy_options::none
     );
+    
+    void undo();
+    void redo();
 
 
 private:
-
-    FileManager() = delete;
-    ~FileManager() = delete;
 
     static void performAction
     (
@@ -98,14 +101,39 @@ private:
 
     static void signalThreadEnd( FileSystemAction act );
 
-    inline static bool compare_options
+    static inline bool compare_options
     (
         fs::copy_options lhs,
         fs::copy_options rhs
     )
     {
         return ( lhs & rhs ) != fs::copy_options::none;
-    }
+    };
+        
+    
+    class UndoStack
+    {
+        public:
+            struct record
+            {
+                FileSystemAction act;
+                fs::paths from;
+                fs::paths to;
+                fs::copy_options co;
+            };
+            
+        UndoStack();
+        ~UndoStack();
+        void undo();
+        void redo();
+        void push(FileSystemAction act, fs::paths from, fs::paths to, fs::copy_options co);
+        
+        private:
+        std::deque<record> stack;
+        std::size_t cur_rec;
+        static const std::size_t MAX_RECORDS = 10;
+
+    } undoStack;
 
 
 };

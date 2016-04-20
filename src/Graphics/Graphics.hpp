@@ -39,6 +39,17 @@ class Graphics
 {
 
 public:
+
+    static const int CELL_WIDTH = 5;
+    static const int OBJ_WIDTH = CELL_WIDTH * 0.75;
+    static const int GRID_WIDTH = 5;
+    static const int GRID_HEIGHT = GRID_WIDTH;
+    static const int GRID_DEPTH = GRID_HEIGHT;
+    static const int VIEW_WIDTH = CELL_WIDTH * (GRID_WIDTH + 1);
+    static const int VIEW_HEIGHT = CELL_WIDTH * (GRID_HEIGHT + 1);
+    static const int VIEW_DEPTH = CELL_WIDTH * (GRID_DEPTH + 1);
+    static const int CAM_HEIGHT = CELL_WIDTH * GRID_WIDTH * 0.5;
+
     static Graphics* getInstance();
 
     void newObjects( std::vector<DirObject> );

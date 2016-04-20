@@ -132,12 +132,12 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
       if(isOpen)
       {
         curGestures[+GestType::OPEN] = true;
-        std::cout<<"OPEN"<<std::endl;
         if(!activeGestures[+GestType::OPEN])
-          GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::OPEN, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
-        
+        {
+          GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::OPEN, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT ))); 
+          std::cout<<"OPEN"<<std::endl;
+        }
       }
-      
     }
     
     if(1==grabStr && 1>pinchStr)
@@ -147,7 +147,7 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
             GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::GRAB, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
         activeGestures[+GestType::GRAB] = true;
     }
-    else if(1>=pinchStr && .5>grabStr)
+    else if(1<=pinchStr)
     {
         curGestures[+GestType::PINCH] = true;
         if(!activeGestures[+GestType::PINCH])
@@ -160,15 +160,15 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
 float GestureCapture::pinchStrength(Leap::Hand h)
 {
   Leap::FingerList fingers = h.fingers();
-  float distance = 25 - fingers[0].tipPosition().distanceTo(fingers[1].tipPosition());
+  float strength = 25 - fingers[0].tipPosition().distanceTo(fingers[1].tipPosition());
   for(Leap::FingerList::const_iterator fl = fingers.begin()++; fl != fingers.end(); fl++)
   {
     if(fingers.begin()++ != fl &&
-      (*fingers.begin()).tipPosition().distanceTo((*fl).tipPosition()) < 1)
-      distance = 0;
+      (*fingers.begin()).tipPosition().distanceTo((*fl).tipPosition()) < 25)
+      strength = 0;
   }
-  std::cout<<distance<<std::endl;
-  return distance;
+  std::cout<<strength<<std::endl;
+  return strength;
 }
 
 GestureCapture::GestureCapture(bool background) 

@@ -117,22 +117,26 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
   Leap::HandList hands = frame.hands();
   for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
   {
-    float pinchStr = (*hl).pinchStrength();
+    float pinchStr = pinchStrength(*hl); //(*hl).pinchStrength();
     float grabStr = (*hl).grabStrength();
     
     if(activeGestures[+GestType::PINCH])
     {
       Leap::FingerList fingers = (*hl).fingers();
+      bool isOpen = true;
       for(Leap::FingerList::const_iterator fl = fingers.begin(); fl != fingers.end(); fl++)
       {
         if(!(*fl).isExtended())
-          break;
+          isOpen = false;
       }
-      curGestures[+GestType::OPEN] = true;
-      std::cout<<"OPEN"<<std::endl;
-      if(!activeGestures[+GestType::OPEN])
-        GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::OPEN, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
-      activeGestures[+GestType::OPEN] = true;
+      if(isOpen)
+      {
+        curGestures[+GestType::OPEN] = true;
+        std::cout<<"OPEN"<<std::endl;
+        if(!activeGestures[+GestType::OPEN])
+          GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::OPEN, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
+        activeGestures[+GestType::OPEN] = true;
+      }
     }
     
     if(1==grabStr && 1>pinchStr)
@@ -150,6 +154,20 @@ void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
         activeGestures[+GestType::PINCH] = true;
     }
   }
+}
+
+float GestureCapture::pinchStrength(Leap::Hand h)
+{
+  Leap::FingerList fingers = h.fingers();
+  float distance = 1 - fingers[0].tipPosition().distanceTo(fingers[1].tipPosition());
+  for(Leap::FingerList::const_iterator fl = fingers.begin()++; fl != fingers.end(); fl++)
+  {
+    if(fingers.begin()++ != fl &&
+      (*fingers.begin()).tipPosition().distanceTo((*fl).tipPosition()) < 1)
+      distance = 0;
+  }
+  std::cout<<distance<<std::endl;
+  return distance;
 }
 
 GestureCapture::GestureCapture(bool background) 

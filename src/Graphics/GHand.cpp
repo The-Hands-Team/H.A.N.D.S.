@@ -23,13 +23,14 @@ setXYZ(50,50,50);
 
 GHand::~GHand()
 {
-    if(node)
-	    node->remove();
+    // Not remove(). If we get here the scene manager is dead.
+    if( node )
+        node->drop();
 }
 
 void GHand::setXYZ(irr::f32 x,irr::f32 y, irr::f32 z)
 {
-	if(node)
+    if(node)
         node->setPosition(irr::core::vector3df(x,y,z));
 }
 std::tuple<float,float,float> GHand::getXYZ()
@@ -45,14 +46,14 @@ std::tuple<float,float,float> GHand::getXYZ()
 }
 void GHand::setVisible(bool vis)
 {
-	if(node)
-	{
-		node->setVisible(vis);
-		if( false == vis )
-		{
-		node->setPosition(irr::core::vector3df(-1,-1,-1));
-		}
-	}
+    if(node)
+    {
+        node->setVisible(vis);
+        if( false == vis )
+        {
+        node->setPosition(irr::core::vector3df(-1,-1,-1));
+        }
+    }
 }
 void GHand::setTexture(irr::video::ITexture* texture)
 {
@@ -60,13 +61,13 @@ void GHand::setTexture(irr::video::ITexture* texture)
 
 void GHand::copyHand(Hand& hand)
 {
-	if(node)
-	{
-		float x,y,z;
-		std::tie(x,y,z) = hand.getPalmLocation();
-		//node->setPosition(irr::core::vector3df(x*100+100,z*100+100,(1.5-y)*100-100));
-		node->setPosition(irr::core::vector3df(GraphicsConsts::VIEW_WIDTH/2.0+50*x,-GraphicsConsts::VIEW_HEIGHT/2.0+50*(y-1),GraphicsConsts::CAM_HEIGHT+50*(-z)));
-		node->setVisible(true);
-	}
+    if(node)
+    {
+        float x,y,z;
+        std::tie(x,y,z) = hand.getPalmLocation();
+        //node->setPosition(irr::core::vector3df(x*100+100,z*100+100,(1.5-y)*100-100));
+        node->setPosition(irr::core::vector3df(GraphicsConsts::VIEW_WIDTH/2.0+50*x,-GraphicsConsts::VIEW_HEIGHT/2.0+50*(y-1),GraphicsConsts::CAM_HEIGHT+50*(-z)));
+        node->setVisible(true);
+    }
 
 }

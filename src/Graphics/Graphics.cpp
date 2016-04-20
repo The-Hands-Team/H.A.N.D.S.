@@ -78,6 +78,9 @@ Graphics::Graphics()
 
 Graphics::~Graphics()
 {
+    //If we don't do this, before device->drop, it can segfault
+    dirObjects.clear();
+
     if( nullptr != device )
         device->drop();
 
@@ -199,7 +202,6 @@ void Graphics::fillNodes()
             }
         }
 
-        std::cout << dirObjects.at(std::make_tuple(0,0,0)).isSelected << std::endl;
         objLock.unlock();
     }
 }
@@ -209,7 +211,7 @@ void Graphics::drawHands()
     bool leftHandFound = false;
     bool rightHandFound = false;
     std::vector<Hand> hands = GestureCapture::getInstance()->getHands();
-    
+
     std::cout << hands.size() << std::endl;
 
     for(size_t i = 0; i < hands.size() && i < 2; i++)
@@ -241,7 +243,7 @@ void Graphics::drawHands()
     }
     else
     {
-	objLock.lock();
+    objLock.lock();
         if( INVALID_POSITION != currentHighlightPosition
             && dirObjects.count(currentHighlightPosition) )
         {
@@ -253,10 +255,10 @@ void Graphics::drawHands()
         {
             // TODO add highlight to following
             dirObjects.at(pos).setIsHighlighted(true, driver);
-            
+
         }
         currentHighlightPosition = pos;
-	objLock.unlock();
+        objLock.unlock();
     }
 }
 
@@ -418,7 +420,7 @@ void Graphics::mainLoop()
 
 void Graphics::waitForInit()
 {
-	isGraphicsReady.get_future().wait();
+    isGraphicsReady.get_future().wait();
 }
 
 

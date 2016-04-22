@@ -18,15 +18,16 @@ void GHand::init(irr::scene::ISceneManager* smgr)
     for(int i = 0; i < 5; i++)
     {
        fingers[i][0] = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/4.0);
+       fingers[i][0]->setVisible(false);
        for(int j = 0; j < 3; j++)
        {
-          irr::scene::IMesh* mesh = smgr->getGeometryCreator()->createCylinderMesh(
+          /*irr::scene::IMesh* mesh = smgr->getGeometryCreator()->createCylinderMesh(
                                                                    1,
                                                                    1,
                                                                    10);
           fingers[i][j*2+1] = smgr->addMeshSceneNode(mesh);
           fingers[i][j*2+1]->setVisible(false);
-          fingers[i][j*2+1]->setPosition(irr::core::vector3df(-1,-1,-1));
+          fingers[i][j*2+1]->setPosition(irr::core::vector3df(-1,-1,-1));*/
           fingers[i][j*2+2] = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/4.0);
           fingers[i][j*2+2]->setVisible(false);
           fingers[i][j*2+2]->setPosition(irr::core::vector3df(-1,-1,-1));

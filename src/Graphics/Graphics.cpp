@@ -189,7 +189,7 @@ void Graphics::fillNodes()
                      finished_name.c_str(),
                      newNode,
                      core::dimension2d<f32>( finished_name.length() * (CELL_WIDTH/(float) max_text_length), CELL_WIDTH*0.2),
-                     core::vector3df(0,0,-7),
+                     core::vector3df(0,0,-OBJ_WIDTH/2.0 - CELL_WIDTH/10.0),
                      -1,
                      //dirNodes.size(),
                      video::SColor(100,255,255,255),
@@ -340,17 +340,17 @@ void Graphics::createCameras()
     float mid = VIEW_WIDTH / 2.0;
     cams[CAM_PERSP] = smgr->addCameraSceneNode(
                         0,
-                        core::vector3df(mid,-mid,-CAM_HEIGHT),
-                        core::vector3df(mid,-mid,CAM_HEIGHT),
+                        core::vector3df(mid,-mid,-CAM_HEIGHT),//-2 * CAM_HEIGHT),
+                        core::vector3df(mid,-mid,0),
                         -1,
                         true);
-    cams[CAM_PERSP]->setFOV( 3.1415 / 6.5f );
+    cams[CAM_PERSP]->setFOV( ( VIEW_HEIGHT/CAM_HEIGHT ) * 3.1415 / 5.0f);// / 180.0f );
 
     //create orth camera
     cams[CAM_ORTH] = smgr->addCameraSceneNode(
                             0,
+                            core::vector3df(mid,-mid,-CAM_HEIGHT),
                             core::vector3df(mid,-mid,0),
-                            core::vector3df(mid,-mid,CAM_HEIGHT),
                             -1,
                             true);
     core::matrix4 projMat;

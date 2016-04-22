@@ -16,8 +16,8 @@ private:
   std::array<std::array<std::tuple<float,float,float>, 4>, 5> wow;
 
 public:
-  std::vector<DirObject> objects;
-  Hand(Leap::Hand hand);
+  //std::vector<DirObject> objects;
+  Hand( const Leap::Hand& hand);
   ~Hand();
   int getHandID();
   bool isRight();

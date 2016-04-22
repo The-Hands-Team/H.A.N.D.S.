@@ -1,6 +1,6 @@
 #include "Hand.hpp"
 
-Hand::Hand(Leap::Hand hand){
+Hand::Hand( const Leap::Hand& hand){
   if(!hand.isValid())
     return;
 	

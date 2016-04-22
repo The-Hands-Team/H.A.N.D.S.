@@ -112,7 +112,7 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
     }
 }
 
-void GestureCapture::checkHands(Leap::Frame frame, GestFlags& curGestures)
+void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curGestures)
 {
   Leap::HandList hands = frame.hands();
   for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
@@ -200,5 +200,5 @@ std::vector<Hand> GestureCapture::getHands()
     handLock.lock();
     ret = handsInFrame;
     handLock.unlock();
-    return std::move(ret);
+    return ret;
 }

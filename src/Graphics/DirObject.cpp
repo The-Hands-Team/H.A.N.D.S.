@@ -27,6 +27,10 @@ DirObject::DirObject( char i_type
 
 DirObject::~DirObject()
 {
+    if (nullptr != node)
+    {
+        node->remove();
+    }
 }
 
 char DirObject::getType()

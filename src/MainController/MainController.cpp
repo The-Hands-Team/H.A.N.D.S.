@@ -214,6 +214,17 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 		}
 		break;
 	case GestType::CIRCLE:
+	    if( GestHand::RIGHT == ge->getHandedness() )
+	    {
+			if( GestDir::RIGHT == ge->getDir() )
+			{
+				fm.redo();
+			}
+			else
+			{
+				fm.undo();
+			}
+		}
 		break;
 	case GestType::SWIPE:
 		if( GestHand::RIGHT == ge->getHandedness() )
@@ -284,6 +295,12 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
             if(ke->getPressed())
                 switch(ke->getKey())
                 {
+				case irr::EKEY_CODE::KEY_KEY_U:
+					fm.undo();
+					break;
+				case irr::EKEY_CODE::KEY_KEY_R:
+					fm.redo();
+					break;
                 case irr::EKEY_CODE::KEY_KEY_C:
                     if( ke->getShift() )
                     {

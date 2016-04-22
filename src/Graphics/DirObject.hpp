@@ -15,7 +15,7 @@ public:
     char getType();
     irr::f32 getX();
     irr::f32 getY();
-    std::wstring* getName();
+    std::wstring getName();
     bool isHighlighted;
     bool isSelected;
     void setNode(irr::scene::ISceneNode*);

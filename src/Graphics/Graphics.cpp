@@ -131,9 +131,8 @@ void Graphics::emptyNodes()
 
 void Graphics::fillNodes()
 {
-    if(need_node_update.exchange(false))
+    if( need_node_update.exchange(false) )
     {
-        objLock.lock();
         //emptyNodes();
         //for(std::pair<gridcoord, DirObject&> entry : dirObjects)
         for(auto entry = dirObjects.begin(); entry != dirObjects.end(); entry++)
@@ -157,13 +156,13 @@ void Graphics::fillNodes()
                 dirObj.setNode(newNode);
 
                 newNode->setPosition(core::vector3df
-                    (
-                        Xpos * CELL_WIDTH + CELL_WIDTH/2.0,
-                        -(Ypos * CELL_WIDTH + CELL_WIDTH/2.0),
-                        Zpos * CELL_WIDTH + CAM_HEIGHT
-                    ));
+                        (
+                         Xpos * CELL_WIDTH + CELL_WIDTH/2.0,
+                         -(Ypos * CELL_WIDTH + CELL_WIDTH/2.0),
+                         Zpos * CELL_WIDTH + CAM_HEIGHT
+                        ));
 
-                std::wstring finished_name( *(dirObj.getName()) );
+                std::wstring finished_name( dirObj.getName() );
 
                 if( !dirObj.isHighlighted && finished_name.length() > max_text_length )
                 {
@@ -185,22 +184,21 @@ void Graphics::fillNodes()
                 }
                 newNode->setMaterialFlag(video::EMF_LIGHTING, false);
                 smgr->addBillboardTextSceneNode
-                (
-                    env->getFont("media/bigfont.png"),
-                    finished_name.c_str(),
-                    newNode,
-                    core::dimension2d<f32>( finished_name.length() * (CELL_WIDTH/(float) max_text_length), CELL_WIDTH*0.2),
-                    core::vector3df(0,0,-7),
-                    -1,
-                    //dirNodes.size(),
-                    video::SColor(100,255,255,255),
-                    video::SColor(100,255,255,255)
-                );
+                    (
+                     env->getFont("media/bigfont.png"),
+                     finished_name.c_str(),
+                     newNode,
+                     core::dimension2d<f32>( finished_name.length() * (CELL_WIDTH/(float) max_text_length), CELL_WIDTH*0.2),
+                     core::vector3df(0,0,-7),
+                     -1,
+                     //dirNodes.size(),
+                     video::SColor(100,255,255,255),
+                     video::SColor(100,255,255,255)
+                    );
 
             }
         }
 
-        objLock.unlock();
     }
 }
 
@@ -241,7 +239,6 @@ void Graphics::drawHands()
     }
     else
     {
-    objLock.lock();
         if( INVALID_POSITION != currentHighlightPosition
             && dirObjects.count(currentHighlightPosition) )
         {
@@ -256,7 +253,6 @@ void Graphics::drawHands()
 
         }
         currentHighlightPosition = pos;
-        objLock.unlock();
     }
 }
 
@@ -388,18 +384,22 @@ void Graphics::mainLoop()
         }
 
         irr::scene::ICameraSceneNode* cam = smgr->getActiveCamera();
-        fillNodes();
-        drawHands();
-
         checkScroll(cam, receiver);
         checkTilt(cam, receiver);
 
 
-        driver->beginScene(true, true, video::SColor(255,113,113,133));
+        objLock.lock();
+        { 
+            fillNodes();
+            drawHands();
 
-        smgr->drawAll(); // draw the 3d scene
+            driver->beginScene(true, true, video::SColor(255,113,113,133));
 
-        driver->endScene();
+            smgr->drawAll(); // draw the 3d scene
+
+            driver->endScene();
+        }
+        objLock.unlock();
 
         int fps = driver->getFPS();
 
@@ -444,14 +444,14 @@ void Graphics::killGraphics()
     }
 }
 
-std::wstring* Graphics::currentHighlightedPath()
+std::wstring Graphics::currentHighlightedPath()
 {
-	if (dirObjects.count(currentHighlightPosition))
-	{
+    if (dirObjects.count(currentHighlightPosition))
+    {
         return dirObjects.at(currentHighlightPosition).getName();
-	}
-	else
-	{
-        return nullptr;
-	}
+    }
+    else
+    {
+        return std::wstring();
+    }
 }

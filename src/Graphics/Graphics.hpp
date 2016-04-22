@@ -60,7 +60,7 @@ public:
     static void waitForInit();
     static void killGraphics();
 
-	std::wstring* currentHighlightedPath();
+	std::wstring currentHighlightedPath();
 
 private:
 

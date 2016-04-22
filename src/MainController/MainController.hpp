@@ -35,7 +35,7 @@ private:
     void updateDirectory(fs::path);
     fs::path cur_path;
     fs::directory_iterator dir_it;
-	unsigned int pathToIndex(std::wstring*);
+	unsigned int pathToIndex(std::wstring);
 public:
     MainController();
     ~MainController();

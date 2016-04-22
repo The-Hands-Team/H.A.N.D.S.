@@ -27,10 +27,6 @@ DirObject::DirObject( char i_type
 
 DirObject::~DirObject()
 {
-    if (nullptr != node)
-    {
-        node->remove();
-    }
 }
 
 char DirObject::getType()
@@ -45,9 +41,9 @@ char DirObject::getType()
     {
         return y;
     }
-    std::wstring* DirObject::getName()
+    std::wstring DirObject::getName()
     {
-        return &name;
+        return name;
     }
 void DirObject::setNode(irr::scene::ISceneNode* node_p)
 {

@@ -396,15 +396,15 @@ void MainController::sendCurrentPath()
 
 }
 
-unsigned int MainController::pathToIndex(std::wstring* p)
+unsigned int MainController::pathToIndex(std::wstring p)
 {
-	if (nullptr == p)
+	if (p.empty())
 	{
         return -1;
 	}
     for ( unsigned int i = 0; i < new_dir_contents.size(); i++)
 	{
-        if (*p == new_dir_contents[i].path().filename().wstring())
+        if (p == new_dir_contents[i].path().filename().wstring())
 		{
             return i;
 	    }

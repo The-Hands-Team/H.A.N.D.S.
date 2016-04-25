@@ -41,6 +41,7 @@ class Graphics
 public:
 
     static const int CELL_WIDTH = 10;
+    static const int CELL_HEIGHT = CELL_WIDTH;
     static const int OBJ_WIDTH = CELL_WIDTH * 0.75;
     static const int GRID_WIDTH = 5;
     static const int GRID_HEIGHT = GRID_WIDTH;

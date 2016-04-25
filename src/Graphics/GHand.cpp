@@ -89,6 +89,14 @@ void GHand::setVisible(bool vis)
             palm->setPosition(irr::core::vector3df(-1,-1,-1));
         }
     }
+    if(selector)
+    {
+        selector->setVisible(vis);
+        if( false == vis )
+        {
+            selector->setPosition(irr::core::vector3df(-1,-1,-1));
+        }
+    }
     for(int i = 0; i < 5; i++)
     {
         if (fingers[i][0])

@@ -166,7 +166,7 @@ void Graphics::fillNodes()
                         (
                          Xpos * CELL_WIDTH + CELL_WIDTH/2.0,
                          -(Ypos * CELL_WIDTH + CELL_WIDTH/2.0),
-                         Zpos * CELL_WIDTH + CAM_HEIGHT
+                         Zpos * CELL_HEIGHT + CAM_HEIGHT
                         ));
 		/*std::cout << "Given pos: " << Xpos << "," << Ypos << "," << Zpos << std::endl;
                 float fa,fb,fc;
@@ -277,7 +277,7 @@ gridcoord Graphics::convertToLDS(float x, float y, float z)
 {
     return std::make_tuple((x - CELL_WIDTH/2.0)/CELL_WIDTH + 0.5,
                            (-y - CELL_WIDTH/2.0)/CELL_WIDTH + 0.5,
-                           (z - CAM_HEIGHT)/CELL_WIDTH);
+                           (z - CAM_HEIGHT)/CELL_HEIGHT);
 }
 
 gridcoord Graphics::convertToLDS(std::tuple<float,float,float> coords)

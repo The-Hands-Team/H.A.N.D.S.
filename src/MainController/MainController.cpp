@@ -98,7 +98,7 @@ void MainController::chdirUp()
 
 void MainController::chdirDown()
 {
-    updateDirectory(new_dir_contents[new_dir_i].path());
+    updateDirectory(curEntry().path());
 }
 
 void MainController::iterateForward()
@@ -178,7 +178,13 @@ void MainController::clearSelected()
 fs::directory_entry MainController::curEntry()
 {
 	//instead of new_dir_i, call da biz
-    return new_dir_contents[new_dir_i];
+    unsigned int i = pathToIndex(Graphics::getInstance()->currentHighlightedPath());
+    if ((unsigned int) -1 == i)
+    {
+        std::cerr << "Attempted to access element when nothing is highlighted!\n";
+        return new_dir_contents[0];
+    }
+    return new_dir_contents[i];
 }
 
 void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
@@ -227,8 +233,15 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 			}
 		}
 		break;
+        case GestType::OPEN:
+                if( GestHand::RIGHT == ge->getHandedness() )
+                {
+                    std::cout << "OPEN\n";
+                    chdirDown();
+                    break;
+                }
 	case GestType::SWIPE:
-		if( GestHand::RIGHT == ge->getHandedness() )
+		if( GestHand::LEFT == ge->getHandedness() )
 		{
 			switch (ge->getDir())
 			{
@@ -250,7 +263,7 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 		}
 		else
 		{
-			switch (ge->getDir())
+			/*switch (ge->getDir())
 			{
 			case GestDir::UP:
 			    if( cur_path.parent_path() != fs::path( "tests" ) )
@@ -268,7 +281,7 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 			    break;
 			default:
 			    break;
-			}
+			}*/
 		}
 		break;
 	default:
@@ -410,7 +423,7 @@ void MainController::sendCurrentPath()
         objs.emplace_back( fs::is_directory(new_dir_contents[i].path())?'d':'f'
                          , 0, 0
                          , new_dir_contents[i].path().filename().wstring()
-                         , i == new_dir_i
+                         , 0//i == new_dir_i
                          , selected.count( new_dir_contents[i].path() ) );
     }
 

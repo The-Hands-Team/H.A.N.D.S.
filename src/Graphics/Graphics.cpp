@@ -168,7 +168,14 @@ void Graphics::fillNodes()
                          -(Ypos * CELL_WIDTH + CELL_WIDTH/2.0),
                          Zpos * CELL_WIDTH + CAM_HEIGHT
                         ));
-
+		/*std::cout << "Given pos: " << Xpos << "," << Ypos << "," << Zpos << std::endl;
+                float fa,fb,fc;
+                fa = newNode->getPosition().X;
+                fb = newNode->getPosition().Y;
+                fc = newNode->getPosition().Z;
+		int a,b,c;
+                std::tie(a,b,c) = convertToLDS(fa,fb,fc);
+                std::cout << "Calc pos: " << a << ", " << b << ", " << c << std::endl;*/
                 std::wstring finished_name( dirObj.getName() );
 
                 if( !dirObj.isHighlighted && finished_name.length() > max_text_length )
@@ -260,14 +267,17 @@ void Graphics::drawHands()
 
         }
         currentHighlightPosition = pos;
+        float a,b,c;
+        std::tie(a,b,c) = pos;
+        //std::cout << "setting curHP: " << a << "," << b << "," << c << std::endl;
     }
 }
 
 gridcoord Graphics::convertToLDS(float x, float y, float z)
 {
-    return std::make_tuple((x - CELL_WIDTH/2.0)/CELL_WIDTH,
-                           (-y - CELL_WIDTH/2.0)/CELL_WIDTH,
-                           (z - CELL_WIDTH/2.0)/CELL_WIDTH);
+    return std::make_tuple((x - CELL_WIDTH/2.0)/CELL_WIDTH + 0.5,
+                           (-y - CELL_WIDTH/2.0)/CELL_WIDTH + 0.5,
+                           (z - CAM_HEIGHT)/CELL_WIDTH);
 }
 
 gridcoord Graphics::convertToLDS(std::tuple<float,float,float> coords)
@@ -277,7 +287,7 @@ gridcoord Graphics::convertToLDS(std::tuple<float,float,float> coords)
 
 irr::core::vector3df Graphics::convertLeapToIrr(float x, float y, float z)
 {
-   return irr::core::vector3df(Graphics::VIEW_WIDTH/2.0+50*x,-Graphics::VIEW_HEIGHT/2.0+50*(y-1),Graphics::CAM_HEIGHT+50*(-z));
+   return irr::core::vector3df(Graphics::VIEW_WIDTH/2.0+50*x,-Graphics::VIEW_HEIGHT/2.0+2*CELL_WIDTH+50*(y-1),Graphics::CAM_HEIGHT+CELL_WIDTH+50*(-z));
 }
 
 void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener& receiver)

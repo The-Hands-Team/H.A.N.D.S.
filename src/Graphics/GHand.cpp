@@ -15,6 +15,12 @@ void GHand::init(irr::scene::ISceneManager* smgr)
     palm->setVisible(false);
     palm->setPosition(irr::core::vector3df(-1,-1,-1));
 
+    selector = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/6.0);
+    selector->setVisible(false);
+    selector->setPosition(irr::core::vector3df(-1,-1,-1));
+
+    std::cout << "Calling init!\n";
+
     for(int i = 0; i < 5; i++)
     {
        fingers[i][0] = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/4.0);
@@ -66,9 +72,9 @@ std::tuple<float,float,float> GHand::getXYZ()
 {
     irr::core::vector3df pos(-1,-1,-1);
 
-    if(palm)
+    if(selector)//palm)
     {
-        pos = palm->getPosition();
+        pos = selector->getPosition();//palm->getPosition();
     }
 
     return std::make_tuple( pos.X, pos.Y, pos.Z );
@@ -80,13 +86,35 @@ void GHand::setVisible(bool vis)
         palm->setVisible(vis);
         if( false == vis )
         {
-        palm->setPosition(irr::core::vector3df(-1,-1,-1));
+            palm->setPosition(irr::core::vector3df(-1,-1,-1));
+        }
+    }
+    for(int i = 0; i < 5; i++)
+    {
+        if (fingers[i][0])
+        {
+            fingers[i][0]->setVisible(vis);
+            if ( false == vis )
+            {
+                fingers[i][0]->setPosition(irr::core::vector3df(-1,-1,-1));
+            }
+        }
+        for(int j = 0; j < 3; j++)
+        {
+            if (fingers[i][j*2+2])
+            {
+                fingers[i][j*2+2]->setVisible(vis);
+                if ( false == vis )
+                {
+                    fingers[i][j*2+2]->setPosition(irr::core::vector3df(-1,-1,-1));
+                }
+            }
         }
     }
 }
-void GHand::setTexture(irr::video::ITexture* texture)
-{
-}
+//void GHand::setTexture(irr::video::ITexture* texture)
+//{
+//}
 
 void GHand::copyHand(Hand& hand)
 {
@@ -95,10 +123,20 @@ void GHand::copyHand(Hand& hand)
         float x,y,z;
         std::tie(x,y,z) = hand.getPalmLocation();
         //palm->setPosition(irr::core::vector3df(x*100+100,z*100+100,(1.5-y)*100-100));
-        palm->setPosition(irr::core::vector3df(Graphics::VIEW_WIDTH/2.0+50*x,-Graphics::VIEW_HEIGHT/2.0+50*(y-1),Graphics::CAM_HEIGHT+50*(-z)));
+        //palm->setPosition(irr::core::vector3df(Graphics::VIEW_WIDTH/2.0+50*x,-Graphics::VIEW_HEIGHT/2.0+50*(y-1),Graphics::CAM_HEIGHT+50*(-z)));
+        palm->setPosition(irr::core::vector3df(Graphics::convertLeapToIrr(x,y,z)));
         palm->setVisible(true);
     }
     std::array<std::array<std::tuple<float,float,float>, 4>, 5> new_fingers = hand.getFingers();
+    if(selector)
+    {
+        float x1,y1,z1;
+        float x2,y2,z2;
+        std::tie(x1,y1,z1) = new_fingers[0][3];
+        std::tie(x2,y2,z2) = new_fingers[1][3];
+        selector->setPosition(irr::core::vector3df(Graphics::convertLeapToIrr((x1+x2)/2.0,(y1+y2)/2.0,(z1+z2)/2.0)));
+        selector->setVisible(true);
+    }
     for(int i = 0; i < 5; i++)
     {
        if(fingers[i][0])
@@ -106,6 +144,7 @@ void GHand::copyHand(Hand& hand)
           float x,y,z;
           std::tie(x,y,z) = new_fingers[i][0];
           fingers[i][0]->setPosition(Graphics::convertLeapToIrr(x,y,z));
+          fingers[i][0]->setVisible(true);
        }
        for(int j = 0; j < 3; j++)
        {
@@ -117,8 +156,9 @@ void GHand::copyHand(Hand& hand)
           //fingers[i][j*2+1]->setVisible(false);
           //fingers[i][j*2+1]->setPosition(irr::core::vector3df(-1,-1,-1));
           float x,y,z;
-          std::tie(x,y,z) = new_fingers[i][j];
+          std::tie(x,y,z) = new_fingers[i][j+1];
           fingers[i][j*2+2]->setPosition(Graphics::convertLeapToIrr(x,y,z));
+          //std::cout << "i,j: " << i << "," << j << "; x,y,z: " << x << "," << y << "," << z << std::endl;
 	  fingers[i][j*2+2]->setVisible(true);
        }
     }

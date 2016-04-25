@@ -167,7 +167,7 @@ float GestureCapture::pinchStrength(Leap::Hand h)
       (*fingers.begin()).tipPosition().distanceTo((*fl).tipPosition()) < 25)
       strength = 0;
   }
-  std::cout<<strength<<std::endl;
+  //std::cout<<strength<<std::endl;
   return strength;
 }
 

@@ -18,11 +18,12 @@ public:
     std::tuple<float,float,float> getXYZ();
     void copyHand(Hand& h);
     void setVisible(bool vis);
-    void setTexture(irr::video::ITexture*);
+    //void setTexture(irr::video::ITexture*);
 private:
 
     irr::scene::ISceneNode* palm;
     std::array<std::array<irr::scene::ISceneNode*,7>,5> fingers;
+    irr::scene::ISceneNode* selector;
 };
 
 #endif

@@ -14,10 +14,10 @@ Hand::Hand( const Leap::Hand& hand){
   
   Leap::Vector palmPos = hand.palmPosition();
   palm = std::make_tuple(palmPos.x, palmPos.y, palmPos.z);
-  
+
+  Leap::FingerList allTheFingers = hand.fingers();
   int f = 0;
-  Leap::FingerList allTheFingers = hand.frame().fingers();
-  for(Leap::FingerList::const_iterator fl=allTheFingers.begin(); fl!=allTheFingers.end(); fl++)
+  for(Leap::FingerList::const_iterator fl=allTheFingers.begin(); fl!=allTheFingers.end() && f < 5; fl++, f++)
   {
     Leap::Vector fingerPos = (*fl).tipPosition();
     fingers.push_back( std::array<float, 3>{fingerPos.x, fingerPos.y,  fingerPos.z} );
@@ -31,7 +31,6 @@ Hand::Hand( const Leap::Hand& hand){
       Leap::Vector boneEnd = bone.nextJoint();
       wow[f][b] = std::make_tuple(boneEnd.x, boneEnd.y, boneEnd.z);
     }
-    f++;
   }
 }
 

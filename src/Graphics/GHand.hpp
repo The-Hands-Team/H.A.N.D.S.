@@ -12,6 +12,7 @@ class GHand
 public:
     GHand();
     void init(irr::scene::ISceneManager*);
+    void deinit();
     ~GHand();
     void setXYZ(float x,float y, float z);
     std::tuple<float,float,float> getXYZ();

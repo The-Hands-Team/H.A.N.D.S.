@@ -42,19 +42,19 @@ palm->getMaterial(0).EmissiveColor.set(0,0,0,0);
 setXYZ(50,50,50);
 }
 
+void GHand::deinit()
+{
+    palm->remove();
+    palm = nullptr;
+
+    for(auto finger : fingers)
+        for(irr::scene::ISceneNode* node : finger)
+            if( nullptr != node )
+                node->remove();
+}
+
 GHand::~GHand()
 {
-    // Not remove(). If we get here the scene manager is dead.
-    if( palm )
-        palm->drop();
-    for(std::array<irr::scene::ISceneNode*, 7> finger : fingers)
-    {
-        for(irr::scene::ISceneNode* node : finger)
-        {
-            if(node)
-                node->drop();
-        }
-    }
 }
 
 void GHand::setXYZ(irr::f32 x,irr::f32 y, irr::f32 z)

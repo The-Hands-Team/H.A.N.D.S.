@@ -49,41 +49,45 @@ Graphics::Graphics()
     , tiltingD(false)
     , currentHighlightPosition(INVALID_POSITION)
 {
-
-    instance = this;
-
     for( size_t i = 0; nullptr == device && i < preferedDrivers.size(); i++ )
     {
         device = createDevice(preferedDrivers[i],
                 core::dimension2d<u32>(800, 800), 16, false, false, false, &receiver);
     }
 
-    if( nullptr == device )
+    if( nullptr != device )
     {
-        //TODO handle gracefully
-        exit(1);
+        device->setResizable(false);
+        driver = device->getVideoDriver();
+        smgr = device->getSceneManager();
+        env = device->getGUIEnvironment();
+
+        createCameras();
+
+        leftHand.init(smgr);
+        rightHand.init(smgr);
     }
-    device->setResizable(false);
-    driver = device->getVideoDriver();
-    smgr = device->getSceneManager();
-    env = device->getGUIEnvironment();
+    else
+    {
+        run = false;
+    }
 
-    createCameras();
+    instance = this;
 
-    leftHand.init(smgr);
-    rightHand.init(smgr);
 }
 
 Graphics::~Graphics()
 {
-    //If we don't do this, before device->drop, it can segfault
-    dirObjects.clear();
+    objLock.lock();
+    {
+        dirObjects.clear();
 
-    if( nullptr != device )
-        device->drop();
+        if( nullptr != device )
+            device->drop();
 
-    instance = nullptr;
-
+        instance = nullptr;
+    }
+    objLock.unlock();
 }
 
 
@@ -95,28 +99,31 @@ Graphics* Graphics::getInstance()
 void Graphics::newObjects( std::vector<DirObject> objs )
 {
     objLock.lock();
-    dirObjects.clear();
-    bool vecEmpty = objs.empty();
-    for (int z = 0; z < GRID_DEPTH && !vecEmpty; z++)
+    if( instance )
     {
-        for (int y = 0; y < GRID_HEIGHT && !vecEmpty; y++)
+        dirObjects.clear();
+        bool vecEmpty = objs.empty();
+        for (int z = 0; z < GRID_DEPTH && !vecEmpty; z++)
         {
-            for (int x = 0; x < GRID_WIDTH && !vecEmpty; x++)
+            for (int y = 0; y < GRID_HEIGHT && !vecEmpty; y++)
             {
-                if (objs.empty())
+                for (int x = 0; x < GRID_WIDTH && !vecEmpty; x++)
                 {
-                    vecEmpty = true;
-                }
-                else
-                {
-                    dirObjects.insert(std::make_pair<gridcoord, DirObject>(std::make_tuple(x,y,z), std::move(objs.back())));
-                    objs.pop_back();
+                    if (objs.empty())
+                    {
+                        vecEmpty = true;
+                    }
+                    else
+                    {
+                        dirObjects.insert(std::make_pair<gridcoord, DirObject>(std::make_tuple(x,y,z), std::move(objs.back())));
+                        objs.pop_back();
+                    }
                 }
             }
         }
-    }
 
-    need_node_update.store(true);
+        need_node_update.store(true);
+    }
     objLock.unlock();
 }
 
@@ -416,9 +423,19 @@ void Graphics::mainLoop()
 
         if(receiver.IsKeyDown(irr::KEY_ESCAPE))
         {
+            run = false;
+        }
+    }
+    objLock.lock();
+    {
+        instance = nullptr;
+        dirObjects.clear();
+        while(device->run())
+        {
             device->closeDevice();
         }
     }
+    objLock.unlock();
 }
 
 void Graphics::waitForInit()
@@ -432,14 +449,14 @@ void Graphics::initGraphics()
 {
     Graphics g{};
     isGraphicsReady.set_value(true);
-    g.mainLoop();
+    if( g.run )
+        g.mainLoop();
 }
 void Graphics::killGraphics()
 {
-    Graphics* g = getInstance();
-    if( g )
+    if( instance )
     {
-    g->run = false;
+    instance->run = false;
 
     }
 }

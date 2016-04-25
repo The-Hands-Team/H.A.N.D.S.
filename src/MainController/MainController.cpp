@@ -42,7 +42,6 @@ MainController* MainController::getInstance()
 
 void MainController::mainLoop()
 {
-    GestureQueue* event_q = GestureQueue::getInstance();
     std::unique_ptr<Message> ev;
     
     while(Graphics::getInstance())
@@ -52,7 +51,7 @@ void MainController::mainLoop()
         sendCurrentPath();
         //got something in queue
 
-        ev = event_q->pop();
+        ev = gq.pop();
         processEvent(ev);
 		}
 		catch (const std::exception& e)
@@ -111,7 +110,7 @@ void MainController::iterateBack()
     new_dir_i = (new_dir_i + new_dir_contents.size() - 1) % new_dir_contents.size();
 }
 
-void MainController::select()
+void MainController::select() // TODO remove itterator, take a string
 {
     fs::path selection = curEntry().path();
     if( 0 == selected.count( selection ) )
@@ -200,6 +199,7 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 	case GestType::PINCH:
 		if( GestHand::RIGHT == ge->getHandedness() )
 		{
+            // TODO this is where we would use Graphics::currentHighlightedPath
 			select();
 			break;
 		}
@@ -409,8 +409,11 @@ void MainController::sendCurrentPath()
                          , selected.count( new_dir_contents[i].path() ) );
     }
 
-    Graphics::getInstance()->newObjects(std::move(objs));
-
+    Graphics* g = Graphics::getInstance();
+    if( g )
+    {
+        g->newObjects(std::move(objs));
+    }
 }
 
 unsigned int MainController::pathToIndex(std::wstring p)

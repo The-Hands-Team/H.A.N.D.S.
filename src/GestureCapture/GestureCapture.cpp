@@ -117,7 +117,8 @@ void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curGesture
   Leap::HandList hands = frame.hands();
   for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
   {
-    float pinchStr = pinchStrength(*hl); //(*hl).pinchStrength();
+    float pinchStr = pinchStrength(*hl);
+    float leapPinch = (*hl).pinchStrength();
     float grabStr = (*hl).grabStrength();
     
     if(activeGestures[+GestType::GRAB])
@@ -147,7 +148,7 @@ void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curGesture
             GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::GRAB, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
         activeGestures[+GestType::GRAB] = true;
     }
-    else if(1<=pinchStr)
+    else if(1==leapPinch && 0==pinchStr)
     {
         curGestures[+GestType::PINCH] = true;
         if(!activeGestures[+GestType::PINCH])
@@ -167,7 +168,6 @@ float GestureCapture::pinchStrength(Leap::Hand h)
       (*fingers.begin()).tipPosition().distanceTo((*fl).tipPosition()) < 25)
       strength = 0;
   }
-  //std::cout<<strength<<std::endl;
   return strength;
 }
 

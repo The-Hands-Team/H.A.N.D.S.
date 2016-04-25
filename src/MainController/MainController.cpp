@@ -233,10 +233,10 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 			}
 		}
 		break;
-        case GestType::OPEN:
+        case GestType::GRAB:
                 if( GestHand::RIGHT == ge->getHandedness() )
                 {
-                    std::cout << "OPEN\n";
+                    std::cout << "GRAB\n";
                     chdirDown();
                     break;
                 }

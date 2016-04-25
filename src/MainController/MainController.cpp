@@ -92,7 +92,8 @@ void MainController::updateDirectory(fs::path new_dir)
 
 void MainController::chdirUp()
 {
-    updateDirectory(cur_path.parent_path());
+    if( cur_path.parent_path() != fs::path( "tests" ) )
+	updateDirectory(cur_path.parent_path());
 }
 
 void MainController::chdirDown()
@@ -252,19 +253,21 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 			switch (ge->getDir())
 			{
 			case GestDir::UP:
+			    if( cur_path.parent_path() != fs::path( "tests" ) )
 				copyInto(cur_path.parent_path());
-				break;
+			    break;
 			case GestDir::DOWN:
-				copyInto(curEntry());
-				break;
+			    copyInto(curEntry());
+			    break;
 			case GestDir::RIGHT:
+			    if( cur_path.parent_path() != fs::path( "tests" ) )
 				moveInto(cur_path.parent_path());
-				break;
+			    break;
 			case GestDir::LEFT:
-				moveInto(curEntry());
-				break;
+			    moveInto(curEntry());
+			    break;
 			default:
-				break;
+			    break;
 			}
 		}
 		break;
@@ -304,7 +307,8 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                 case irr::EKEY_CODE::KEY_KEY_C:
                     if( ke->getShift() )
                     {
-                        copyInto(cur_path.parent_path());
+			if( cur_path.parent_path() != fs::path( "tests" ) )
+			    copyInto(cur_path.parent_path());
                     }
                     else if ( ke->getCtrl() )
                     {
@@ -318,7 +322,8 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                 case irr::EKEY_CODE::KEY_KEY_M:
                     if( ke->getShift() )
                     {
-                        moveInto(cur_path.parent_path());
+			if( cur_path.parent_path() != fs::path( "tests" ) )
+			    moveInto(cur_path.parent_path());
                     }
                     else if ( ke->getCtrl() )
                     {
@@ -336,7 +341,7 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                     }
                 case irr::EKEY_CODE::KEY_KEY_D:
                     {
-                        std::cout << ke->getShift() << ke->getCtrl() << std::endl;
+                        moveInto( fs::path("tests/TRASH") );
                     }
                     break;
                 case irr::EKEY_CODE::KEY_UP:

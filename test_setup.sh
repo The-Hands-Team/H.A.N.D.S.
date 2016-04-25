@@ -1,4 +1,6 @@
-rm -r tests/test_dir
+rm -r tests/
+mkdir tests
+mkdir tests/TRASH
 mkdir tests/test_dir
 touch tests/test_dir/file1.txt
 printf "content" >> tests/test_dir/file1.txt

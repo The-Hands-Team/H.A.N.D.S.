@@ -16,7 +16,7 @@ Message::Message (Message::MessageType m) : type(m)
 }
 
 
-GestureMessage::GestureMessage( GestType g, GestDir d, GestHand h): Message(GESTURE), gesture(g), dir(d), hand(h)
+GestureMessage::GestureMessage( GestType g, GestDir d, GestHand h, bool s): Message(GESTURE), gesture(g), dir(d), hand(h), isEnding(s)
 {
 }
 GestType GestureMessage::getGesture()
@@ -30,6 +30,10 @@ GestDir GestureMessage::getDir()
 GestHand GestureMessage::getHandedness()
 {
     return hand;
+}
+bool GestureMessage::isStopping()
+{
+    return isEnding;
 }
 
 

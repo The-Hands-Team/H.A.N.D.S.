@@ -30,17 +30,18 @@ protected:
 class GestureMessage : public Message
 {
 public:
-    GestureMessage(GestType g, GestDir d, GestHand h);
+    GestureMessage(GestType g, GestDir d, GestHand h, bool s);
     GestType getGesture();
     GestDir getDir();
     GestHand getHandedness();
-    bool isStopping;
+    bool isStopping();
     bool isLongGesture;
 
 private:
     GestType gesture;
     GestDir dir;
     GestHand hand;
+    bool isEnding;
 };
 
 class KeyMessage : public Message

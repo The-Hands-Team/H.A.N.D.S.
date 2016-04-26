@@ -53,13 +53,13 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
                 else
                     dir = GestDir::LEFT;
                 if(!activeGestures[+GestType::CIRCLE])
-                    GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::CIRCLE, dir, hand));
+                    GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::CIRCLE, dir, hand, false));
                 activeGestures[+GestType::CIRCLE] = true;
                 break;
             case Leap::Gesture::TYPE_SCREEN_TAP:
                 curGestures[+GestType::SCREEN_TAP] = true;
                 if(!activeGestures[+GestType::SCREEN_TAP])
-                    GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::SCREEN_TAP, GestDir::NONE, hand));
+                    GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::SCREEN_TAP, GestDir::NONE, hand, false));
                 activeGestures[+GestType::SCREEN_TAP] = true;
                 break;
             case Leap::Gesture::TYPE_SWIPE:
@@ -93,7 +93,7 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
                 {
                     curGestures[+GestType::SWIPE] = true;
                     if(!activeGestures[+GestType::SWIPE])
-                        GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::SWIPE, swipeType, hand));
+                        GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::SWIPE, swipeType, hand, false));
                     activeGestures[+GestType::SWIPE] = true;
                 }
                 break;
@@ -135,7 +135,7 @@ void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curGesture
         curGestures[+GestType::OPEN] = true;
         if(!activeGestures[+GestType::OPEN])
         {
-          GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::OPEN, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT ))); 
+          GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::OPEN, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT ), false)); 
           std::cout<<"OPEN"<<std::endl;
         }
       }
@@ -145,14 +145,14 @@ void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curGesture
     {
         curGestures[+GestType::GRAB] = true;
         if(!activeGestures[+GestType::GRAB])
-            GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::GRAB, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
+            GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::GRAB, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT ), false));
         activeGestures[+GestType::GRAB] = true;
     }
     else if(1==leapPinch && 0==pinchStr)
     {
         curGestures[+GestType::PINCH] = true;
         if(!activeGestures[+GestType::PINCH])
-            GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::PINCH, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT )));
+            GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::PINCH, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT ), false));
         activeGestures[+GestType::PINCH] = true;
     }
   }

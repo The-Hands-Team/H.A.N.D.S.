@@ -155,6 +155,12 @@ void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curGesture
             GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::PINCH, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT ), false));
         activeGestures[+GestType::PINCH] = true;
     }
+
+    //Send a message for ending gestures
+    if(!curGestures[+GestType::GRAB] && activeGestures[+GestType::GRAB])
+        GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::GRAB, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT ), true));
+    if(!curGestures[+GestType::PINCH] && activeGestures[+GestType::PINCH])
+        GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::PINCH, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT ), true));
   }
 }
 

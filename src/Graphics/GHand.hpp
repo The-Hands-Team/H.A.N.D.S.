@@ -21,9 +21,9 @@ public:
     //void setTexture(irr::video::ITexture*);
 private:
 
-    irr::scene::ISceneNode* palm;
-    std::array<std::array<irr::scene::ISceneNode*,7>,5> fingers;
-    irr::scene::ISceneNode* selector;
+    irr::scene::IMeshSceneNode* palm;
+    std::array<std::array<irr::scene::IMeshSceneNode*,7>,5> fingers;
+    irr::scene::IMeshSceneNode* selector;
 };
 
 #endif

@@ -1,6 +1,6 @@
 #include "GHand.hpp"
 #include "Graphics.hpp"
-#include "irrlicht/IMeshSceneNode.h"
+#include "irrlicht/irrlicht.h"
 
 #include <tuple>
 
@@ -12,19 +12,29 @@ GHand::GHand()
 void GHand::init(irr::scene::ISceneManager* smgr)
 {
     palm = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/2.0);
+    palm->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+    smgr->getMeshManipulator()->setVertexColors(palm->getMesh(), irr::video::SColor(255,0,0,255));
+    palm->setMaterialFlag(video::EMF_LIGHTING, false);
     palm->setVisible(false);
     palm->setPosition(irr::core::vector3df(-1,-1,-1));
 
     selector = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/6.0);
+    selector->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+    smgr->getMeshManipulator()->setVertexColors(selector->getMesh(), irr::video::SColor(0,0,255,255));
+    selector->setMaterialFlag(video::EMF_LIGHTING, false);
     selector->setVisible(false);
     selector->setPosition(irr::core::vector3df(-1,-1,-1));
 
     std::cout << "Calling init!\n";
+    std::cout << selector->getMaterialCount() << std::endl;
 
     for(int i = 0; i < 5; i++)
     {
        fingers[i][0] = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/4.0);
        fingers[i][0]->setVisible(false);
+       fingers[i][0]->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+       smgr->getMeshManipulator()->setVertexColors(fingers[i][0]->getMesh(), irr::video::SColor(255,0,0,255));
+       fingers[i][0]->setMaterialFlag(video::EMF_LIGHTING, false);
        for(int j = 0; j < 3; j++)
        {
           /*irr::scene::IMesh* mesh = smgr->getGeometryCreator()->createCylinderMesh(
@@ -35,16 +45,20 @@ void GHand::init(irr::scene::ISceneManager* smgr)
           fingers[i][j*2+1]->setVisible(false);
           fingers[i][j*2+1]->setPosition(irr::core::vector3df(-1,-1,-1));*/
           fingers[i][j*2+2] = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/4.0);
+          fingers[i][j*2+2]->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+            smgr->getMeshManipulator()->setVertexColors(fingers[i][j*2+2]->getMesh(), irr::video::SColor(255,0,0,255));
+            fingers[i][j*2+2]->setMaterialFlag(video::EMF_LIGHTING, false);
           fingers[i][j*2+2]->setVisible(false);
           fingers[i][j*2+2]->setPosition(irr::core::vector3df(-1,-1,-1));
        }
     }
 
 
-palm->getMaterial(0).SpecularColor.set(128, 255, 192, 203);
-palm->getMaterial(0).AmbientColor.set(128, 255, 192, 203);
-palm->getMaterial(0).DiffuseColor.set(128, 255, 192, 203);
-palm->getMaterial(0).EmissiveColor.set(0,0,0,0);
+selector->getMaterial(0).SpecularColor.set(0,0,255,127);
+selector->getMaterial(0).AmbientColor.set(0,0,255,127);
+selector->getMaterial(0).DiffuseColor.set(0,0,255,127);
+selector->getMaterial(0).EmissiveColor.set(0,0,0,0);
+
 setXYZ(50,50,50);
 }
 

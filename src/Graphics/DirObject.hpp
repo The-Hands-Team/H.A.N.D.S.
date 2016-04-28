@@ -1,8 +1,5 @@
 #include <string>
-#include "irrlicht/irrTypes.h"
-#include "irrlicht/IVideoDriver.h"
-#include "irrlicht/ISceneNode.h"
-#include "irrlicht/IBillboardTextSceneNode.h"
+#include "irrlicht/irrlicht.h"
 
 
 #ifndef DIROBJECT_HPP
@@ -19,7 +16,7 @@ public:
     std::wstring getName();
     bool isHighlighted;
     bool isSelected;
-    void setNode(irr::scene::ISceneNode*);
+    void setNode(irr::scene::IMeshSceneNode*);
     void setNodeText(irr::scene::IBillboardTextSceneNode*);
     irr::scene::ISceneNode* getNode();
     irr::scene::IBillboardTextSceneNode* getNodeText();
@@ -30,7 +27,7 @@ private:
     irr::f32 x;
     irr::f32 y;
     std::wstring name;
-    irr::scene::ISceneNode* node;
+    irr::scene::IMeshSceneNode* node;
     irr::scene::IBillboardTextSceneNode* text_node;
 };
 

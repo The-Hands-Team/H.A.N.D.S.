@@ -134,9 +134,6 @@ void GHand::setVisible(bool vis)
         }
     }
 }
-//void GHand::setTexture(irr::video::ITexture* texture)
-//{
-//}
 
 void GHand::copyHand(Hand& hand)
 {

@@ -1,5 +1,4 @@
 #include <iostream>
-#include "irrlicht/IBillboardTextSceneNode.h"
 #include "DirObject.hpp"
 
 DirObject::DirObject()
@@ -52,7 +51,7 @@ char DirObject::getType()
     {
         return name;
     }
-void DirObject::setNode(irr::scene::ISceneNode* node_p)
+void DirObject::setNode(irr::scene::IMeshSceneNode* node_p)
 {
     node = node_p;
 }
@@ -77,11 +76,11 @@ void DirObject::setIsHighlighted(bool h, irr::video::IVideoDriver* driver)
     isHighlighted = h;
     if(isHighlighted)
     {
-        node->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
+        node->getSceneManager()->getMeshManipulator()->setVertexColors(node->getMesh(), irr::video::SColor(255,0,255,0));
     }
     else
     {
-        node->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
+        node->getSceneManager()->getMeshManipulator()->setVertexColors(node->getMesh(), irr::video::SColor(255,0,0,255));
     }
 }
 

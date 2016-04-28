@@ -147,7 +147,7 @@ void Graphics::fillNodes()
             DirObject& dirObj = entry->second;
             float Xpos,Ypos,Zpos;
             std::tie(Xpos,Ypos,Zpos) = entry->first;
-            scene::ISceneNode* newNode;
+            scene::IMeshSceneNode* newNode;
             scene::IBillboardTextSceneNode* newTextNode;
             if(dirObj.getType() == 'f')
             {
@@ -184,20 +184,12 @@ void Graphics::fillNodes()
                     finished_name.erase( max_text_length - 3 );
                     finished_name += L"...";
                 }
-
-                if(dirObj.isHighlighted)
-                {
-                    newNode->setMaterialTexture(0, driver->getTexture("media/selected.jpg"));
-                }
-                else
-                {
-                    newNode->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
-                }
+                smgr->getMeshManipulator()->setVertexColors(newNode->getMesh(), irr::video::SColor(255,0,0,255));
                 if(dirObj.isSelected)
                 {
                     newNode->setMaterialFlag(video::EMF_WIREFRAME, true);
                 }
-                newNode->setMaterialFlag(video::EMF_LIGHTING, false);
+                newNode->setMaterialFlag(video::EMF_LIGHTING, true);
                 newTextNode = smgr->addBillboardTextSceneNode
                     (
                      env->getFont("media/bigfont.png"),
@@ -410,6 +402,13 @@ void Graphics::mainLoop()
     // In order to do framerate independent movement, we have to know
     // how long it was since the last frame
     // u32 then = device->getTimer()->getTime();
+    float mid = VIEW_WIDTH / 2.0;
+    smgr->addLightSceneNode(nullptr,
+                            core::vector3df(mid,-mid,-CAM_HEIGHT),
+                            video::SColorf(1.0f,1.0f,1.0f),
+                            100.0f,
+                            -1
+                           );
 
     smgr->setActiveCamera(cams[CAM_PERSP]);
 

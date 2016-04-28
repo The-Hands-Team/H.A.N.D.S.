@@ -18,7 +18,6 @@ public:
     std::tuple<float,float,float> getXYZ();
     void copyHand(Hand& h);
     void setVisible(bool vis);
-    //void setTexture(irr::video::ITexture*);
 private:
 
     irr::scene::IMeshSceneNode* palm;

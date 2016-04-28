@@ -282,7 +282,7 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
                             }
                         break;
                     }
-                    else if ( !ge->isStopping() )
+                    else if ( GestType::GRAB != curGests[LEFT] && !ge->isStopping() )
                     {
                         select();
                         break;

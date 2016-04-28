@@ -28,7 +28,8 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
     const Leap::Frame frame = controller.frame();
     const Leap::Frame prevFrame = controller.frame(1);
     //Initialize all gestures to false
-    GestFlags curGestures{};
+    GestFlags curLeftGestures{};
+    GestFlags curRightGestures{};
 
     Leap::HandList handList = frame.hands();
     handLock.lock();
@@ -44,6 +45,8 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
     for( auto gl : gestures )
     {
         GestHand hand = (*gl.hands().begin()).isRight() ? GestHand::RIGHT : GestHand::LEFT;
+        GestFlags& curGestures = (GestHand::RIGHT == hand ? curRightGestures : curLeftGestures);
+        GestFlags& activeGestures = (GestHand::RIGHT == hand ? activeRightGestures : activeLeftGestures);
         switch (gl.type()) {
             case Leap::Gesture::TYPE_CIRCLE:
                 curGestures[+GestType::CIRCLE] = true;
@@ -104,15 +107,16 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
         }
     }
 
-    checkHands(frame, curGestures);
+    checkHands(frame, curLeftGestures, curRightGestures);
 
     for(auto i= +GestType::CIRCLE; i<+GestType::INVALID_GESTURE; i++)
     {
-        activeGestures[i] = curGestures[i];
+        activeLeftGestures[i] = curLeftGestures[i];
+        activeRightGestures[i] = curRightGestures[i];
     }
 }
 
-void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curGestures)
+void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curLeftGestures, GestFlags& curRightGestures)
 {
   Leap::HandList hands = frame.hands();
   for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
@@ -120,6 +124,8 @@ void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curGesture
     float pinchStr = pinchStrength(*hl);
     float leapPinch = (*hl).pinchStrength();
     float grabStr = (*hl).grabStrength();
+    GestFlags& activeGestures = ((*hl).isRight() ? activeRightGestures : activeLeftGestures);
+    GestFlags& curGestures = ((*hl).isRight() ? curRightGestures : curLeftGestures);
     
     if(activeGestures[+GestType::GRAB])
     {

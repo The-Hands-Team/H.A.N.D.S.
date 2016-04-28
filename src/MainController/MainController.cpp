@@ -61,6 +61,11 @@ void MainController::mainLoop()
     }
 }
 
+bool MainController::isLong(enum GestType gt)
+{
+    return gt == GestType::GRAB;
+}
+
 void MainController::updateDirectory(fs::path new_dir)
 {
     if (fs::is_directory(new_dir))
@@ -189,26 +194,46 @@ fs::directory_entry MainController::curEntry()
 
 void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 {
+        if (ge->isStopping())
+        {
+            std::cout << "Stopping! " << (GestHand::RIGHT == ge->getHandedness() ? "right" : "left")<< std::endl;
+        }
 	//lonk or short
 	//the handz
 		//keep track of hands and their gestures
 	//
-	try
-	{
-	    std::cout << "Here is where I would do something with this: " << pathToIndex(Graphics::getInstance()->currentHighlightedPath()) << std::endl;
-	}
-	catch (...)
-	{
-		std::cout << "Couldn't do debug text! MainController line 192" << std::endl;
-	}
+        if (!isLong(ge->getGesture()))
+        {
+            curGests[GestHand::RIGHT == ge->getHandedness() ? RIGHT : LEFT] = GestType::INVALID_GESTURE;
+            if (ge->isStopping())
+            {
+                return;
+            }
+        }
+        else
+        {
+            if (ge->isStopping())
+            {
+                
+            }
+            //TODO: verify that we can assume only 1 gesture per hand at a time
+            curGests[GestHand::RIGHT == ge->getHandedness() ? RIGHT : LEFT] = ge->isStopping() ? GestType::INVALID_GESTURE : ge->getGesture();
+        }
 	switch (ge->getGesture())
 	{
 	case GestType::PINCH:
 		if( GestHand::RIGHT == ge->getHandedness() )
 		{
-            // TODO this is where we would use Graphics::currentHighlightedPath
+                    if( GestType::GRAB == curGests[LEFT] )
+                    {
+                        chdirDown();
+                        break;
+                    }
+                    else
+                    {
 			select();
 			break;
+                    }
 		}
 		else
 		{
@@ -236,9 +261,13 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
         case GestType::GRAB:
                 if( GestHand::RIGHT == ge->getHandedness() )
                 {
-                    std::cout << "GRAB\n";
-                    chdirDown();
+                    std::cout << "GRAB " << (ge->isStopping() ? "stop" : "start") << std::endl;
+                    //chdirDown();
                     break;
+                }
+                else if (!ge->isStopping())
+                {
+                    std::cout << "Left Grab\n";
                 }
 	case GestType::SWIPE:
 		if( GestHand::LEFT == ge->getHandedness() )

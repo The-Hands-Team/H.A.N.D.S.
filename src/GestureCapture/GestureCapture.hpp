@@ -60,6 +60,8 @@ class GestureCapture : public Leap::Listener {
     private:
         // This should be removed soon anyway
         GestFlags activeGestures;
+        bool activePinchHand;
+        bool activeGrabHand;
         std::mutex handLock;
         void checkHands( const Leap::Frame& frame, GestFlags& curGestures);
         float pinchStrength(Leap::Hand h);

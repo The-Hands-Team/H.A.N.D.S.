@@ -148,6 +148,7 @@ void Graphics::fillNodes()
             float Xpos,Ypos,Zpos;
             std::tie(Xpos,Ypos,Zpos) = entry->first;
             scene::ISceneNode* newNode;
+            scene::IBillboardTextSceneNode* newTextNode;
             if(dirObj.getType() == 'f')
             {
                 newNode = smgr->addSphereSceneNode(0.5*OBJ_WIDTH);
@@ -197,7 +198,7 @@ void Graphics::fillNodes()
                     newNode->setMaterialFlag(video::EMF_WIREFRAME, true);
                 }
                 newNode->setMaterialFlag(video::EMF_LIGHTING, false);
-                smgr->addBillboardTextSceneNode
+                newTextNode = smgr->addBillboardTextSceneNode
                     (
                      env->getFont("media/bigfont.png"),
                      finished_name.c_str(),
@@ -209,6 +210,7 @@ void Graphics::fillNodes()
                      video::SColor(100,255,255,255),
                      video::SColor(100,255,255,255)
                     );
+                dirObj.setNodeText(newTextNode);
 
             }
         }

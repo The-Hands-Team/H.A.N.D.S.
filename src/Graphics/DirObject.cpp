@@ -25,6 +25,7 @@ DirObject::DirObject( char i_type
     , name( i_name )
     {
         node = nullptr;
+        text_node = nullptr;
     }
 
 DirObject::~DirObject()
@@ -32,6 +33,7 @@ DirObject::~DirObject()
     if (nullptr != node)
     {
         node->remove();
+        text_node->remove();
     }
 }
 
@@ -56,9 +58,19 @@ void DirObject::setNode(irr::scene::ISceneNode* node_p)
     node = node_p;
 }
 
+void DirObject::setNodeText(irr::scene::IBillboardTextSceneNode* node_t)
+{
+    text_node = node_t;
+}
+
 irr::scene::ISceneNode* DirObject::getNode()
 {
     return node;
+}
+
+irr::scene::IBillboardTextSceneNode* DirObject::getNodeText()
+{
+    return text_node;
 }
 
 void DirObject::setIsHighlighted(bool h, irr::video::IVideoDriver* driver)
@@ -84,4 +96,5 @@ void DirObject::setTranslucent(bool b)
     {
        node->setMaterialType(irr::video::EMT_SOLID);
     }
+    text_node->setVisible(b);
 } 

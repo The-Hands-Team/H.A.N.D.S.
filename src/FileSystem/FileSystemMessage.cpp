@@ -39,7 +39,7 @@ std::promise<HandleErrorCommand>& FileSystemMessage::getPromise()
 
 void FileSystemMessage::prettyPrintMessage( std::ostream& out)
 {
-    out << "Error: " << errCode.message() << " while ";
+    out << "Error: " << errCode.value() << " " << errCode.message() << " while ";
     switch( action )
     {
         case FileSystemAction::COPY:

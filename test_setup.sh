@@ -4,8 +4,10 @@ if [ ! -d tests ]
 fi
 rm -r tests/TRASH
 rm -r tests/test_dir
+rm -r tests/CLIPBOARD
 mkdir tests/TRASH
 mkdir tests/test_dir
+mkdir tests/CLIPBOARD
 if [ -a tests/example.pdf ]
     then
         cp tests/example.pdf tests/test_dir/example.pdf

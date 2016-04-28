@@ -195,7 +195,6 @@ void MainController::deleteSelected()
     if( 0 < toDel.size() )
     {
         moveInto( fs::path("tests/TRASH") );
-        //fm.deleteFiles(toDel);
     }
 
     clearSelected();
@@ -205,6 +204,36 @@ void MainController::clearSelected()
 {
     selected.clear();
 }
+
+void MainController::clearClipboard()
+{
+    fs::path clipboard( "tests/CLIPBOARD" );
+    if( fs::exists( clipboard ) && fs::is_directory( clipboard ) )
+    {
+        for( auto& dir_e : fs::directory_iterator(clipboard) )
+        {
+            fs::remove_all( dir_e );
+        }
+    }
+}
+
+void MainController::pasteFromClipboard()
+{
+    fs::path clipboard( "tests/CLIPBOARD" );
+    if( fs::exists( clipboard ) && fs::is_directory( clipboard ) )
+    {
+        std::vector<fs::path> fromPaste;
+        std::vector<fs::path> toPaste;
+        for( auto& dir_e : fs::directory_iterator(clipboard) )
+        {
+            fromPaste.emplace_back(dir_e);
+            toPaste.emplace_back( cur_path / dir_e.path().filename() );
+        }
+        
+        fm.copyFiles( fromPaste, toPaste, fs::copy_options::recursive );
+    }
+}
+
 
 bool MainController::hasTarget()
 {
@@ -288,10 +317,6 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
                         break;
                     }
                 }
-                else
-                {
-                        copyInto( cur_path );
-                }
         case GestType::SCREEN_TAP:
                 if( GestHand::RIGHT == ge->getHandedness() )
                 {
@@ -315,18 +340,17 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
                 if( GestHand::RIGHT == ge->getHandedness() )
                 {
                     std::cout << "GRAB " << (ge->isStopping() ? "stop" : "start") << std::endl;
-                    if( GestType::GRAB == curGests[LEFT] )
-                    {
-                       deleteSelected();
-                       break;
-                    }
-                    //chdirDown();
-                    break;
+                    
                 }
                 else if (!ge->isStopping())
                 {
                     std::cout << "Left Grab\n";
                 }
+                if( GestType::GRAB == curGests[LEFT] && GestType::GRAB == curGests[RIGHT] )
+                {
+                   deleteSelected();
+                }
+                break;
         case GestType::SWIPE:
                 if( GestHand::LEFT == ge->getHandedness() )
                 {
@@ -339,10 +363,13 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
                                 chdirDown();
                                 break;
                         case GestDir::RIGHT:
-                                iterateForward();
+                                std::cout << "paste" << std::endl;
+                                pasteFromClipboard();
                                 break;
                         case GestDir::LEFT:
-                                iterateBack();
+                                clearClipboard();
+                                std::cout << "copy to clipboard" << std::endl;
+                                copyInto(fs::path("tests/CLIPBOARD"));
                                 break;
                         default:
                                 break;
@@ -476,6 +503,25 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                 case 0:
                     fe->getPromise().set_value( HandleErrorCommand::NO_ERROR );
                     updateDirectory(cur_path);
+                    break;
+                case EEXIST:
+                    {
+                            fs::path dest = fe->getPath2();
+                            dest += fs::path("_copy");
+                        fs::paths from(1, fe->getPath1());
+                        fs::paths to(1, dest);
+                        if( FileSystemAction::COPY == fe->getAction() )
+                        {
+                            fm.copyFiles( from, to, fs::copy_options::recursive  );
+                        }
+                        else if( FileSystemAction::COPY == fe->getAction() )
+                        {
+                            fm.moveFiles( from, to, fs::copy_options::recursive );
+                        }
+                        
+                        fe->getPromise().set_value(HandleErrorCommand::IGNORE);
+                        
+                    }
                     break;
                 case EIO:
                     // This happens when copying empty file.

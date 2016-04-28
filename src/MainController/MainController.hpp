@@ -28,6 +28,8 @@ private:
     void moveInto(fs::path);
     void deleteSelected();
     void clearSelected();
+    void clearClipboard();
+    void pasteFromClipboard();
     fs::directory_entry curEntry();
 
     unsigned int new_dir_i;

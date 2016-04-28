@@ -119,6 +119,8 @@ void GestureCapture::onFrame(const Leap::Controller& controller) {
 void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curLeftGestures, GestFlags& curRightGestures)
 {
   Leap::HandList hands = frame.hands();
+  bool gotLeft = false;
+  bool gotRight = false;
   for(Leap::HandList::const_iterator hl = hands.begin(); hl != hands.end(); hl++)
   {
     float pinchStr = pinchStrength(*hl);
@@ -126,6 +128,14 @@ void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curLeftGes
     float grabStr = (*hl).grabStrength();
     GestFlags& activeGestures = ((*hl).isRight() ? activeRightGestures : activeLeftGestures);
     GestFlags& curGestures = ((*hl).isRight() ? curRightGestures : curLeftGestures);
+    if ((*hl).isRight())
+    {
+      gotRight = true;
+    }
+    else
+    {
+      gotLeft = true;
+    }
     
     if(activeGestures[+GestType::GRAB])
     {
@@ -168,6 +178,29 @@ void GestureCapture::checkHands( const Leap::Frame& frame, GestFlags& curLeftGes
     if(!curGestures[+GestType::PINCH] && activeGestures[+GestType::PINCH])
         GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::PINCH, GestDir::NONE, (((*hl).isRight()) ? GestHand::RIGHT : GestHand::LEFT ), true));
   }
+  if (!gotRight)
+  {
+    if (activeRightGestures[+GestType::PINCH])
+    {
+      GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::PINCH, GestDir::NONE, GestHand::RIGHT, true));
+    }
+    if (activeRightGestures[+GestType::GRAB])
+    {
+      GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::GRAB, GestDir::NONE, GestHand::RIGHT, true));
+    }
+  }
+  if (!gotLeft)
+  {
+    if (activeLeftGestures[+GestType::PINCH])
+    {
+      GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::PINCH, GestDir::NONE, GestHand::LEFT, true));
+    }
+    if (activeLeftGestures[+GestType::GRAB])
+    {
+      GestureQueue::getInstance()->push(std::make_unique<GestureMessage>(GestType::GRAB, GestDir::NONE, GestHand::LEFT, true));
+    }
+  }
+
 }
 
 float GestureCapture::pinchStrength(Leap::Hand h)

@@ -103,7 +103,10 @@ void MainController::chdirUp()
 
 void MainController::chdirDown()
 {
-    updateDirectory(curEntry().path());
+    if (hasTarget())
+    {
+        updateDirectory(curEntry().path());
+    }
 }
 
 void MainController::iterateForward()
@@ -118,14 +121,17 @@ void MainController::iterateBack()
 
 void MainController::select() // TODO remove itterator, take a string
 {
-    fs::path selection = curEntry().path();
-    if( 0 == selected.count( selection ) )
+    if (hasTarget())
     {
-        selected.emplace( selection );
-    }
-    else
-    {
-        selected.erase( selection );
+        fs::path selection = curEntry().path();
+        if( 0 == selected.count( selection ) )
+        {
+            selected.emplace( selection );
+        }
+        else
+        {
+            selected.erase( selection );
+        }
     }
 }
 
@@ -175,9 +181,38 @@ void MainController::moveInto(fs::path dest)
     }
 }
 
+void MainController::deleteSelected()
+{
+    std::vector<fs::path> toDel;
+    for( auto const v : selected )
+    {
+        toDel.emplace_back( v );
+    }
+
+    if( 0 < toDel.size() )
+    {
+        fm.deleteFiles(toDel);
+    }
+
+    clearSelected();
+}
+
 void MainController::clearSelected()
 {
     selected.clear();
+}
+
+bool MainController::hasTarget()
+{
+    unsigned int i = pathToIndex(Graphics::getInstance()->currentHighlightedPath());
+    if ((unsigned int) -1 == i)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 fs::directory_entry MainController::curEntry()
@@ -194,9 +229,11 @@ fs::directory_entry MainController::curEntry()
 
 void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
 {
+        std::string gestStrings[] = {"circle", "pinch", "grab", "screen tap", "swipe", "open", "invalid"};
+        std::cout << "Got gesture: " << gestStrings[(int) ge->getGesture()] << (ge->isStopping() ? " stop\n" : " start\n");
         if (ge->isStopping())
         {
-            std::cout << "Stopping! " << (GestHand::RIGHT == ge->getHandedness() ? "right" : "left")<< std::endl;
+            //std::cout << "Stopping! " << (GestHand::RIGHT == ge->getHandedness() ? "right" : "left")<< std::endl;
         }
 	//lonk or short
 	//the handz
@@ -262,6 +299,11 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
                 if( GestHand::RIGHT == ge->getHandedness() )
                 {
                     std::cout << "GRAB " << (ge->isStopping() ? "stop" : "start") << std::endl;
+                    if( GestType::GRAB == curGests[LEFT] )
+                    {
+                       deleteSelected();
+                       break;
+                    }
                     //chdirDown();
                     break;
                 }
@@ -354,7 +396,10 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                     }
                     else if ( ke->getCtrl() )
                     {
-                        copyInto(curEntry());
+                        if (hasTarget())
+                        {
+                            copyInto(curEntry());
+                        }
                     }
                     else
                     {
@@ -369,7 +414,10 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                     }
                     else if ( ke->getCtrl() )
                     {
-                        moveInto(curEntry());
+                        if (hasTarget())
+                        {
+                            moveInto(curEntry());
+                        }
                     }
                     else
                     {

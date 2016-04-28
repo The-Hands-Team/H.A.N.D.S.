@@ -26,6 +26,7 @@ private:
     void select();
     void copyInto(fs::path);
     void moveInto(fs::path);
+    void deleteSelected();
     void clearSelected();
     fs::directory_entry curEntry();
 
@@ -41,6 +42,7 @@ private:
     const int LEFT = 0;
     const int RIGHT = 1;   
     bool isLong(enum GestType);
+    bool hasTarget();
 public:
     MainController();
     ~MainController();

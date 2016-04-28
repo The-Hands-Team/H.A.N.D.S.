@@ -6,6 +6,15 @@ touch tests/test_dir/file1.txt
 printf "content" >> tests/test_dir/file1.txt
 touch tests/test_dir/file2.txt
 printf "content" >> tests/test_dir/file2.txt
+
+fnum=30
+while [ $fnum -gt 0 ]
+do
+touch tests/test_dir/f$fnum
+printf "content" >> tests/test_dir/f$fnum
+fnum=`expr $fnum - 1`
+done
+
 mkdir tests/test_dir/dir1
 mkdir tests/test_dir/dir2
 touch tests/test_dir/dir1/sdfile1_1.txt

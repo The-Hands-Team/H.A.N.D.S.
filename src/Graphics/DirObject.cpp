@@ -72,10 +72,14 @@ void DirObject::setIsHighlighted(bool h, irr::video::IVideoDriver* driver)
     }
 }
 
-void DirObject::setTranslucent(bool b, irr::video::IVideoDriver* driver)
+void DirObject::setTranslucent(bool b)
 {
     if(b)
+    {
        node->setMaterialType(irr::video::EMT_TRANSPARENT_ADD_COLOR);
+    }
     else
+    {
        node->setMaterialType(irr::video::EMT_SOLID);
+    }
 } 

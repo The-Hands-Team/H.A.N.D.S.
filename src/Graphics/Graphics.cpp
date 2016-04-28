@@ -275,10 +275,13 @@ void Graphics::setLayerTranslucency(bool b, int z)
 {
     for(int i = 0; i < GRID_WIDTH; i++)
     {
-        for(int j = 0; j < GRID_WIDTH; j++)
+        for(int j = 0; j < GRID_HEIGHT; j++)
         {
             gridcoord coord = gridcoord(i,j,z);
-            dirObjects.at(coord).setTranslucent(b, driver);
+            if(dirObjects.count(coord))
+            {
+               dirObjects.at(coord).setTranslucent(b);
+            }
         }
     }
 }

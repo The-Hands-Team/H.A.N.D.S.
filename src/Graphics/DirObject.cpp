@@ -95,5 +95,5 @@ void DirObject::setTranslucent(bool b)
     {
        node->setMaterialType(irr::video::EMT_SOLID);
     }
-    text_node->setVisible(b);
+    //text_node->setVisible(b);
 } 

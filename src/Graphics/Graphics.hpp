@@ -113,6 +113,8 @@ private:
     void checkScroll(scene::ICameraSceneNode*, EventListener&);
     void checkTilt(scene::ICameraSceneNode* cam, EventListener& receiver);
     void drawHands();
+    void setLayerTranslucency(bool b, int z);
+    void setLayerTranslucencies(int z);
     gridcoord convertToLDS(float x, float y, float z);
     gridcoord convertToLDS(std::tuple<float,float,float>);
     //std::pair<gridcoord, DirObject> 

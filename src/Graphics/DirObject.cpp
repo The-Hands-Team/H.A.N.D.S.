@@ -71,3 +71,11 @@ void DirObject::setIsHighlighted(bool h, irr::video::IVideoDriver* driver)
         node->setMaterialTexture(0, driver->getTexture("media/unselected.jpg"));
     }
 }
+
+void DirObject::setTranslucent(bool b, irr::video::IVideoDriver* driver)
+{
+    if(b)
+       node->setMaterialType(irr::video::EMT_TRANSPARENT_ADD_COLOR);
+    else
+       node->setMaterialType(irr::video::EMT_SOLID);
+} 

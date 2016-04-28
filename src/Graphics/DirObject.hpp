@@ -21,6 +21,7 @@ public:
     void setNode(irr::scene::ISceneNode*);
     irr::scene::ISceneNode* getNode();
     void setIsHighlighted(bool, irr::video::IVideoDriver*);
+    void setTranslucent(bool, irr::video::IVideoDriver*);
 private:
     char type;
     irr::f32 x;

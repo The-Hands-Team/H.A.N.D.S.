@@ -267,9 +267,27 @@ void Graphics::drawHands()
 
         }
         currentHighlightPosition = pos;
-        float a,b,c;
-        std::tie(a,b,c) = pos;
-        //std::cout << "setting curHP: " << a << "," << b << "," << c << std::endl;
+        setLayerTranslucencies(std::get<2>(pos));
+    }
+}
+
+void Graphics::setLayerTranslucency(bool b, int z)
+{
+    for(int i = 0; i < GRID_WIDTH; i++)
+    {
+        for(int j = 0; j < GRID_WIDTH; j++)
+        {
+            gridcoord coord = gridcoord(i,j,z);
+            dirObjects.at(coord).setTranslucent(b, driver);
+        }
+    }
+}
+
+void Graphics::setLayerTranslucencies(int z)
+{
+    for(int i = 0; i < GRID_DEPTH; i++)
+    {
+       setLayerTranslucency(i<z,i);
     }
 }
 

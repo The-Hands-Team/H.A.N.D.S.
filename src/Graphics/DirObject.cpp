@@ -1,3 +1,5 @@
+#include <iostream>
+#include "irrlicht/IBillboardTextSceneNode.h"
 #include "DirObject.hpp"
 
 DirObject::DirObject()
@@ -81,9 +83,5 @@ void DirObject::setTranslucent(bool b)
     else
     {
        node->setMaterialType(irr::video::EMT_SOLID);
-    }
-    for(irr::scene::ISceneNode* child : node->getChildren())
-    {
-        child->setVisible(b);
     }
 } 

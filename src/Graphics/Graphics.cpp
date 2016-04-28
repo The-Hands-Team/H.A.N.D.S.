@@ -411,6 +411,8 @@ void Graphics::mainLoop()
     // how long it was since the last frame
     // u32 then = device->getTimer()->getTime();
 
+    smgr->setActiveCamera(cams[CAM_PERSP]);
+
     while( run && device->run() )
     {
 

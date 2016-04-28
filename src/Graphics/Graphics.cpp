@@ -52,7 +52,7 @@ Graphics::Graphics()
     for( size_t i = 0; nullptr == device && i < preferedDrivers.size(); i++ )
     {
         device = createDevice(preferedDrivers[i],
-                core::dimension2d<u32>(800, 800), 16, false, false, false, &receiver);
+                core::dimension2d<u32>(933, 800), 16, false, false, false, &receiver);
     }
 
     if( nullptr != device )
@@ -165,7 +165,7 @@ void Graphics::fillNodes()
 
                 newNode->setPosition(core::vector3df
                         (
-                         Xpos * CELL_WIDTH + CELL_WIDTH/2.0,
+                         Xpos * CELL_WIDTH + CELL_WIDTH*1.5,
                          -(Ypos * CELL_WIDTH + CELL_WIDTH/2.0),
                          Zpos * CELL_HEIGHT + CAM_HEIGHT
                         ));
@@ -244,6 +244,7 @@ void Graphics::drawHands()
     if( !rightHandFound )
     {
         rightHand.setVisible(false);
+        setLayerTranslucencies(-1);
     }
     else
     {
@@ -261,7 +262,7 @@ void Graphics::drawHands()
 
         }
         currentHighlightPosition = pos;
-        setLayerTranslucencies(std::get<2>(pos));
+        setLayerTranslucencies(std::get<2>(pos) + 0.5);
     }
 }
 
@@ -290,7 +291,7 @@ void Graphics::setLayerTranslucencies(int z)
 
 gridcoord Graphics::convertToLDS(float x, float y, float z)
 {
-    return std::make_tuple((x - CELL_WIDTH/2.0)/CELL_WIDTH + 0.5,
+    return std::make_tuple((x - CELL_WIDTH*1.5)/CELL_WIDTH + 0.5,
                            (-y - CELL_WIDTH/2.0)/CELL_WIDTH + 0.5,
                            (z - CAM_HEIGHT)/CELL_HEIGHT);
 }
@@ -303,67 +304,6 @@ gridcoord Graphics::convertToLDS(std::tuple<float,float,float> coords)
 irr::core::vector3df Graphics::convertLeapToIrr(float x, float y, float z)
 {
    return irr::core::vector3df(Graphics::VIEW_WIDTH/2.0+50*x,-Graphics::VIEW_HEIGHT/2.0+2*CELL_WIDTH+50*(y-1),Graphics::CAM_HEIGHT+CELL_WIDTH+50*(-z));
-}
-
-void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener& receiver)
-{
-   if(receiver.IsKeyDown(irr::KEY_KEY_Z))
-   {
-  cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+1, cam->getPosition().Z));
-  cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y+1, cam->getTarget().Z));
-   }
-   if(receiver.IsKeyDown(irr::KEY_KEY_X))
-   {
-  cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-1, cam->getPosition().Z));
-  cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y-1, cam->getTarget().Z));
-   }
-}
-
-void Graphics::checkTilt(scene::ICameraSceneNode* cam, EventListener& receiver)
-{
-   if(receiver.IsKeyDown(irr::KEY_KEY_I) && !tiltingU)
-   {
-      cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+25, cam->getPosition().Z));
-      tiltingU = true;
-   }
-   else if(!receiver.IsKeyDown(irr::KEY_KEY_I) && tiltingU)
-   {
-      cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-25, cam->getPosition().Z));
-  tiltingU = false;
-   }
-
-   if(receiver.IsKeyDown(irr::KEY_KEY_K) && !tiltingD)
-   {
-      cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-25, cam->getPosition().Z));
-      tiltingD = true;
-   }
-   else if(!receiver.IsKeyDown(irr::KEY_KEY_K) && tiltingD)
-   {
-      cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+25, cam->getPosition().Z));
-  tiltingD = false;
-   }
-
-   if(receiver.IsKeyDown(irr::KEY_KEY_J) && !tiltingL)
-   {
-      cam->setPosition(core::vector3df(cam->getPosition().X-25, cam->getPosition().Y, cam->getPosition().Z));
-      tiltingL = true;
-   }
-   else if(!receiver.IsKeyDown(irr::KEY_KEY_J) && tiltingL)
-   {
-      cam->setPosition(core::vector3df(cam->getPosition().X+25, cam->getPosition().Y, cam->getPosition().Z));
-  tiltingL = false;
-   }
-
-   if(receiver.IsKeyDown(irr::KEY_KEY_L) && !tiltingR)
-   {
-      cam->setPosition(core::vector3df(cam->getPosition().X+25, cam->getPosition().Y, cam->getPosition().Z));
-      tiltingR = true;
-   }
-   else if(!receiver.IsKeyDown(irr::KEY_KEY_L) && tiltingR)
-   {
-      cam->setPosition(core::vector3df(cam->getPosition().X-25, cam->getPosition().Y, cam->getPosition().Z));
-  tiltingR = false;
-   }
 }
 
 void Graphics::createCameras()
@@ -505,4 +445,70 @@ std::wstring Graphics::currentHighlightedPath()
     {
         return std::wstring();
     }
+}
+
+
+
+
+
+
+void Graphics::checkScroll(irr::scene::ICameraSceneNode* cam, EventListener& receiver)
+{
+   if(receiver.IsKeyDown(irr::KEY_KEY_Z))
+   {
+  cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+1, cam->getPosition().Z));
+  cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y+1, cam->getTarget().Z));
+   }
+   if(receiver.IsKeyDown(irr::KEY_KEY_X))
+   {
+  cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-1, cam->getPosition().Z));
+  cam->setTarget(core::vector3df(cam->getTarget().X, cam->getTarget().Y-1, cam->getTarget().Z));
+   }
+}
+
+void Graphics::checkTilt(scene::ICameraSceneNode* cam, EventListener& receiver)
+{
+   if(receiver.IsKeyDown(irr::KEY_KEY_I) && !tiltingU)
+   {
+      cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+25, cam->getPosition().Z));
+      tiltingU = true;
+   }
+   else if(!receiver.IsKeyDown(irr::KEY_KEY_I) && tiltingU)
+   {
+      cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-25, cam->getPosition().Z));
+  tiltingU = false;
+   }
+
+   if(receiver.IsKeyDown(irr::KEY_KEY_K) && !tiltingD)
+   {
+      cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y-25, cam->getPosition().Z));
+      tiltingD = true;
+   }
+   else if(!receiver.IsKeyDown(irr::KEY_KEY_K) && tiltingD)
+   {
+      cam->setPosition(core::vector3df(cam->getPosition().X, cam->getPosition().Y+25, cam->getPosition().Z));
+  tiltingD = false;
+   }
+
+   if(receiver.IsKeyDown(irr::KEY_KEY_J) && !tiltingL)
+   {
+      cam->setPosition(core::vector3df(cam->getPosition().X-25, cam->getPosition().Y, cam->getPosition().Z));
+      tiltingL = true;
+   }
+   else if(!receiver.IsKeyDown(irr::KEY_KEY_J) && tiltingL)
+   {
+      cam->setPosition(core::vector3df(cam->getPosition().X+25, cam->getPosition().Y, cam->getPosition().Z));
+  tiltingL = false;
+   }
+
+   if(receiver.IsKeyDown(irr::KEY_KEY_L) && !tiltingR)
+   {
+      cam->setPosition(core::vector3df(cam->getPosition().X+25, cam->getPosition().Y, cam->getPosition().Z));
+      tiltingR = true;
+   }
+   else if(!receiver.IsKeyDown(irr::KEY_KEY_L) && tiltingR)
+   {
+      cam->setPosition(core::vector3df(cam->getPosition().X-25, cam->getPosition().Y, cam->getPosition().Z));
+  tiltingR = false;
+   }
 }

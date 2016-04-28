@@ -1,7 +1,15 @@
-rm -r tests/
-mkdir tests
+if [ ! -d tests ]
+    then
+        mkdir tests
+fi
+rm -r tests/TRASH
+rm -r tests/test_dir
 mkdir tests/TRASH
 mkdir tests/test_dir
+if [ -a tests/example.pdf ]
+    then
+        cp tests/example.pdf tests/test_dir/example.pdf
+fi
 touch tests/test_dir/file1.txt
 printf "content" >> tests/test_dir/file1.txt
 touch tests/test_dir/file2.txt

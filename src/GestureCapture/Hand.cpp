@@ -49,11 +49,11 @@ bool Hand::isLeft(){
 std::tuple<float,float,float> Hand::getPalmLocation(){
     float palmX, palmY, palmZ;
     std::tie( palmX, palmY, palmZ ) = palm;
-  return std::make_tuple(palmX/box[0], palmY/box[1], palmZ/box[2]);
+  return std::make_tuple(palmX/box[0] - 0.25, palmY/box[1], palmZ/box[2]);
 }
 
 std::tuple<float,float,float> Hand::getFingerLocation(int fingerIndex){
-  return std::make_tuple(fingers[fingerIndex][0]/box[0], fingers[fingerIndex][1]/box[1], fingers[fingerIndex][2]/box[2]);
+  return std::make_tuple(fingers[fingerIndex][0]/box[0] - 0.25, fingers[fingerIndex][1]/box[1], fingers[fingerIndex][2]/box[2]);
 }
 
 
@@ -64,7 +64,7 @@ std::array<std::array<std::tuple<float,float,float>, 4>, 5> Hand::getFingers(){
     {
     	float x,y,z;
     	std::tie(x,y,z) = wow[f][b];
-      fings[f][b] = std::make_tuple(x/box[0], y/box[1], z/box[2]);
+      fings[f][b] = std::make_tuple(x/box[0] - 0.25, y/box[1], z/box[2]);
     }
   return std::move(fings);
 }

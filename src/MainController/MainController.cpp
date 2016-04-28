@@ -191,7 +191,8 @@ void MainController::deleteSelected()
 
     if( 0 < toDel.size() )
     {
-        fm.deleteFiles(toDel);
+        moveInto( fs::path("tests/TRASH") );
+        //fm.deleteFiles(toDel);
     }
 
     clearSelected();

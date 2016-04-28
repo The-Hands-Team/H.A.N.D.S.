@@ -33,7 +33,6 @@ DirObject::~DirObject()
     if (nullptr != node)
     {
         node->remove();
-        text_node->remove();
     }
 }
 

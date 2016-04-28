@@ -21,8 +21,11 @@ MainController::MainController()
 {
     curInstance = this;
     
+    
+    
     //blocks until Graphics Initialized
     Graphics::waitForInit();
+    
 
     updateDirectory(cur_path);
 
@@ -46,24 +49,24 @@ void MainController::mainLoop()
     
     while(Graphics::getInstance())
     {
-		try 
-		{
+                try 
+                {
         sendCurrentPath();
         //got something in queue
 
         ev = gq.pop();
         processEvent(ev);
-		}
-		catch (const std::exception& e)
-		{
-			std::cerr << e.what() << std::endl;
-		}
+                }
+                catch (const std::exception& e)
+                {
+                        std::cerr << e.what() << std::endl;
+                }
     }
 }
 
 bool MainController::isLong(enum GestType gt)
 {
-    return gt == GestType::GRAB;
+    return gt == GestType::GRAB || gt == GestType::PINCH;
 }
 
 void MainController::updateDirectory(fs::path new_dir)
@@ -98,7 +101,7 @@ void MainController::updateDirectory(fs::path new_dir)
 void MainController::chdirUp()
 {
     if( cur_path.parent_path() != fs::path( "tests" ) )
-	updateDirectory(cur_path.parent_path());
+        updateDirectory(cur_path.parent_path());
 }
 
 void MainController::chdirDown()
@@ -218,12 +221,12 @@ bool MainController::hasTarget()
 
 fs::directory_entry MainController::curEntry()
 {
-	//instead of new_dir_i, call da biz
+        //instead of new_dir_i, call da biz
     unsigned int i = pathToIndex(Graphics::getInstance()->currentHighlightedPath());
     if ((unsigned int) -1 == i)
     {
         std::cerr << "Attempted to access element when nothing is highlighted!\n";
-        return new_dir_contents[0];
+        return fs::directory_entry();
     }
     return new_dir_contents[i];
 }
@@ -236,10 +239,10 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
         {
             //std::cout << "Stopping! " << (GestHand::RIGHT == ge->getHandedness() ? "right" : "left")<< std::endl;
         }
-	//lonk or short
-	//the handz
-		//keep track of hands and their gestures
-	//
+        //lonk or short
+        //the handz
+                //keep track of hands and their gestures
+        //
         if (!isLong(ge->getGesture()))
         {
             curGests[GestHand::RIGHT == ge->getHandedness() ? RIGHT : LEFT] = GestType::INVALID_GESTURE;
@@ -257,45 +260,57 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
             //TODO: verify that we can assume only 1 gesture per hand at a time
             curGests[GestHand::RIGHT == ge->getHandedness() ? RIGHT : LEFT] = ge->isStopping() ? GestType::INVALID_GESTURE : ge->getGesture();
         }
-	switch (ge->getGesture())
-	{
-	case GestType::PINCH:
-		if( GestHand::RIGHT == ge->getHandedness() )
-		{
-                    if( GestType::GRAB == curGests[LEFT] )
+        switch (ge->getGesture())
+        {
+        case GestType::PINCH:
+                if( GestHand::RIGHT == ge->getHandedness() )
+                {
+                    if( GestType::GRAB == curGests[LEFT] && ge->isStopping() )
                     {
-                        chdirDown();
+                        #ifdef __linux
+                            fs::path p = curEntry().path();
+                            if( !p.empty() && !fs::is_directory( p ) )
+                            {
+                                std::string command = "xdg-open " + p.native();
+                                system(command.c_str());
+                                std::cout << command << std::endl;
+                            }
+                            else
+                        #endif //__linux
+                            {
+                                chdirDown();
+                            }
                         break;
                     }
-                    else
+                    else if ( !ge->isStopping() )
                     {
-			select();
-			break;
+                        select();
+                        break;
                     }
-		}
-		else
-		{
-			copyInto( cur_path );
-		}
-	case GestType::SCREEN_TAP:
-		if( GestHand::RIGHT == ge->getHandedness() )
-		{
-			std::cout << cur_path << std::endl;
-		}
-		break;
-	case GestType::CIRCLE:
-	    if( GestHand::RIGHT == ge->getHandedness() )
-	    {
-			if( GestDir::RIGHT == ge->getDir() )
-			{
-				fm.redo();
-			}
-			else
-			{
-				fm.undo();
-			}
-		}
-		break;
+                }
+                else
+                {
+                        copyInto( cur_path );
+                }
+        case GestType::SCREEN_TAP:
+                if( GestHand::RIGHT == ge->getHandedness() )
+                {
+                        std::cout << cur_path << std::endl;
+                }
+                break;
+        case GestType::CIRCLE:
+            if( GestHand::RIGHT == ge->getHandedness() )
+            {
+                        if( GestDir::RIGHT == ge->getDir() )
+                        {
+                                fm.redo();
+                        }
+                        else
+                        {
+                                fm.undo();
+                        }
+                }
+                break;
         case GestType::GRAB:
                 if( GestHand::RIGHT == ge->getHandedness() )
                 {
@@ -312,54 +327,54 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
                 {
                     std::cout << "Left Grab\n";
                 }
-	case GestType::SWIPE:
-		if( GestHand::LEFT == ge->getHandedness() )
-		{
-			switch (ge->getDir())
-			{
-			case GestDir::UP:
-				chdirUp();
-				break;
-			case GestDir::DOWN:
-				chdirDown();
-				break;
-			case GestDir::RIGHT:
-				iterateForward();
-				break;
-			case GestDir::LEFT:
-				iterateBack();
-				break;
-			default:
-				break;
-			}
-		}
-		else
-		{
-			/*switch (ge->getDir())
-			{
-			case GestDir::UP:
-			    if( cur_path.parent_path() != fs::path( "tests" ) )
-				copyInto(cur_path.parent_path());
-			    break;
-			case GestDir::DOWN:
-			    copyInto(curEntry());
-			    break;
-			case GestDir::RIGHT:
-			    if( cur_path.parent_path() != fs::path( "tests" ) )
-				moveInto(cur_path.parent_path());
-			    break;
-			case GestDir::LEFT:
-			    moveInto(curEntry());
-			    break;
-			default:
-			    break;
-			}*/
-		}
-		break;
-	default:
-		std::cout << "Gesture not supported\n";
-		break;
-	}
+        case GestType::SWIPE:
+                if( GestHand::LEFT == ge->getHandedness() )
+                {
+                        switch (ge->getDir())
+                        {
+                        case GestDir::UP:
+                                chdirUp();
+                                break;
+                        case GestDir::DOWN:
+                                chdirDown();
+                                break;
+                        case GestDir::RIGHT:
+                                iterateForward();
+                                break;
+                        case GestDir::LEFT:
+                                iterateBack();
+                                break;
+                        default:
+                                break;
+                        }
+                }
+                else
+                {
+                        /*switch (ge->getDir())
+                        {
+                        case GestDir::UP:
+                            if( cur_path.parent_path() != fs::path( "tests" ) )
+                                copyInto(cur_path.parent_path());
+                            break;
+                        case GestDir::DOWN:
+                            copyInto(curEntry());
+                            break;
+                        case GestDir::RIGHT:
+                            if( cur_path.parent_path() != fs::path( "tests" ) )
+                                moveInto(cur_path.parent_path());
+                            break;
+                        case GestDir::LEFT:
+                            moveInto(curEntry());
+                            break;
+                        default:
+                            break;
+                        }*/
+                }
+                break;
+        default:
+                std::cout << "Gesture not supported\n";
+                break;
+        }
 }
 
 void MainController::processEvent(std::unique_ptr<Message>& m)
@@ -375,7 +390,7 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
         case Message::GESTURE:
         {
             handleGestureMessage(dynamic_unique_move<GestureMessage>(std::move(m)));
-		}
+                }
         break;
         case Message::KEYPRESS:
         {
@@ -383,17 +398,17 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
             if(ke->getPressed())
                 switch(ke->getKey())
                 {
-				case irr::EKEY_CODE::KEY_KEY_U:
-					fm.undo();
-					break;
-				case irr::EKEY_CODE::KEY_KEY_R:
-					fm.redo();
-					break;
+                                case irr::EKEY_CODE::KEY_KEY_U:
+                                        fm.undo();
+                                        break;
+                                case irr::EKEY_CODE::KEY_KEY_R:
+                                        fm.redo();
+                                        break;
                 case irr::EKEY_CODE::KEY_KEY_C:
                     if( ke->getShift() )
                     {
-			if( cur_path.parent_path() != fs::path( "tests" ) )
-			    copyInto(cur_path.parent_path());
+                        if( cur_path.parent_path() != fs::path( "tests" ) )
+                            copyInto(cur_path.parent_path());
                     }
                     else if ( ke->getCtrl() )
                     {
@@ -410,8 +425,8 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                 case irr::EKEY_CODE::KEY_KEY_M:
                     if( ke->getShift() )
                     {
-			if( cur_path.parent_path() != fs::path( "tests" ) )
-			    moveInto(cur_path.parent_path());
+                        if( cur_path.parent_path() != fs::path( "tests" ) )
+                            moveInto(cur_path.parent_path());
                     }
                     else if ( ke->getCtrl() )
                     {
@@ -467,8 +482,8 @@ void MainController::processEvent(std::unique_ptr<Message>& m)
                     if( FileSystemAction::COPY == fe->getAction() &&
                         fs::exists( fe->getPath2() ) &&
                         fs::exists( fe->getPath1() ) &&
-			!fs::is_directory( fe->getPath1() ) &&
-			!fs::is_directory( fe->getPath2() ) &&
+                        !fs::is_directory( fe->getPath1() ) &&
+                        !fs::is_directory( fe->getPath2() ) &&
                         fs::file_size(fe->getPath1()) == fs::file_size(fe->getPath2()))
                     {
                         std::cout << fs::file_size(fe->getPath1()) << std::endl;
@@ -514,18 +529,18 @@ void MainController::sendCurrentPath()
 
 unsigned int MainController::pathToIndex(std::wstring p)
 {
-	if (p.empty())
-	{
+        if (p.empty())
+        {
         return -1;
-	}
+        }
     for ( unsigned int i = 0; i < new_dir_contents.size(); i++)
-	{
+        {
         if (p == new_dir_contents[i].path().filename().wstring())
-		{
+                {
             return i;
-	    }
-	}
-	return -1;
+            }
+        }
+        return -1;
 }
 
 // Start it all.

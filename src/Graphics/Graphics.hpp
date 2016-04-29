@@ -50,18 +50,22 @@ public:
     static const int VIEW_HEIGHT = CELL_WIDTH * (GRID_HEIGHT + 1);
     static const int VIEW_DEPTH = CELL_WIDTH * (GRID_DEPTH + 1);
     static const int CAM_HEIGHT = CELL_WIDTH * GRID_WIDTH;
+    static const int max_text_length;
 
     static irr::core::vector3df convertLeapToIrr(float,float,float);
 
     static Graphics* getInstance();
 
     void newObjects( std::vector<DirObject> );
+    std::wstring pickUpHighlighted();
+    void dropHeld(bool dropInDir);
     
     static void initGraphics();
     static void waitForInit();
     static void killGraphics();
 
-	std::wstring currentHighlightedPath();
+    std::wstring currentHighlightedPath();
+    static const gridcoord INVALID_POSITION;
 
 private:
 
@@ -79,9 +83,7 @@ private:
     static Graphics* instance;
     static std::promise<bool> isGraphicsReady;
     
-    static const gridcoord INVALID_POSITION;
 
-    static const int max_text_length;
     static const std::array<video::E_DRIVER_TYPE, 6> preferedDrivers;
 
     IrrlichtDevice*       device;
@@ -117,6 +119,7 @@ private:
     void setLayerTranslucencies(int z);
     gridcoord convertToLDS(float x, float y, float z);
     gridcoord convertToLDS(std::tuple<float,float,float>);
+    void addObjAt(std::vector<DirObject>, gridcoord);
     //std::pair<gridcoord, DirObject> 
 
 };

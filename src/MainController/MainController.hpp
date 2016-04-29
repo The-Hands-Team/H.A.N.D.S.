@@ -45,6 +45,9 @@ private:
     const int RIGHT = 1;   
     bool isLong(enum GestType);
     bool hasTarget();
+
+    std::wstring heldPath;
+
 public:
     MainController();
     ~MainController();

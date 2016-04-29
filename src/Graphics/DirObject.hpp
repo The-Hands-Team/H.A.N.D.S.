@@ -9,6 +9,7 @@ class DirObject
 public:
     DirObject();
     DirObject(char i_type, irr::f32 i_x, irr::f32 i_y, const std::wstring& i_name, bool i_isHighlighted, bool i_isSelected );
+    DirObject( const DirObject&);
     ~DirObject();
     char getType();
     irr::f32 getX();
@@ -22,6 +23,7 @@ public:
     irr::scene::IBillboardTextSceneNode* getNodeText();
     void setIsHighlighted(bool, irr::video::IVideoDriver*);
     void setTranslucent(bool);
+    void setVisible(bool);
 private:
     char type;
     irr::f32 x;

@@ -1,12 +1,16 @@
 #include "GHand.hpp"
 #include "Graphics.hpp"
 #include "irrlicht/irrlicht.h"
+#include "irrlicht/IBillboardTextSceneNode.h"
 
 #include <tuple>
 
 GHand::GHand()
 : palm(nullptr)
 , fingers({{nullptr}})
+, heldObj(nullptr)
+, heldNode(nullptr)
+, heldObjLoc(Graphics::INVALID_POSITION)
 {}
 
 void GHand::init(irr::scene::ISceneManager* smgr)
@@ -86,6 +90,14 @@ std::tuple<float,float,float> GHand::getXYZ()
 }
 void GHand::setVisible(bool vis)
 {
+    if (false == vis)
+    {
+        //TODO: drop the object
+        //heldObj = nullptr;
+        //heldObjLoc = Graphics::INVALID_POSITION;
+        //heldNode = nullptr;
+        dropObj();
+    }
     if(palm)
     {
         palm->setVisible(vis);
@@ -173,4 +185,69 @@ void GHand::copyHand(Hand& hand)
        }
     }
 
+    if(heldNode)
+    {
+        //TODO:set pos to selector pos
+        heldNode->setPosition(selector->getPosition());
+    }
+
+}
+
+void GHand::pickUp(DirObject& target, gridcoord targetLoc, irr::scene::ISceneManager* smgr, irr::gui::IGUIEnvironment* env)
+{
+    //selector->invis
+    selector->setVisible(false);
+    //heldNode = proper biz
+    if (target.getType() == 'f')
+    {
+        heldNode = smgr->addSphereSceneNode(0.5*Graphics::OBJ_WIDTH);
+    }
+    else
+    {
+        heldNode = smgr->addCubeSceneNode(Graphics::OBJ_WIDTH);
+    }
+
+    if (heldNode)
+    {
+        heldObjLoc = targetLoc;
+        heldNode->setPosition(selector->getPosition());
+        smgr->getMeshManipulator()->setVertexColors(heldNode->getMesh(), irr::video::SColor(255,0,255,0));
+        std::wstring finished_name( target.getName() );
+
+        if( !target.isHighlighted && finished_name.length() > Graphics::max_text_length )
+        {
+            finished_name.erase( Graphics::max_text_length - 3 );
+            finished_name += L"...";
+        }
+        scene::IBillboardTextSceneNode* newTextNode = smgr->addBillboardTextSceneNode
+                    (
+                     env->getFont("media/bigfont.png"),
+                     finished_name.c_str(),
+                     heldNode,
+                     core::dimension2d<f32>( finished_name.length() * (Graphics::CELL_WIDTH/(float) Graphics::max_text_length), Graphics::CELL_WIDTH*0.2),
+                     core::vector3df(0,0,-Graphics::OBJ_WIDTH/2.0 - Graphics::CELL_WIDTH/10.0),
+                     -1,
+                     video::SColor(100,255,255,255),
+                     video::SColor(100,255,255,255)
+                    );
+        heldNode->setMaterialFlag(video::EMF_LIGHTING, true);
+    }
+    //target->invis
+    target.setVisible(false);
+}
+
+gridcoord GHand::dropObj()
+{
+    if (heldNode)
+    {
+    heldNode->remove();
+    //heldNode->setVisible(false);
+    heldNode = nullptr;
+    selector->setVisible(true);
+    gridcoord ret = heldObjLoc;
+    heldObj = nullptr;
+    heldObjLoc = Graphics::INVALID_POSITION;
+    return ret;
+    }
+    return Graphics::INVALID_POSITION;
 }

@@ -2,12 +2,15 @@
 #include "DirObject.hpp"
 
 DirObject::DirObject()
-    :isHighlighted(false)
+    : isHighlighted(false)
+    , isSelected( false )
     , type('f')
     , x(5)
     , y(5)
     , name(L"")
     {
+        node = nullptr;
+        text_node = nullptr;
     }
 
 DirObject::DirObject( char i_type
@@ -31,8 +34,27 @@ DirObject::~DirObject()
 {
     if (nullptr != node)
     {
-        node->remove();
+        if( 1 < node->getReferenceCount() )
+        {
+             node->drop();
+        }
+        else
+        {
+            node->remove();
+        }
     }
+}
+
+DirObject::DirObject( const DirObject& other ):DirObject()
+{
+    isHighlighted = other.isHighlighted;
+    type = other.type;
+    name = other.name;
+    //if( nullptr != other.node )
+    //{
+        node = other.node;
+        //node->grab();
+    //}
 }
 
 char DirObject::getType()
@@ -96,3 +118,8 @@ void DirObject::setTranslucent(bool b)
     }
     //text_node->setVisible(b);
 } 
+
+void DirObject::setVisible(bool b)
+{
+    node->setVisible(b);
+}

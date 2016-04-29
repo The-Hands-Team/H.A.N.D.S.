@@ -127,6 +127,118 @@ void Graphics::newObjects( std::vector<DirObject> objs )
     objLock.unlock();
 }
 
+std::wstring Graphics::pickUpHighlighted()
+{
+    //find highlighted thing
+    if( INVALID_POSITION != currentHighlightPosition
+            && dirObjects.count(currentHighlightPosition) )
+    {
+        //call righthand->pickup it
+        rightHand.pickUp(dirObjects.at(currentHighlightPosition), currentHighlightPosition, smgr, env);
+        return dirObjects.at(currentHighlightPosition).getName();
+    }
+    else
+    {
+        return std::wstring();
+    }
+}
+
+void Graphics::addObjAt(std::vector<DirObject> objs, gridcoord pos)
+{
+    int x,y,z;
+    std::tie(x,y,z) = pos;
+    dirObjects.insert(std::make_pair<gridcoord, DirObject>(std::make_tuple(x,y,z), std::move(objs.back())));
+    objs.pop_back();
+}
+
+void Graphics::dropHeld(bool dropInDir)
+{
+    int x,y,z;
+    std::tie(x,y,z) = currentHighlightPosition;
+    gridcoord droppedLoc = rightHand.dropObj();
+    if (INVALID_POSITION != droppedLoc)
+    {
+    DirObject& dropped = dirObjects.at(droppedLoc);
+        if (dropInDir)
+        {
+            //ice it
+            dirObjects.erase(droppedLoc);
+        }
+        else if (x < 0 || x > GRID_WIDTH || y < 0 || y > GRID_HEIGHT || z < 0 || z > GRID_DEPTH || dirObjects.count(currentHighlightPosition)/*something here or out of bounds*/)
+        {
+            //put it back
+            dropped.setVisible(true);
+        }
+        else //empty/valid spot
+        {
+            std::cerr << "Adding?\n";
+            //dropped.setVisible(true);
+            //dirObjects.insert(std::make_pair(currentHighlightPosition, DirObject(dropped)));//DirObject(dropped.getType(),0,0,dropped.getName(),0,0)));
+            //dirObjects.insert(std::make_pair<gridcoord,DirObject>(currentHighlightPosition, DirObject(dropped.getType(),0,0,dropped.getName(),0,0)));
+            //dirObjects.erase(droppedLoc);
+            //DirObject newDO(dropped.getType(),0,0,dropped.getName(),0,0);
+            //dirObjects.emplace(currentHighlightPosition, dropped.getType(),0,0,dropped.getName(),0,0);
+            std::vector<DirObject> objs{};
+            objs.emplace_back( dropped.getType(),0,0,dropped.getName(),0,0 );
+            addObjAt(std::move(objs), currentHighlightPosition);
+            //dirObjects.insert(std::make_pair(currentHighlightPosition, DirObject(dropped.getType(),0,0,dropped.getName(),0,0)));
+            DirObject& newDO = dirObjects.at(currentHighlightPosition);
+            scene::IMeshSceneNode* newNode;
+            scene::IBillboardTextSceneNode* newTextNode;
+            if(newDO.getType() == 'f')
+            {
+                newNode = smgr->addSphereSceneNode(0.5*OBJ_WIDTH);
+            }
+            else
+            {
+                newNode = smgr->addCubeSceneNode(OBJ_WIDTH);
+            }
+            float Xpos,Ypos,Zpos;
+            std::tie(Xpos,Ypos,Zpos) = currentHighlightPosition;
+            if(newNode)
+            {
+                //dirNodes.push_back(newNode);
+                newDO.setNode(newNode);
+
+                newNode->setPosition(core::vector3df
+                        (
+                         Xpos * CELL_WIDTH + CELL_WIDTH*1.5,
+                         -(Ypos * CELL_WIDTH + CELL_WIDTH/2.0),
+                         Zpos * CELL_HEIGHT + CAM_HEIGHT
+                        ));
+                std::wstring finished_name( newDO.getName() );
+
+                if( !newDO.isHighlighted && finished_name.length() > max_text_length )
+                {
+                    finished_name.erase( max_text_length - 3 );
+                    finished_name += L"...";
+                }
+                smgr->getMeshManipulator()->setVertexColors(newNode->getMesh(), irr::video::SColor(255,0,0,255));
+                if(newDO.isSelected)
+                {
+                    newNode->setMaterialFlag(video::EMF_WIREFRAME, true);
+                }
+                newNode->setMaterialFlag(video::EMF_LIGHTING, true);
+                newTextNode = smgr->addBillboardTextSceneNode
+                    (
+                     env->getFont("media/bigfont.png"),
+                     finished_name.c_str(),
+                     newNode,
+                     core::dimension2d<f32>( finished_name.length() * (CELL_WIDTH/(float) max_text_length), CELL_WIDTH*0.2),
+                     core::vector3df(0,0,-OBJ_WIDTH/2.0 - CELL_WIDTH/10.0),
+                     -1,
+                     //dirNodes.size(),
+                     video::SColor(100,255,255,255),
+                     video::SColor(100,255,255,255)
+                    );
+                newDO.setNodeText(newTextNode);
+                dirObjects.erase(droppedLoc);
+                //dirObjects.insert(std::make_pair(currentHighlightPosition, newDO));//DirObject(dropped.getType(),0,0,dropped.getName(),0,0)));
+            }
+        }
+    }
+}
+
 void Graphics::emptyNodes()
 {
     /*for( scene::ISceneNode* node : dirNodes )
@@ -224,16 +336,16 @@ void Graphics::drawHands()
         {
             rightHand.copyHand(hands[i]);
             rightHandFound = true;
-            float x,y,z;
-            std::tie(x,y,z) = hands[i].getPalmLocation();
+            //float x,y,z;
+            //std::tie(x,y,z) = hands[i].getPalmLocation();
             //std::cout << "Right: " << x << ',' << y << ',' << z << std::endl;
         }
         else
         {
             leftHand.copyHand(hands[i]);
             leftHandFound = true;
-            float x,y,z;
-            std::tie(x,y,z) = hands[i].getPalmLocation();
+            //float x,y,z;
+            //std::tie(x,y,z) = hands[i].getPalmLocation();
             //std::cout << "Left : " << x << ',' << y << ',' << z << std::endl;
         }
     }

@@ -313,7 +313,15 @@ void MainController::handleGestureMessage(std::unique_ptr<GestureMessage> ge)
                     }
                     else if ( GestType::GRAB != curGests[LEFT] && !ge->isStopping() )
                     {
-                        select();
+                        heldPath = Graphics::getInstance()->pickUpHighlighted();
+                        //select();
+                        break;
+                    }
+                    else if ( GestType::GRAB != curGests[LEFT])
+                    {
+                        bool dropInDir = hasTarget();
+                        dropInDir = dropInDir && fs::is_directory(curEntry().path());
+                        Graphics::getInstance()->dropHeld(dropInDir);
                         break;
                     }
                 }

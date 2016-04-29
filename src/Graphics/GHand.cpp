@@ -11,14 +11,15 @@ GHand::GHand()
 
 void GHand::init(irr::scene::ISceneManager* smgr)
 {
-    palm = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/2.0);
-    smgr->getMeshManipulator()->setVertexColors(palm->getMesh(), irr::video::SColor(255,0,0,255));
+    irr::video::SColor handColor(255, 200,200,200);
+    palm = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/3.0);
+    smgr->getMeshManipulator()->setVertexColors(palm->getMesh(), handColor);
     palm->setMaterialFlag(video::EMF_LIGHTING, false);
     palm->setVisible(false);
     palm->setPosition(irr::core::vector3df(-1,-1,-1));
 
-    selector = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/6.0);
-    smgr->getMeshManipulator()->setVertexColors(selector->getMesh(), irr::video::SColor(0,0,255,255));
+    selector = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/9.0);
+    smgr->getMeshManipulator()->setVertexColors(selector->getMesh(), irr::video::SColor(0,0,255,127));
     selector->setMaterialFlag(video::EMF_LIGHTING, false);
     selector->setVisible(false);
     selector->setPosition(irr::core::vector3df(-1,-1,-1));
@@ -28,9 +29,9 @@ void GHand::init(irr::scene::ISceneManager* smgr)
 
     for(int i = 0; i < 5; i++)
     {
-       fingers[i][0] = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/4.0);
+       fingers[i][0] = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/6.0);
        fingers[i][0]->setVisible(false);
-       smgr->getMeshManipulator()->setVertexColors(fingers[i][0]->getMesh(), irr::video::SColor(255,0,0,255));
+       smgr->getMeshManipulator()->setVertexColors(fingers[i][0]->getMesh(), handColor);
        fingers[i][0]->setMaterialFlag(video::EMF_LIGHTING, false);
        for(int j = 0; j < 3; j++)
        {
@@ -41,8 +42,8 @@ void GHand::init(irr::scene::ISceneManager* smgr)
           fingers[i][j*2+1] = smgr->addMeshSceneNode(mesh);
           fingers[i][j*2+1]->setVisible(false);
           fingers[i][j*2+1]->setPosition(irr::core::vector3df(-1,-1,-1));*/
-          fingers[i][j*2+2] = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/4.0);
-            smgr->getMeshManipulator()->setVertexColors(fingers[i][j*2+2]->getMesh(), irr::video::SColor(255,0,0,255));
+          fingers[i][j*2+2] = smgr->addSphereSceneNode(Graphics::CELL_WIDTH/6.0);
+            smgr->getMeshManipulator()->setVertexColors(fingers[i][j*2+2]->getMesh(), handColor);
             fingers[i][j*2+2]->setMaterialFlag(video::EMF_LIGHTING, false);
           fingers[i][j*2+2]->setVisible(false);
           fingers[i][j*2+2]->setPosition(irr::core::vector3df(-1,-1,-1));

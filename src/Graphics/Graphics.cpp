@@ -52,7 +52,7 @@ Graphics::Graphics()
     for( size_t i = 0; nullptr == device && i < preferedDrivers.size(); i++ )
     {
         device = createDevice(preferedDrivers[i],
-                core::dimension2d<u32>(933, 800), 16, false, false, false, &receiver);
+                core::dimension2d<u32>(1920, 1200), 16, false, false, false, &receiver);
     }
 
     if( nullptr != device )
@@ -237,6 +237,14 @@ void Graphics::drawHands()
             //std::cout << "Left : " << x << ',' << y << ',' << z << std::endl;
         }
     }
+    
+    if( INVALID_POSITION != currentHighlightPosition
+            && dirObjects.count(currentHighlightPosition) )
+        {
+            // TODO remove highlight from following
+            dirObjects.at(currentHighlightPosition).setIsHighlighted(false, driver);
+        }
+    
     if( !leftHandFound )
     {
         leftHand.setVisible(false);
@@ -293,7 +301,7 @@ gridcoord Graphics::convertToLDS(float x, float y, float z)
 {
     return std::make_tuple((x - CELL_WIDTH*1.5)/CELL_WIDTH + 0.5,
                            (-y - CELL_WIDTH/2.0)/CELL_WIDTH + 0.5,
-                           (z - CAM_HEIGHT)/CELL_HEIGHT);
+                           (z - CAM_HEIGHT)/CELL_HEIGHT + 0.5);
 }
 
 gridcoord Graphics::convertToLDS(std::tuple<float,float,float> coords)
@@ -344,7 +352,7 @@ void Graphics::mainLoop()
     // u32 then = device->getTimer()->getTime();
     float mid = VIEW_WIDTH / 2.0;
     smgr->addLightSceneNode(nullptr,
-                            core::vector3df(mid,-mid,-CAM_HEIGHT),
+                            core::vector3df(0,0,-CAM_HEIGHT),
                             video::SColorf(1.0f,1.0f,1.0f),
                             100.0f,
                             -1

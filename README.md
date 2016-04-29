@@ -1,4 +1,4 @@
-# Name TBD
+# H.A.N.D.S.
 
 
 The resources in `include/LeapMotion` and `lib/LeapMotion` are (c) Leap Motion, Inc.  
